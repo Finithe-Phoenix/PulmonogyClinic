@@ -2807,3 +2807,17 @@ dialog::backdrop {
 .page-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; max-width: 460px; }
 .page-actions .button { white-space: nowrap; }
 @media (max-width: 700px) { .page-actions { justify-content: flex-start; width: 100%; } }
+@media (max-width: 760px) {
+  .table-scroll table.inventory-table { min-width: 0; width: 100%; }
+  .inventory-table thead { display: none; }
+  .inventory-table tbody { display: block; }
+  .inventory-table tr { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; padding: 22px 20px; border-bottom: 1px solid var(--border); }
+  .inventory-table tr:last-child { border: 0; }
+  .inventory-table td { display: block; padding: 0; border: 0; min-width: 0; white-space: normal; overflow-wrap: anywhere; }
+  .inventory-table td:first-child { grid-column: 1 / -1; }
+  .inventory-table td:not(:first-child)::before { display: block; color: var(--muted); font-size: 11px; margin-bottom: 8px; }
+  .inventory-table td:nth-child(2)::before { content: "Lote / caducidad"; }
+  .inventory-table td:nth-child(3)::before { content: "Existencias"; }
+  .inventory-table td:nth-child(4)::before { content: "Estado"; }
+  .inventory-table td:nth-child(5)::before { content: "Movimiento"; }
+}

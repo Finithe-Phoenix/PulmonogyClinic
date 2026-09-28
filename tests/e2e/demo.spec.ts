@@ -264,6 +264,7 @@ test('el catálogo admite productos y nuevos lotes sin inventar existencias', as
   await expect(second).toContainText('Cuarentena');
   await expect(first).toContainText('7 uds.');
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  expect(await page.locator('.inventory-table').evaluate(el => el.scrollWidth <= el.parentElement!.clientWidth)).toBe(true);
   await page.screenshot({ path: info.outputPath('catalogo.png'), fullPage: true });
   await page.goto(base + '#/panel/compras');
   await page.getByRole('button', { name: 'Nueva orden', exact: true }).click();
