@@ -1,5 +1,11 @@
 # Backlog de implementación
 
+## Avance v0.5.0 · primera operación privada
+
+SEC-01, INV-02 y COM-02 ahora tienen **portal privado local conectado y verificado**, con Keycloak de desarrollo, PKCE, autorización JWT existente, PostgreSQL, persistencia entre sesiones y concurrencia entre usuarios. DEV-01 tiene Pages habilitado y desplegado; DEV-02 agrega workflow privado con 10 pruebas E2E. Identidad/MFA productivos, hosting y piloto siguen pendientes. [Guía](PRIVATE_PORTAL.md), [96 pruebas locales](VALIDATION.md), [diagnóstico y dependencias](SESSION_2026-09-28.md).
+
+La tabla conserva el alcance completo; los avances de conexión del portal se actualizan debajo.
+
 Base: plan de 18 semanas acordado como referencia, operación actual en papel y Doctoralia. No equivale a una fecha comprometida ni a un expediente clínico terminado.
 
 | ID      | Prioridad | Entrega / criterio de aceptación                                                             | Estado                      |
@@ -10,13 +16,14 @@ Base: plan de 18 semanas acordado como referencia, operación actual en papel y 
 | COM-01  | P0        | Proveedores, órdenes, entregas parciales, trazabilidad por lote, bloqueo de duplicados y cancelación del saldo. | Demo implementada en v0.2.0 |
 | CAJ-01  | P0        | Cobros en centavos, referencias únicas, reversos y cierre ilustrativo.                       | Demo implementada           |
 | CLI-01  | P0        | Flujo de borrador, cierre y adenda, identificado sin validez clínica.                        | Demo implementada           |
-| DEV-01  | P0        | Compilación y pruebas en Actions; artefacto estático para Pages.                             | Workflow implementado       |
+| DEV-01  | P0        | Compilación y pruebas en Actions; artefacto estático para Pages.                             | Pages habilitado, publicado y verificado |
+| DEV-02  | P0        | Portal privado separado, stack local y pruebas integrales de identidad/API/UI.              | Implementado; 10 E2E locales aprobados |
 | DISC-01 | P0        | Confirmar nombre, razón social, sedes, servicios, personal, horarios y plan Doctoralia.      | Pendiente del levantamiento |
 | CLI-02  | P0        | Seleccionar sistema clínico y verificar certificación/versión/alcance, exportación y firma.  | Pendiente de evaluación     |
-| SEC-01  | P0        | Portal privado, identidad/MFA, RBAC en API y pruebas negativas por rol/recurso.              | Inventario y compras con RBAC; identidad/MFA y portal pendientes |
+| SEC-01  | P0        | Portal privado, identidad/MFA, RBAC en API y pruebas negativas por rol/recurso.              | Portal local/Keycloak/PKCE/RBAC verificados; MFA e identidad productiva pendientes |
 | API-01  | P0        | Spring Boot modular, PostgreSQL, migraciones y repositorios con transacciones.               | API de inventario y compras implementada en v0.4.0 |
-| INV-02  | P0        | Catálogo y lotes reales, conteo inicial, compras, recepción parcial, FEFO y concurrencia.    | API de catálogo/lotes/movimientos/FEFO/compras; conexión y conteo real pendientes |
-| COM-02  | P0        | Proveedores y órdenes persistentes; recibir por lote, evitar duplicados/sobreentrega y cancelar saldos con permiso. | API implementada en v0.4.0; conexión del portal pendiente |
+| INV-02  | P0        | Catálogo y lotes reales, conteo inicial, compras, recepción parcial, FEFO y concurrencia.    | API conservada; catálogo, recepción y existencias conectados; conteo real y UI de movimientos pendientes |
+| COM-02  | P0        | Proveedores y órdenes persistentes; recibir por lote, evitar duplicados/sobreentrega y cancelar saldos con permiso. | API y portal local conectados; persistencia y concurrencia verificadas |
 | COM-03  | P1        | Devoluciones, correcciones de entrega, impuestos y documentos acordados con el responsable. | Pendiente del levantamiento |
 | INV-03  | P0        | Procedimientos de antibióticos y categorías reguladas acordes al catálogo real.              | Pendiente del responsable   |
 | CAJ-02  | P0        | Turnos de caja, fondo inicial, autorizaciones de reverso y persistencia privada.             | Pendiente                   |
@@ -35,4 +42,4 @@ Nombre comercial confirmado; servicios/horarios; lista de personal y responsabil
 
 ## Secuencia siguiente
 
-Cerrar descubrimiento y sistema clínico; configurar identidad/MFA y conectar inventario/compras del portal a la API; extender pacientes administrativos, recepción, caja y equipos al servidor; preparar conteo e importación; realizar pruebas integrales y piloto. La demo adelanta diseño y conversación con el doctor, no omite estas etapas.
+Tras el primer recorrido privado local verificado, extender pacientes administrativos y recepción al servidor; continuar caja y equipos con sus interfaces y pruebas. En paralelo, cerrar descubrimiento/sistema clínico y seleccionar infraestructura e identidad/MFA productivas. Después preparar conteo/importación, recuperación, capacitación y piloto. La integración local no omite estas etapas.

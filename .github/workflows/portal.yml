@@ -1,0 +1,40 @@
+name: Validate private portal
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: portal-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  private-e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci --no-fund
+      - run: npm run build:portal
+      - run: npx playwright install --with-deps chromium
+      - name: Start isolated synthetic stack
+        run: npm run dev:private
+      - run: node scripts/wait-private.mjs
+      - name: Real login, persistence, retry, roles and concurrent receipt
+        run: npm run test:portal
+      - name: Save results without credentials or authentication traces
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: private-portal-report
+          path: playwright-report/portal/
+          retention-days: 7
+      - name: Stop synthetic stack
+        if: always()
+        run: npm run dev:private:stop

@@ -18,6 +18,15 @@
             "styles": ["src/styles.css"]
           },
           "configurations": {
+            "portal": {
+              "browser": "src/portal-main.ts",
+              "index": "src/portal/index.html",
+              "outputPath": "dist/portal",
+              "optimization": { "scripts": true, "styles": { "minify": true, "inlineCritical": false }, "fonts": false },
+              "styles": ["src/portal/portal.css"],
+              "assets": [],
+              "outputHashing": "all"
+            },
             "production": {
               "outputHashing": "all",
               "budgets": [

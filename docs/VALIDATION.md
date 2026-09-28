@@ -1,4 +1,20 @@
-# Validación de la entrega v0.4.0
+# Validación de la entrega v0.5.0
+
+## Evidencia local actual · 28/09/2026
+
+En Windows se ejecutaron **96 casos, cero fallos y cero omisiones** en las ejecuciones finales: 25 de reglas (`npm test`), 22 de demo en navegador (`npm run test:e2e`), 39 API/migración (`npm run test:api:local`) y 10 de portal (`npm run test:portal`). Compilaciones separadas de Pages y portal aprobadas. El backend se compiló y probó con Java 21 y PostgreSQL 17.11 en Docker.
+
+Los 10 nuevos casos son cinco recorridos en escritorio y cinco en móvil Chromium: inicio de sesión Keycloak/PKCE, compra/recepción parcial/auditoría y persistencia al cerrar/iniciar sesión; respuesta perdida después del commit y reintento tras recarga; competencia admin/farmacia por una unidad; auditor con lectura y POST denegado en servidor; acceso anónimo 401 y recepción sin módulos autorizados. No se simula la API ni se omite JWT. Solo el caso de fallo de red intercepta y descarta una respuesta después de recibirla del servidor real.
+
+También se recorrió manualmente el portal con la habilidad de navegador: orden OC-VISUAL-001 de 10 unidades, recepción de 4, estado PARTIAL, lote con 4 unidades y evento PURCHASE_RECEIVED con sujeto de admin. La inspección visual detectó carga CSS incompatible con CSP; la compilación privada ahora desactiva CSS crítico inline para no depender de manejadores JavaScript inline.
+
+Los primeros intentos de automatización detectaron un selector de etiqueta incorrecto y una espera insuficiente tras un alta; corregidos antes de la ejecución final de 10/10. Los reportes locales quedan en `backend/target/surefire-reports` y `playwright-report/portal`. No se graban trazas de autenticación. Los datos sintéticos del portal permanecen en `clinic_dev`; las pruebas destructivas usaron exclusivamente `clinic_test`.
+
+Pages fue habilitado y la ejecución [36439460252](https://github.com/Finithe-Phoenix/PulmonogyClinic/actions/runs/36439460252) completó validación y despliegue. Se abrió y comprobó [el sitio publicado](https://finithe-phoenix.github.io/PulmonogyClinic/) en navegador. La API y el portal privado solo están desplegados localmente; no hay hosting privado productivo, HTTPS/MFA productivos ni validación de recuperación ante desastre. [Reproducción](PRIVATE_PORTAL.md).
+
+## Registro histórico de v0.4.0
+
+La información siguiente se conserva como evidencia de la entrega previa; sus menciones de conexión y Pages pendientes quedaron superadas para el portal local y la demo pública descritos arriba.
 
 La web y el panel de Pages contienen únicamente ejemplos. La API privada de inventario y compras todavía no está conectada a ese panel ni desplegada para uso del personal.
 

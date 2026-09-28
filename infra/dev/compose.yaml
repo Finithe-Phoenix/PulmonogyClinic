@@ -1,0 +1,75 @@
+name: pulmonogy-private-dev
+services:
+  db:
+    image: postgres:17
+    environment:
+      POSTGRES_DB: clinic_dev
+      POSTGRES_USER: clinic_dev
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?}
+    volumes: ["clinic-dev:/var/lib/postgresql/data"]
+    healthcheck:
+      test: [CMD-SHELL, "pg_isready -U clinic_dev -d clinic_dev"]
+      interval: 3s
+      retries: 30
+  identity:
+    image: quay.io/keycloak/keycloak:26.7.4
+    command: [start-dev, --import-realm]
+    environment:
+      KC_HOSTNAME: http://localhost:8180
+      DEV_ADMIN_PASSWORD: ${DEV_ADMIN_PASSWORD:?}
+      DEV_PHARMACY_PASSWORD: ${DEV_PHARMACY_PASSWORD:?}
+      DEV_AUDITOR_PASSWORD: ${DEV_AUDITOR_PASSWORD:?}
+      DEV_RECEPTION_PASSWORD: ${DEV_RECEPTION_PASSWORD:?}
+    ports: ["127.0.0.1:8180:8080"]
+    volumes: ["./clinic-dev-realm.json:/opt/keycloak/data/import/clinic-dev-realm.json:ro"]
+  api:
+    build: ../../backend
+    environment:
+      DB_URL: jdbc:postgresql://db:5432/clinic_dev
+      DB_USER: clinic_dev
+      DB_PASSWORD: ${DB_PASSWORD:?}
+      OIDC_ISSUER_URI: http://localhost:8180/realms/clinic-dev
+      OIDC_JWK_SET_URI: http://identity:8080/realms/clinic-dev/protocol/openid-connect/certs
+      OIDC_AUDIENCE: clinic-api
+    depends_on:
+      db: {condition: service_healthy}
+    ports: ["127.0.0.1:8181:8080"]
+  portal:
+    image: node:24.16.0-alpine
+    user: node
+    working_dir: /app
+    command: [node, scripts/portal-server.mjs]
+    environment:
+      PORTAL_BIND: 0.0.0.0
+      API_UPSTREAM: http://api:8080
+    ports: ["127.0.0.1:4180:4180"]
+    volumes:
+      - ../../dist/portal/browser:/app/dist/portal/browser:ro
+      - ../../scripts/portal-server.mjs:/app/scripts/portal-server.mjs:ro
+  test-db:
+    profiles: [test]
+    image: postgres:17
+    environment:
+      POSTGRES_DB: clinic_test
+      POSTGRES_USER: clinic_test
+      POSTGRES_PASSWORD: ${TEST_DB_PASSWORD:?}
+    tmpfs: [/var/lib/postgresql/data]
+    healthcheck:
+      test: [CMD-SHELL, "pg_isready -U clinic_test -d clinic_test"]
+      interval: 3s
+      retries: 30
+  api-test:
+    profiles: [test]
+    image: maven:3.9.11-eclipse-temurin-21
+    working_dir: /app
+    command: [mvn, -B, -ntp, verify]
+    environment:
+      TEST_DB_URL: jdbc:postgresql://test-db:5432/clinic_test
+      TEST_DB_USER: clinic_test
+      TEST_DB_PASSWORD: ${TEST_DB_PASSWORD:?}
+    volumes: ["../../backend:/app", "maven-cache:/root/.m2"]
+    depends_on:
+      test-db: {condition: service_healthy}
+volumes:
+  clinic-dev:
+  maven-cache:

@@ -1,4 +1,14 @@
-# Arquitectura y límites · v0.4.0
+# Arquitectura y límites · v0.5.0
+
+## Portal privado local añadido en v0.5.0
+
+`src/portal-main.ts` inicia otra aplicación Angular; la configuración `portal` compila a `dist/portal/browser` con HTML y CSS propios. Pages conserva `src/main.ts` y `dist/clinic/browser`. No hay enrutamiento accidental del panel público a la API ni credenciales en sus bundles.
+
+El gateway local (`scripts/portal-server.mjs`) sirve el portal y reenvía `/api/` a Spring manteniendo Bearer explícito. Keycloak 26.7.4 corre en otro servicio de loopback, con usuarios sintéticos, roles importados, audiencia clinic-api y PKCE S256 obligatorio. `oidc-client-ts` guarda tokens solo en memoria; una recarga requiere volver a autenticar por la sesión del proveedor. La solicitud pendiente y su clave se conservan en sessionStorage, ligadas al sujeto, para reintentos sin duplicar.
+
+Docker Compose separa `clinic_dev` persistente de `clinic_test` desechable y sin puertos de BD públicos. El servidor mantiene intactos RBAC, transacciones, V1 y V2. Los cambios entre usuarios se consultan con Actualizar; no se implementó push en tiempo real. La API valida permisos aunque el cliente muestre u oculte acciones. [Arranque, alcance y límites](PRIVATE_PORTAL.md).
+
+Las secciones siguientes describen la base de demo/API v0.4.0. Donde mencionan conexión e identidad pendientes, la conexión ya está resuelta para el entorno local sintético; sigue pendiente la identidad y operación productiva.
 
 ## Decisiones ejecutadas
 

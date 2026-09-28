@@ -2,7 +2,11 @@
 
 Proyecto digital del Dr. Marco Antonio De Nova Macedo: sitio profesional propuesto y plataforma de demostración para consultorio, farmacia y caja.
 
-**Estado: v0.4.0 — sitio y demo Angular + API privada de inventario y compras. Todos los pacientes, proveedores, compras, notas, productos, lotes, equipos y cobros son ficticios. No usar para atención clínica ni capturar datos reales.**
+**Estado: v0.5.0 — sitio/demo públicos + portal privado local conectado a inventario y compras. Todos los pacientes, proveedores, compras, notas, productos, lotes, equipos y cobros son ficticios. No usar para atención clínica ni capturar datos reales.**
+
+[Abrir sitio y demo publicados](https://finithe-phoenix.github.io/PulmonogyClinic/) · [Iniciar portal privado local](docs/PRIVATE_PORTAL.md) · [Diagnóstico y pendientes por dependencia](docs/SESSION_2026-09-28.md)
+
+La v0.5.0 completa el recorrido local **inicio de sesión → proveedor → orden → recepción parcial → existencias → auditoría** con Keycloak/PKCE, roles de servidor y PostgreSQL. El portal se compila por separado y no se publica en Pages. Requiere Node 24 y Docker: `npm ci`, `npm run build:portal`, `npm run dev:private`, `node scripts/wait-private.mjs`; abrir `http://localhost:4180/`. Las contraseñas sintéticas se generan en `.local/private.env`, excluido del repositorio. [Guía y límites](docs/PRIVATE_PORTAL.md).
 
 ![Propuesta del sitio del doctor](docs/previews/sitio-desktop.jpg)
 
@@ -52,11 +56,11 @@ Salida: `dist/clinic/browser`. Base pública: `/PulmonogyClinic/`. La navegació
 | Caja            | Cobros simulados en centavos, referencia única, reversos con motivo, conciliación de efectivo y CSV.                    |
 | Proyecto        | Estado visible de lo demostrado y lo pendiente para producción.                                                         |
 
-Los cambios se conservan en `localStorage` de ese navegador. **La interfaz pública no está conectada a la API privada. No hay sincronización entre dispositivos, reservas en Doctoralia, firma electrónica, recetas válidas, pagos, CFDI ni certificación clínica.** El cierre de una nota es una demostración visual y lógica, no una firma médica. Los bloqueos de la demo son locales. El módulo `backend` implementa por separado transacciones PostgreSQL, permisos por JWT, lotes, movimientos, cuarentena e idempotencia. Su conexión al portal y al proveedor de identidad aún está pendiente; ver [API privada y puesta en marcha](backend/README.md).
+Los cambios de la demo se conservan en `localStorage` de ese navegador. **La interfaz pública no está conectada a la API privada. En la demo no hay sincronización entre dispositivos, reservas en Doctoralia, firma electrónica, recetas válidas, pagos, CFDI ni certificación clínica.** El cierre de una nota es una demostración visual y lógica, no una firma médica. Los bloqueos de la demo son locales. El módulo `backend` implementa transacciones PostgreSQL, permisos por JWT, lotes, movimientos, cuarentena e idempotencia. El portal privado local de v0.5.0 consume esa API con Keycloak de desarrollo; identidad/MFA y despliegue productivos permanecen pendientes. Ver [API privada y puesta en marcha](backend/README.md).
 
 La v0.4.0 agrega al servidor **proveedores, órdenes de varias partidas y recepciones parciales**. Crear una orden no cambia el stock. Confirmar una entrega guarda lote, entrada, costo de la partida, saldo recibido y auditoría en una sola transacción; una cancelación administrativa conserva lo recibido y cierra únicamente lo pendiente. Incluye migración desde la v0.3.0 y pruebas de reintentos, permisos y concurrencia. [Contrato de compras](backend/docs/PURCHASING_API.md).
 
-**Validación:** 86 casos aprobados: 25 de reglas, 22 de navegador y 39 del servidor con PostgreSQL, incluida la migración. [Ejecuciones y límites](docs/VALIDATION.md).
+**Validación local:** 96 casos aprobados: 25 de reglas, 22 de demo en navegador, 39 del servidor con PostgreSQL (incluida la migración) y 10 del portal con identidad real de desarrollo. [Ejecuciones y límites](docs/VALIDATION.md).
 
 Fecha operativa fija: **28 de septiembre de 2026**, señalada en la interfaz para que los casos de caducidad y conciliación sean reproducibles. Precios y equipos son ejemplos, no información comercial validada.
 
@@ -64,7 +68,7 @@ Fecha operativa fija: **28 de septiembre de 2026**, señalada en la interfaz par
 
 El workflow `.github/workflows/api.yml` valida la API en PostgreSQL 17 con tokens firmados de prueba. El workflow `.github/workflows/pages.yml` ejecuta pruebas, compila y publica únicamente el resultado estático. En pull requests solo valida.
 
-El administrador debe habilitar **Settings → Pages → Build and deployment → Source: GitHub Actions** una sola vez. No se incluye ningún token personal en el repositorio. Si Pages todavía no está habilitado, el job de validación puede pasar y el job de despliegue fallará; después de habilitarlo, volver a ejecutar el workflow. Ver [guía de publicación](docs/DEPLOYMENT.md).
+Pages fue habilitado con Source **GitHub Actions** el 28/09/2026; la publicación y su URL fueron verificadas. En una copia nueva del repositorio se debe habilitar esa opción una vez. No se incluye ningún token personal en el repositorio. Ver [guía de publicación](docs/DEPLOYMENT.md).
 
 ## Organización
 

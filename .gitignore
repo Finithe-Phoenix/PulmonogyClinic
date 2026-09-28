@@ -10,6 +10,7 @@ playwright-report/
 *.log
 .DS_Store
 backend/target/
+.local/
 *.jks
 *.p12
 *.pem

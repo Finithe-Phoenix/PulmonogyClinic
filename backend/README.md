@@ -1,5 +1,7 @@
 # API privada de inventario y compras · v0.4.0
 
+**Integración v0.5.0:** el contrato y las migraciones de esta API se conservan. Ahora existe un [portal privado local conectado](../docs/PRIVATE_PORTAL.md), compilado por separado, con Keycloak de desarrollo y pruebas de navegador. La demo pública continúa aislada. La identidad productiva/MFA y el hosting privado siguen pendientes. Puede ejecutar Java 21 y las pruebas mediante Docker, aunque su host tenga otra versión de Java.
+
 Servidor del consultorio: catálogo, lotes, movimientos, cuarentena, proveedores, órdenes de compra, recepciones parciales y auditoría en PostgreSQL. Java 21, Spring Boot 4.0.8, Spring Security y Flyway. **La demo Angular de Pages todavía usa sus ejemplos locales; no está conectada a esta API.**
 
 El servidor inicia sin productos ni usuarios de ejemplo. No almacena pacientes ni notas clínicas. Su entrega es una base de desarrollo con pruebas de integración, no una autorización para utilizarla con datos reales.

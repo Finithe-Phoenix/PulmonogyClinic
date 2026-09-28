@@ -1,5 +1,9 @@
 # Publicar la demo en GitHub Pages
 
+**Estado verificado 28/09/2026:** Pages habilitado con `build_type: workflow`, HTTPS activo y [publicación comprobada](https://finithe-phoenix.github.io/PulmonogyClinic/). La ejecución [36439460252](https://github.com/Finithe-Phoenix/PulmonogyClinic/actions/runs/36439460252) terminó correctamente. Los pasos de activación siguientes sirven para nuevas instalaciones.
+
+El [portal privado de desarrollo](PRIVATE_PORTAL.md) usa otro build y Docker local. El workflow `portal.yml` valida identidad, API y navegador sin publicar ese build. Para producción se requiere acordar hosting/dominio y proveedor de identidad, reemplazar las URLs de loopback, configurar TLS y MFA, separar usuarios de migración/ejecución de BD y probar respaldos/restauración antes del piloto. No desplegar `infra/dev` como producción.
+
 Repositorio: `Finithe-Phoenix/PulmonogyClinic`. Se respeta la ortografía existente del nombre.
 
 1. Abrir **Settings → Pages** con una cuenta que pueda administrar este repositorio.

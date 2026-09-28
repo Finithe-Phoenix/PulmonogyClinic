@@ -1,12 +1,17 @@
 {
   "name": "pulmonogy-clinic",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "private": true,
   "type": "module",
   "engines": {
     "node": ">=24.15 <25"
   },
   "scripts": {
+    "build:portal": "ng build --configuration portal",
+    "dev:private": "node scripts/private-dev.mjs up",
+    "dev:private:stop": "node scripts/private-dev.mjs stop",
+    "test:api:local": "node scripts/private-dev.mjs test",
+    "test:portal": "playwright test --config playwright.portal.config.ts",
     "start": "ng serve --host 0.0.0.0",
     "build": "ng build",
     "build:pages": "ng build --base-href /PulmonogyClinic/",
@@ -21,6 +26,7 @@
     "@angular/core": "21.2.24",
     "@angular/forms": "21.2.24",
     "@angular/platform-browser": "21.2.24",
+    "oidc-client-ts": "3.5.0",
     "rxjs": "7.8.2",
     "tslib": "2.8.1"
   },

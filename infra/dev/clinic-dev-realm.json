@@ -1,0 +1,152 @@
+{
+  "realm": "clinic-dev",
+  "enabled": true,
+  "displayName": "Consultorio · desarrollo sintético",
+  "sslRequired": "none",
+  "registrationAllowed": false,
+  "resetPasswordAllowed": false,
+  "loginWithEmailAllowed": false,
+  "bruteForceProtected": true,
+  "accessTokenLifespan": 300,
+  "roles": {
+    "realm": [
+      {
+        "name": "ADMIN"
+      },
+      {
+        "name": "FARMACIA"
+      },
+      {
+        "name": "AUDITOR"
+      },
+      {
+        "name": "RECEPCION"
+      }
+    ]
+  },
+  "clients": [
+    {
+      "clientId": "clinic-portal",
+      "name": "Portal privado local",
+      "enabled": true,
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": false,
+      "implicitFlowEnabled": false,
+      "serviceAccountsEnabled": false,
+      "redirectUris": [
+        "http://localhost:4180/"
+      ],
+      "webOrigins": [
+        "http://localhost:4180"
+      ],
+      "attributes": {
+        "pkce.code.challenge.method": "S256",
+        "post.logout.redirect.uris": "http://localhost:4180/"
+      },
+      "protocol": "openid-connect",
+      "protocolMappers": [
+        {
+          "name": "clinic-roles",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-realm-role-mapper",
+          "config": {
+            "claim.name": "roles",
+            "jsonType.label": "String",
+            "multivalued": "true",
+            "access.token.claim": "true",
+            "id.token.claim": "true"
+          }
+        },
+        {
+          "name": "clinic-audience",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper",
+          "config": {
+            "included.custom.audience": "clinic-api",
+            "access.token.claim": "true",
+            "id.token.claim": "false"
+          }
+        }
+      ]
+    }
+  ],
+  "users": [
+    {
+      "username": "admin",
+      "id": "f31b404a-98ca-40fd-af6d-55ddce8cb301",
+      "enabled": true,
+      "firstName": "admin",
+      "lastName": "Sintético",
+      "email": "admin@example.invalid",
+      "emailVerified": true,
+      "realmRoles": [
+        "ADMIN"
+      ],
+      "credentials": [
+        {
+          "type": "password",
+          "value": "${DEV_ADMIN_PASSWORD}",
+          "temporary": false
+        }
+      ]
+    },
+    {
+      "username": "farmacia",
+      "id": "f31b404a-98ca-40fd-af6d-55ddce8cb302",
+      "enabled": true,
+      "firstName": "farmacia",
+      "lastName": "Sintético",
+      "email": "farmacia@example.invalid",
+      "emailVerified": true,
+      "realmRoles": [
+        "FARMACIA"
+      ],
+      "credentials": [
+        {
+          "type": "password",
+          "value": "${DEV_PHARMACY_PASSWORD}",
+          "temporary": false
+        }
+      ]
+    },
+    {
+      "username": "auditor",
+      "id": "f31b404a-98ca-40fd-af6d-55ddce8cb303",
+      "enabled": true,
+      "firstName": "auditor",
+      "lastName": "Sintético",
+      "email": "auditor@example.invalid",
+      "emailVerified": true,
+      "realmRoles": [
+        "AUDITOR"
+      ],
+      "credentials": [
+        {
+          "type": "password",
+          "value": "${DEV_AUDITOR_PASSWORD}",
+          "temporary": false
+        }
+      ]
+    },
+    {
+      "username": "recepcion",
+      "id": "f31b404a-98ca-40fd-af6d-55ddce8cb304",
+      "enabled": true,
+      "firstName": "recepcion",
+      "lastName": "Sintético",
+      "email": "recepcion@example.invalid",
+      "emailVerified": true,
+      "realmRoles": [
+        "RECEPCION"
+      ],
+      "credentials": [
+        {
+          "type": "password",
+          "value": "${DEV_RECEPTION_PASSWORD}",
+          "temporary": false
+        }
+      ]
+    }
+  ]
+}
