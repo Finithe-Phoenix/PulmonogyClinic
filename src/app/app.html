@@ -1,0 +1,1311 @@
+@if (page() === 'inicio') {
+<div class="preview-bar">
+  <span
+    ><span class="live-dot"></span> Propuesta de sitio · Versión de
+    demostración</span
+  ><a href="#/panel/resumen">Explorar plataforma <app-icon name="arrow" /></a>
+</div>
+<header class="site-header wrap">
+  <a href="#/" class="brand"
+    ><span class="brand-icon"><app-icon name="lungs" /></span
+    ><span
+      ><strong>Dr. De Nova</strong><small>NEUMOLOGÍA · TOLUCA</small></span
+    ></a
+  >
+  <nav aria-label="Sitio del doctor">
+    <button (click)="scroll('doctor')">El doctor</button
+    ><button (click)="scroll('servicios')">Servicios</button
+    ><button (click)="scroll('ubicacion')">Ubicación</button>
+  </nav>
+  <a
+    class="button primary small"
+    [href]="doctoralia"
+    target="_blank"
+    rel="noopener noreferrer"
+    >Ver perfil en Doctoralia <app-icon name="arrowup"
+  /></a>
+</header>
+<main id="main">
+  <section class="hero wrap">
+    <div class="hero-copy">
+      <div class="eyebrow">
+        <span class="line"></span> ATENCIÓN RESPIRATORIA ESPECIALIZADA
+      </div>
+      <h1>Respirar mejor<br />empieza con<br /><em>una buena atención.</em></h1>
+      <p>
+        Dr. Marco Antonio De Nova Macedo.<br />Una propuesta de atención
+        cercana, con claridad en cada paso de tu consulta.
+      </p>
+      <div class="hero-actions">
+        <a
+          class="button primary"
+          [href]="doctoralia"
+          target="_blank"
+          rel="noopener noreferrer"
+          >Consultar citas en Doctoralia <app-icon name="arrowup" /></a
+        ><button class="button text" (click)="scroll('servicios')">
+          Conocer servicios <app-icon name="arrow" />
+        </button>
+      </div>
+      <div class="location-note">
+        <app-icon name="location" /> Toluca, Estado de México
+        <span>·</span> Neumología
+      </div>
+    </div>
+    <div class="hero-art" aria-label="Ilustración decorativa de pulmones">
+      <div class="art-top">
+        <span>EL CUIDADO EMPIEZA<br />POR ESCUCHARTE.</span
+        ><app-icon name="plus" />
+      </div>
+      <div class="breath-ring r1"></div>
+      <div class="breath-ring r2"></div>
+      <div class="breath-ring r3"></div>
+      <svg
+        class="lung-art"
+        viewBox="0 0 360 380"
+        fill="none"
+        aria-hidden="true"
+      >
+        <defs>
+          <linearGradient
+            id="lungFill"
+            x1="80"
+            y1="60"
+            x2="280"
+            y2="320"
+            gradientUnits="userSpaceOnUse"
+          >
+            <stop stop-color="#e1f2d4" stop-opacity=".95" />
+            <stop offset="1" stop-color="#83c7ac" stop-opacity=".35" />
+          </linearGradient>
+        </defs>
+        <path
+          d="M165 72C148 41 115 64 90 99 64 133 36 206 37 263c1 65 67 49 101 28 22-14 26-32 26-57V72Z"
+          fill="url(#lungFill)"
+        />
+        <path
+          d="M195 72c17-31 50-8 75 27 26 34 54 107 53 164-1 65-67 49-101 28-22-14-26-32-26-57V72Z"
+          fill="url(#lungFill)"
+        />
+        <g
+          stroke="#e6f3dc"
+          stroke-width="5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path
+            d="M180 26v92m0 0-52 43-19 79m71-122 52 43 19 79M144 148l-36-22m20 35-48 20m35 33 23 29m78-95 36-22m-20 35 48 20m-35 33-23 29"
+          />
+          <path
+            d="m175 41 10 0m-10 16h10m-10 16h10m-10 16h10"
+            stroke-width="3"
+          />
+        </g>
+      </svg>
+      <div class="art-bottom">
+        <span class="tiny-wave">⌁</span
+        ><span>Un nuevo espacio<br />para tu salud respiratoria.</span
+        ><span class="art-number">01 / 03</span>
+      </div>
+      <div class="floating-note">
+        <span class="soft-icon"><app-icon name="shield" /></span>
+        <div>
+          <strong>Atención especializada</strong
+          ><small>Dr. Marco Antonio De Nova Macedo</small>
+        </div>
+      </div>
+    </div>
+  </section>
+  <div class="trust-strip wrap">
+    <span><app-icon name="users" /> Atención centrada en ti</span
+    ><span><app-icon name="file" /> Información clara</span
+    ><span><app-icon name="calendar" /> Citas desde Doctoralia</span
+    ><span><app-icon name="location" /> Consulta en Toluca</span>
+  </div>
+  <section class="section wrap" id="servicios">
+    <div class="section-heading">
+      <div>
+        <span class="eyebrow">CUIDADO RESPIRATORIO</span>
+        <h2>Conoce los servicios.</h2>
+      </div>
+      <p>
+        El primer paso es conocer lo que necesitas.<br />Confirma indicaciones y
+        disponibilidad con el consultorio.
+      </p>
+    </div>
+    <div class="service-grid">
+      @for(service of services;track service.title;let i=$index){<button
+        class="service-card"
+        (click)="serviceDetail=service.detail;openModal('service',service.title)"
+      >
+        <div class="service-top">
+          <span class="soft-icon"><app-icon [name]="service.icon" /></span
+          ><span class="index">0{{i+1}}</span>
+        </div>
+        <h3>{{service.title}}</h3>
+        <p>{{service.text}}</p>
+        <span class="card-link"
+          >Conocer más <app-icon name="arrow"
+        /></span></button
+      >}
+    </div>
+  </section>
+  <section class="doctor-section wrap" id="doctor">
+    <div class="doctor-monogram">
+      <span class="eyebrow">DR. MARCO ANTONIO</span
+      ><span class="monogram">MN<span>+</span></span
+      ><span>DE NOVA MACEDO</span><small>Identidad visual provisional</small>
+    </div>
+    <div class="doctor-copy">
+      <span class="eyebrow">CONOCE A TU ESPECIALISTA</span>
+      <h2>Una consulta comienza<br />con una conversación.</h2>
+      <p>
+        Dr. Marco Antonio De Nova Macedo, especialista en neumología con
+        consulta en Toluca.
+      </p>
+      <p>
+        Este espacio reunirá su trayectoria validada, los servicios del
+        consultorio y la información que necesitas para preparar tu visita.
+      </p>
+      <a
+        class="button outline"
+        [href]="doctoralia"
+        target="_blank"
+        rel="noopener noreferrer"
+        >Consultar perfil profesional <app-icon name="arrowup" /></a
+      ><small class="muted"
+        >Fotografía, marca de la clínica y textos finales pendientes de
+        aprobación.</small
+      >
+    </div>
+  </section>
+  <section class="section wrap location-section" id="ubicacion">
+    <div>
+      <span class="eyebrow">CERCA DE TI</span>
+      <h2>Tu próxima visita,<br />con todo más claro.</h2>
+      <p>
+        <strong>Plaza PAME · Local 3</strong><br />Blvd. Solidaridad Las Torres
+        605,<br />Moderna de la Cruz, Toluca.
+      </p>
+      <p class="muted">
+        Dirección publicada en el perfil profesional.<br />Confirma sede y
+        horario antes de acudir.
+      </p>
+      <a
+        class="button primary"
+        href="https://www.google.com/maps/search/?api=1&query=Plaza+PAME+Solidaridad+Las+Torres+605+Toluca"
+        target="_blank"
+        rel="noopener noreferrer"
+        >Ver ubicación en Maps <app-icon name="arrowup"
+      /></a>
+    </div>
+    <div class="visit-guide">
+      <span class="eyebrow">PREPARA TU CONSULTA</span>
+      <h3>Antes de tu visita</h3>
+      <div>
+        <span>01</span>
+        <p>Confirma tu cita y las indicaciones con recepción.</p>
+      </div>
+      <div>
+        <span>02</span>
+        <p>
+          Ten a la mano tus estudios y la información de tratamientos previos.
+        </p>
+      </div>
+      <div>
+        <span>03</span>
+        <p>Consulta cualquier preparación especial antes de un estudio.</p>
+      </div>
+      <p class="guide-footer">
+        <app-icon name="info" /> Las reservas reales se gestionan en Doctoralia.
+      </p>
+    </div>
+  </section>
+  <section class="demo-invite wrap">
+    <div>
+      <span class="eyebrow">LA CLÍNICA, MEJOR ORGANIZADA</span>
+      <h2>Un vistazo al siguiente paso.</h2>
+      <p>
+        Explora cómo podrían trabajar juntos recepción, consultas, farmacia y
+        caja.
+      </p>
+    </div>
+    <a href="#/panel/resumen" class="button light"
+      >Entrar a la demo de gestión <app-icon name="arrow"
+    /></a>
+  </section>
+</main>
+<footer class="site-footer wrap">
+  <a href="#/" class="brand"
+    ><span class="brand-icon"><app-icon name="lungs" /></span
+    ><span
+      ><strong>Dr. De Nova</strong><small>PROPUESTA DIGITAL · 2026</small></span
+    ></a
+  >
+  <p>Demostración para revisión. No es el sitio oficial del consultorio.</p>
+  <button (click)="openModal('privacy')">Acerca de la demo</button>
+</footer>
+} @else {
+<div class="app-shell">
+  <aside class="sidebar" [class.is-open]="mobileMenu">
+    <a href="#/" class="brand side-brand"
+      ><span class="brand-icon"><app-icon name="lungs" /></span
+      ><span
+        ><strong>De Nova</strong><small>CONSULTORIO DIGITAL</small></span
+      ></a
+    >
+    <div class="workspace-switch">
+      <span class="workspace-avatar">DN</span>
+      <div>
+        <strong>Consulta en Toluca</strong
+        ><small>Espacio de demostración</small>
+      </div>
+    </div>
+    <div class="nav-label">ESPACIO DE TRABAJO</div>
+    <nav aria-label="Módulos de gestión">
+      @for(item of nav;track item.id){<a
+        [href]="'#/panel/'+item.id"
+        [class.active]="page()===item.id"
+        [attr.aria-current]="page()===item.id?'page':null"
+        ><app-icon [name]="item.icon" /><span>{{item.label}}</span
+        >@if(item.id==='inventario'){<span class="nav-count"
+          >{{alerts().length}}</span
+        >}</a
+      >}
+    </nav>
+    <div class="sidebar-bottom">
+      <div class="demo-card">
+        <span class="pill green">DEMO INTERACTIVA</span>
+        <p>Explora con tranquilidad.<br />Todos los datos son ficticios.</p>
+        <button (click)="openModal('reset')">
+          <app-icon name="reset" /> Restablecer datos
+        </button>
+      </div>
+      <a href="#/" class="back-site"
+        ><app-icon name="arrowup" /> Ver sitio del doctor</a
+      >
+      <div class="user-chip">
+        <span>FD</span>
+        <div>
+          <strong>Equipo de demostración</strong
+          ><small>Sin sesión clínica real</small>
+        </div>
+      </div>
+    </div>
+  </aside>
+  @if(mobileMenu){<button
+    class="mobile-backdrop"
+    aria-label="Cerrar menú"
+    (click)="mobileMenu=false"
+  ></button
+  >}
+  <div class="app-main">
+    <header class="app-header">
+      <div class="breadcrumbs">
+        <button
+          class="icon-button menu-toggle"
+          aria-label="Abrir menú"
+          [attr.aria-expanded]="mobileMenu"
+          (click)="mobileMenu=!mobileMenu"
+        >
+          <app-icon name="menu" /></button
+        ><span>Consultorio</span><span class="slash">/</span
+        ><strong>{{title()}}</strong>
+      </div>
+      <div class="header-right">
+        <span class="header-demo"
+          ><span class="live-dot"></span> Entorno demo</span
+        ><button
+          class="icon-button"
+          aria-label="Información de la demo"
+          (click)="openModal('privacy')"
+        >
+          <app-icon name="info" /></button
+        ><span class="header-avatar">DN</span>
+      </div>
+    </header>
+    <div class="demo-notice">
+      <app-icon name="shield" /><span
+        ><strong>Datos ficticios.</strong> Los cambios se guardan en este
+        navegador. No captures información real de pacientes.</span
+      >
+    </div>
+    <main class="dashboard" id="main">
+      @switch(page()) { @case('resumen') {
+      <div class="page-heading">
+        <div>
+          <div class="eyebrow">
+            LUNES, 28 DE SEPTIEMBRE DE 2026 · FECHA DE DEMO
+          </div>
+          <h1>Todo listo para cuidar.</h1>
+          <p>Una vista clara de la jornada en tu consultorio.</p>
+        </div>
+        <button class="button primary" (click)="navigate('recepcion')">
+          <app-icon name="calendar" /> Ver recepción
+        </button>
+      </div>
+      <div class="stat-grid">
+        <article class="stat-card">
+          <span>Atenciones de hoy <app-icon name="calendar" /></span
+          ><strong>{{todayVisits().length.toString().padStart(2,'0')}}</strong
+          ><small><span class="stat-dot"></span> Jornada de ejemplo</small>
+        </article>
+        <article class="stat-card">
+          <span>En sala de espera <app-icon name="users" /></span
+          ><strong>{{waiting().toString().padStart(2,'0')}}</strong
+          ><small>Seguimiento desde recepción</small>
+        </article>
+        <article class="stat-card">
+          <span>Cobros registrados <app-icon name="wallet" /></span
+          ><strong>{{money(collected())}}</strong
+          ><small>Importes ilustrativos · MXN</small>
+        </article>
+        <article class="stat-card alert-stat">
+          <span>Alertas de inventario <app-icon name="box" /></span
+          ><strong>{{alerts().length.toString().padStart(2,'0')}}</strong
+          ><small>Requieren revisión</small>
+        </article>
+      </div>
+      <div class="dashboard-grid">
+        <section class="panel agenda-panel">
+          <div class="panel-heading">
+            <div>
+              <h2>La jornada de hoy</h2>
+              <p>Vista operativa de demostración</p>
+            </div>
+            <a href="#/panel/recepcion" class="subtle-link"
+              >Ver todas <app-icon name="arrow"
+            /></a>
+          </div>
+          <div class="appointment-list">
+            @for(v of todayVisits();track v.id){
+            <div class="appointment">
+              <time>{{v.time}}</time
+              ><span class="avatar" [class.lavender]="$odd"
+                >{{initials(patientName(v.patientId))}}</span
+              >
+              <div class="appointment-info">
+                <strong>{{patientName(v.patientId)}}</strong
+                ><small>{{v.service}}</small>
+              </div>
+              <span class="pill" [ngClass]="pill(v.status)">{{v.status}}</span
+              ><button
+                class="icon-button"
+                [attr.aria-label]="'Abrir consulta de '+patientName(v.patientId)"
+                (click)="openPatient(v.patientId)"
+              >
+                <app-icon name="arrow" />
+              </button>
+            </div>
+            }
+          </div>
+          <div class="panel-foot">
+            <app-icon name="info" /> Doctoralia sigue siendo la agenda
+            principal. Esta demo no está sincronizada.
+          </div>
+        </section>
+        <div class="right-stack">
+          <section class="focus-card">
+            <div>
+              <span class="eyebrow">EL CUIDADO CONTINÚA</span
+              ><app-icon name="lungs" />
+            </div>
+            <h2>Menos papel.<br />Más tiempo para atender.</h2>
+            <p>Prueba una consulta y descubre cómo organizar la información.</p>
+            <button class="button light" (click)="openPatient('DEMO-002')">
+              Abrir consulta de ejemplo <app-icon name="arrow" />
+            </button>
+          </section>
+          <section class="panel inventory-alerts">
+            <div class="panel-heading">
+              <h2>Atención al inventario</h2>
+              <span class="pill warning">{{alerts().length}}</span>
+            </div>
+            @for(l of alerts().slice(0,3);track l.id){<button
+              class="alert-row"
+              (click)="navigate('inventario')"
+            >
+              <span
+                class="alert-marker"
+                [class.red]="lotStatus(l)==='Caducado'"
+              ></span>
+              <div>
+                <strong>{{l.product}}</strong
+                ><small>{{lotStatus(l)}} · {{l.batch}}</small>
+              </div>
+              <app-icon name="arrow" /></button
+            >}<a href="#/panel/inventario" class="full-link"
+              >Revisar existencias <app-icon name="arrow"
+            /></a>
+          </section>
+        </div>
+      </div>
+      <section class="quick-section">
+        <h2>Continúa donde lo necesitas</h2>
+        <div class="quick-grid">
+          <button (click)="navigate('pacientes')">
+            <span class="soft-icon"><app-icon name="users" /></span>
+            <div>
+              <strong>Directorio de pacientes</strong
+              ><small>Identidad y continuidad</small>
+            </div>
+            <app-icon name="arrow" /></button
+          ><button (click)="navigate('caja')">
+            <span class="soft-icon"><app-icon name="wallet" /></span>
+            <div>
+              <strong>Cierre de caja</strong
+              ><small>Conciliar los cobros del día</small>
+            </div>
+            <app-icon name="arrow" /></button
+          ><button (click)="navigate('proyecto')">
+            <span class="soft-icon"><app-icon name="route" /></span>
+            <div>
+              <strong>Camino a producción</strong
+              ><small>Próximas entregas y validaciones</small>
+            </div>
+            <app-icon name="arrow" />
+          </button>
+        </div>
+      </section>
+      } @case('recepcion') {
+      <div class="page-heading">
+        <div>
+          <span class="eyebrow">OPERACIÓN DIARIA</span>
+          <h1>Recepción</h1>
+          <p>Del registro de llegada a la consulta, sin perder el hilo.</p>
+        </div>
+        <button class="button primary" (click)="openModal('visit')">
+          <app-icon name="plus" /> Simular cita
+        </button>
+      </div>
+      <div class="info-banner">
+        <app-icon name="info" />
+        <p>
+          Estas citas son ficticias. Registrar o cancelar aquí
+          <strong>no modifica Doctoralia</strong>. En la operación real,
+          recepción trabajará sobre la agenda principal.
+        </p>
+      </div>
+      <section class="panel">
+        <div class="toolbar">
+          <label class="search"
+            ><app-icon name="search" /><input
+              aria-label="Buscar cita"
+              [(ngModel)]="query"
+              placeholder="Buscar paciente o folio..." /></label
+          ><label class="inline-label"
+            >Fecha <input type="date" [(ngModel)]="agendaDate" /></label
+          ><select
+            aria-label="Filtrar estado de cita"
+            [(ngModel)]="statusFilter"
+          >
+            <option>Todas</option>
+            <option>Confirmada</option>
+            <option>En espera</option>
+            <option>En consulta</option>
+            <option>Finalizada</option>
+            <option>Cancelada</option>
+          </select>
+        </div>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>Hora</th>
+                <th>Paciente</th>
+                <th>Atención</th>
+                <th>Estado</th>
+                <th>Acción</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for(v of visits();track v.id){
+              <tr>
+                <td class="time-cell">{{v.time}}</td>
+                <td>
+                  <strong>{{patientName(v.patientId)}}</strong
+                  ><small>{{v.externalRef}}</small>
+                </td>
+                <td>{{v.service}}</td>
+                <td>
+                  <span class="pill" [ngClass]="pill(v.status)"
+                    >{{v.status}}</span
+                  >
+                </td>
+                <td>
+                  <div class="row-actions">
+                    @if(v.status==='Confirmada'){<button
+                      class="button compact"
+                      (click)="setVisitStatus(v.id,'En espera')"
+                    >
+                      Registrar llegada</button
+                    ><button
+                      class="plain danger-text"
+                      (click)="setVisitStatus(v.id,'Cancelada')"
+                    >
+                      Cancelar</button
+                    >}@if(v.status==='En espera'){<button
+                      class="button compact"
+                      (click)="setVisitStatus(v.id,'En consulta');openPatient(v.patientId)"
+                    >
+                      Iniciar consulta</button
+                    >}@if(v.status==='En consulta'){<button
+                      class="button compact"
+                      (click)="setVisitStatus(v.id,'Finalizada')"
+                    >
+                      Finalizar atención</button
+                    >}@if(v.status==='Finalizada'){<button
+                      class="plain"
+                      (click)="openPatient(v.patientId)"
+                    >
+                      Ver consulta</button
+                    >}
+                  </div>
+                </td>
+              </tr>
+              }@empty{
+              <tr>
+                <td colspan="5" class="empty-state">
+                  No hay citas que coincidan. Cambia los filtros o simula una
+                  cita.
+                </td>
+              </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </section>
+      } @case('pacientes') {
+      <div class="page-heading">
+        <div>
+          <span class="eyebrow">IDENTIDAD Y CONTINUIDAD</span>
+          <h1>Pacientes</h1>
+          <p>
+            Un registro para cada persona. Todos los perfiles de esta demo son
+            ficticios.
+          </p>
+        </div>
+        <button class="button primary" (click)="openModal('patient')">
+          <app-icon name="plus" /> Agregar ejemplo
+        </button>
+      </div>
+      <section class="panel">
+        <div class="toolbar">
+          <label class="search"
+            ><app-icon name="search" /><input
+              aria-label="Buscar paciente"
+              [(ngModel)]="query"
+              placeholder="Buscar por nombre, identificador o tipo..." /></label
+          ><span class="muted">{{patients().length}} perfiles de ejemplo</span>
+        </div>
+        <div class="patient-grid">
+          @for(p of patients();track p.id){
+          <article class="patient-card">
+            <div class="patient-card-top">
+              <span class="avatar large" [class.lavender]="$odd"
+                >{{initials(p.name)}}</span
+              ><span class="pill blue">{{p.tag}}</span>
+            </div>
+            <h3>{{p.name}}</h3>
+            <small>{{p.id}}</small>
+            <dl>
+              <div>
+                <dt>Nacimiento ficticio</dt>
+                <dd>{{p.birth}}</dd>
+              </div>
+              <div>
+                <dt>Contacto</dt>
+                <dd>{{p.phone}}</dd>
+              </div>
+            </dl>
+            <button class="button outline full" (click)="openPatient(p.id)">
+              Abrir expediente demo <app-icon name="arrow" />
+            </button>
+          </article>
+          }@empty{
+          <p class="empty-state">No encontramos coincidencias.</p>
+          }
+        </div>
+      </section>
+      } @case('consultas') {
+      <div class="page-heading">
+        <div>
+          <span class="eyebrow">ESPACIO CLÍNICO · PROTOTIPO</span>
+          <h1>Consulta y expediente</h1>
+          <p>Explora el flujo de documentación con información de ejemplo.</p>
+        </div>
+        <button class="button outline" (click)="exportNote()">
+          <app-icon name="download" /> Exportar ejemplo
+        </button>
+      </div>
+      <div class="info-banner">
+        <app-icon name="shield" />
+        <p>
+          Prototipo sin validez clínica ni firma electrónica. El sistema de
+          expedientes para uso real se elegirá y validará con el doctor.
+        </p>
+      </div>
+      <div class="clinical-grid">
+        <aside class="panel patient-context">
+          <label
+            >Paciente de demostración<select
+              [(ngModel)]="selectedPatient"
+              (ngModelChange)="selectedNoteId='';loadNote()"
+            >
+              @for(p of state().patients;track p.id){
+              <option [value]="p.id">{{p.name}}</option>
+              }
+            </select></label
+          ><span class="avatar xl"
+            >{{initials(patientName(selectedPatient))}}</span
+          >
+          <h2>{{patientName(selectedPatient)}}</h2>
+          <small>{{selectedPatient}}</small>
+          <div class="context-info">
+            <app-icon name="info" />
+            <p>
+              La demo permite guardar borradores, cerrar notas de ejemplo y
+              agregar adendas. Ninguna acción firma un expediente real.
+            </p>
+          </div>
+          <div class="panel-heading">
+            <h3>Notas de ejemplo</h3>
+            <button
+              class="icon-button"
+              aria-label="Nueva nota de ejemplo"
+              (click)="newNote()"
+            >
+              <app-icon name="plus" />
+            </button>
+          </div>
+          @for(n of patientNotes();track n.id){<button
+            class="note-item"
+            [class.selected]="note.id===n.id"
+            (click)="selectedNoteId=n.id;loadNote()"
+          >
+            <span>{{n.date}}</span
+            ><span class="pill" [ngClass]="pill(n.status)"
+              >{{n.status}}</span
+            ></button
+          >}@empty{
+          <p class="muted">Aún no hay notas guardadas.</p>
+          }
+        </aside>
+        <section class="panel note-editor">
+          <div class="panel-heading">
+            <div>
+              <h2>Nota de atención</h2>
+              <p>{{note.date}} · Documento de demostración</p>
+            </div>
+            <span class="pill" [ngClass]="pill(note.status)"
+              >{{note.status}}</span
+            >
+          </div>
+          <div class="note-fields">
+            <label
+              >Motivo de consulta<textarea
+                rows="2"
+                [(ngModel)]="note.reason"
+                [disabled]="note.status==='Cerrada'"
+                placeholder="Escribe un motivo ficticio..."
+              ></textarea></label
+            ><label
+              >Antecedentes y evolución<textarea
+                rows="3"
+                [(ngModel)]="note.history"
+                [disabled]="note.status==='Cerrada'"
+                placeholder="Ejemplo ficticio para revisar la estructura de captura."
+              ></textarea></label
+            ><label
+              >Evaluación del profesional<textarea
+                rows="3"
+                [(ngModel)]="note.assessment"
+                [disabled]="note.status==='Cerrada'"
+                placeholder="Sin sugerencias ni diagnóstico automático."
+              ></textarea></label
+            ><label
+              >Plan y seguimiento<textarea
+                rows="3"
+                [(ngModel)]="note.plan"
+                [disabled]="note.status==='Cerrada'"
+                placeholder="Contenido de ejemplo; no genera recetas reales."
+              ></textarea></label
+            >@if(error&&!modal){
+            <p role="alert" class="error-message">{{error}}</p>
+            }@for(a of note.addenda;track $index){
+            <div class="addendum">
+              <strong>Adenda {{ $index+1 }} · {{a.date}}</strong>
+              <p>{{a.text}}</p>
+            </div>
+            }
+            <div class="form-actions">
+              @if(note.status==='Borrador'){<button
+                class="button outline"
+                (click)="saveNote()"
+              >
+                Guardar borrador</button
+              ><button class="button primary" (click)="saveNote(true)">
+                Cerrar nota de ejemplo <app-icon name="check" /></button
+              >}@else{<span class="muted"
+                >Contenido cerrado. Las correcciones se añaden como
+                adendas.</span
+              ><button class="button primary" (click)="openModal('addendum')">
+                Agregar adenda</button
+              >}
+            </div>
+          </div>
+        </section>
+      </div>
+      } @case('inventario') {
+      <div class="page-heading">
+        <div>
+          <span class="eyebrow">FARMACIA Y CONSULTORIO</span>
+          <h1>Inventario bajo control.</h1>
+          <p>Existencias, lotes y caducidades en una sola vista.</p>
+        </div>
+        <button class="button outline" (click)="exportInventory()">
+          <app-icon name="download" /> Exportar CSV
+        </button>
+      </div>
+      <div class="stat-grid three">
+        <article class="stat-card">
+          <span>Lotes de ejemplo <app-icon name="box" /></span
+          ><strong>{{state().lots.length}}</strong
+          ><small>Farmacia y consumibles separados</small>
+        </article>
+        <article class="stat-card">
+          <span>Valor disponible ilustrativo</span
+          ><strong>{{money(availableValue())}}</strong
+          ><small>Excluye caducados y cuarentena</small>
+        </article>
+        <article class="stat-card alert-stat">
+          <span>Lotes con alerta</span><strong>{{alerts().length}}</strong
+          ><small>Stock, caducidad o cuarentena</small>
+        </article>
+      </div>
+      <section class="panel">
+        <div class="toolbar">
+          <div class="segmented" aria-label="Categorías de inventario">
+            @for(filter of ['Todos','Farmacia','Insumos','Alertas'];track
+            filter){<button
+              [class.selected]="inventoryFilter===filter"
+              (click)="inventoryFilter=filter"
+            >
+              {{filter}}</button
+            >}
+          </div>
+          <label class="search"
+            ><app-icon name="search" /><input
+              aria-label="Buscar inventario"
+              [(ngModel)]="query"
+              placeholder="Producto, SKU o lote..."
+          /></label>
+        </div>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>Producto / categoría</th>
+                <th>Lote / caducidad</th>
+                <th>Existencias</th>
+                <th>Estado</th>
+                <th>Movimiento</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for(l of inventory();track l.id){
+              <tr>
+                <td>
+                  <strong>{{l.product}}</strong
+                  ><small>{{l.category}} · {{l.sku}}</small>
+                </td>
+                <td>{{l.batch}}<small>{{l.expires}}</small></td>
+                <td>
+                  <strong>{{l.quantity}} <span class="muted">uds.</span></strong
+                  ><small>Mínimo ilustrativo: {{l.minimum}}</small>
+                </td>
+                <td>
+                  <span class="pill" [ngClass]="pill(lotStatus(l))"
+                    >{{lotStatus(l)}}</span
+                  >
+                </td>
+                <td>
+                  <button
+                    class="button compact"
+                    (click)="openModal('movement',l.id)"
+                  >
+                    Registrar <app-icon name="plus" />
+                  </button>
+                </td>
+              </tr>
+              }@empty{
+              <tr>
+                <td colspan="5" class="empty-state">
+                  No hay productos que coincidan con el filtro.
+                </td>
+              </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+        <div class="panel-foot">
+          <app-icon name="shield" /> La demo bloquea salidas de lotes caducados,
+          en cuarentena o sin existencias suficientes.
+        </div>
+      </section>
+      <section class="panel spaced">
+        <div class="panel-heading">
+          <h2>Movimientos de esta demo</h2>
+          <span class="pill blue">{{state().movements.length}}</span>
+        </div>
+        @for(m of state().movements;track m.id){
+        <div class="ledger-row">
+          <span class="pill" [ngClass]="m.kind==='Entrada'?'green':'blue'"
+            >{{m.kind}}</span
+          ><strong>{{m.quantity}} unidades</strong><span>{{m.lotId}}</span
+          ><span>{{m.reason}}</span><small>{{m.date}}</small>
+        </div>
+        }@empty{
+        <p class="empty-state">
+          Registra una entrada o salida para ver su trazabilidad aquí.
+        </p>
+        }
+      </section>
+      } @case('equipos') {
+      <div class="page-heading">
+        <div>
+          <span class="eyebrow">ACTIVOS DEL CONSULTORIO</span>
+          <h1>Equipos y mantenimiento</h1>
+          <p>
+            Los equipos se controlan como activos individuales, separados de los
+            consumibles.
+          </p>
+        </div>
+      </div>
+      <div class="equipment-grid">
+        @for(e of state().equipment;track e.id){
+        <article class="panel equipment-card">
+          <div class="equipment-top">
+            <span class="soft-icon"><app-icon name="pulse" /></span
+            ><span class="pill" [ngClass]="pill(e.status)">{{e.status}}</span>
+          </div>
+          <h2>{{e.name}}</h2>
+          <p>{{e.serial}}</p>
+          <dl>
+            <div>
+              <dt>Ubicación ilustrativa</dt>
+              <dd>{{e.place}}</dd>
+            </div>
+            <div>
+              <dt>Próxima revisión de ejemplo</dt>
+              <dd>{{e.nextService}}</dd>
+            </div>
+          </dl>
+          <button class="button outline full" (click)="toggleEquipment(e.id)">
+            {{e.status==='Disponible'?'Marcar en mantenimiento':'Marcar
+            disponible'}}
+          </button>
+        </article>
+        }
+      </div>
+      <div class="info-banner spaced">
+        <app-icon name="info" />
+        <p>
+          Catálogo ficticio. El inventario real de dispositivos, sus
+          mantenimientos y calibraciones se levantará con el responsable del
+          consultorio.
+        </p>
+      </div>
+      } @case('caja') {
+      <div class="page-heading">
+        <div>
+          <span class="eyebrow">COBROS Y CONCILIACIÓN</span>
+          <h1>Caja del día</h1>
+          <p>
+            28 de septiembre de 2026 · Importes exclusivamente ilustrativos.
+          </p>
+        </div>
+        <button class="button primary" (click)="openModal('payment')">
+          <app-icon name="plus" /> Registrar cobro
+        </button>
+      </div>
+      <div class="stat-grid three">
+        <article class="stat-card">
+          <span>Total registrado</span><strong>{{money(collected())}}</strong
+          ><small>Cobros vigentes del día de demo</small>
+        </article>
+        <article class="stat-card">
+          <span>Efectivo esperado</span
+          ><strong>{{money(expectedCash())}}</strong
+          ><small>Fondo de apertura: $0.00 en la demo</small>
+        </article>
+        <article class="stat-card">
+          <span>Operaciones registradas</span
+          ><strong>{{state().payments.length}}</strong
+          ><small>Incluye movimientos reversados</small>
+        </article>
+      </div>
+      <div class="cash-grid">
+        <section class="panel">
+          <div class="panel-heading">
+            <h2>Registro de cobros</h2>
+            <button class="plain" (click)="exportCash()">
+              <app-icon name="download" /> CSV
+            </button>
+          </div>
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>Concepto / referencia</th>
+                  <th>Importe</th>
+                  <th>Medio</th>
+                  <th>Estado</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for(p of state().payments;track p.id){
+                <tr>
+                  <td>
+                    <strong>{{p.concept}}</strong><small>{{p.reference}}</small>
+                  </td>
+                  <td>{{money(p.amountCents)}}</td>
+                  <td>{{p.method}}</td>
+                  <td>
+                    @if(p.reversed){<span class="pill warning">Reversado</span
+                    ><small>{{p.reversalReason}}</small>}@else{<button
+                      class="plain danger-text"
+                      (click)="openModal('reverse',p.id)"
+                    >
+                      Reversar</button
+                    >}
+                  </td>
+                </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </section>
+        <section class="panel cash-close">
+          <span class="soft-icon"><app-icon name="wallet" /></span>
+          <h2>Probar cierre de caja</h2>
+          <p>Compara el efectivo contado con los cobros registrados.</p>
+          <label
+            >Efectivo contado (MXN)<input
+              type="number"
+              min="0"
+              step="0.01"
+              [(ngModel)]="cashCount"
+              placeholder="0.00" /></label
+          ><button class="button primary full" (click)="reconcile()">
+            Conciliar efectivo <app-icon name="check" /></button
+          >@if(cashResult){
+          <div class="cash-result" role="status">{{cashResult}}</div>
+          }<small
+            >Sin cobros reales, terminal bancaria ni emisión de CFDI.</small
+          >
+        </section>
+      </div>
+      } @case('proyecto') {
+      <div class="page-heading">
+        <div>
+          <span class="eyebrow">DE LA DEMO A LA OPERACIÓN</span>
+          <h1>Construir con claridad.</h1>
+          <p>
+            Qué puedes probar hoy y qué falta antes de atender pacientes reales.
+          </p>
+        </div>
+        <a
+          class="button outline"
+          href="https://github.com/Finithe-Phoenix/PulmonogyClinic"
+          target="_blank"
+          rel="noopener noreferrer"
+          >Ver repositorio <app-icon name="arrowup"
+        /></a>
+      </div>
+      <div class="milestones">
+        @for(m of milestones;track m.phase){
+        <article class="panel milestone">
+          <span class="phase" [class.complete]="m.done">{{m.phase}}</span>
+          <div>
+            <h2>{{m.title}}</h2>
+            <p>{{m.detail}}</p>
+          </div>
+          <span class="pill" [ngClass]="m.done?'green':'warning'"
+            >{{m.state}}</span
+          >
+        </article>
+        }
+      </div>
+      <section class="panel spaced production-note">
+        <h2>Antes de la primera atención real</h2>
+        <div class="production-grid">
+          <div>
+            <app-icon name="shield" />
+            <h3>Accesos privados</h3>
+            <p>
+              Autenticación, permisos en servidor, auditoría y respaldos
+              restaurados con éxito.
+            </p>
+          </div>
+          <div>
+            <app-icon name="file" />
+            <h3>Validación clínica</h3>
+            <p>
+              Decidir el sistema de expedientes y validar notas, firma,
+              exportación y conservación.
+            </p>
+          </div>
+          <div>
+            <app-icon name="box" />
+            <h3>Datos de apertura</h3>
+            <p>
+              Identificar pacientes, contar existencias por lote y conciliar la
+              agenda de Doctoralia.
+            </p>
+          </div>
+        </div>
+      </section>
+      } }
+      <footer class="app-footer">
+        <span>De Nova · Plataforma de demostración</span
+        ><span>v0.1.0 · Datos sintéticos · Sin conexión clínica</span>
+      </footer>
+    </main>
+  </div>
+</div>
+}
+
+<dialog
+  id="modal"
+  (close)="modalClosed()"
+  (cancel)="modalClosed()"
+  aria-labelledby="modal-title"
+>
+  <div class="modal-heading">
+    <div>
+      <span class="eyebrow">PULMONOGY CLINIC · DEMO</span>
+      <h2 id="modal-title">{{modalTitle}}</h2>
+    </div>
+    <button
+      class="icon-button"
+      aria-label="Cerrar diálogo"
+      (click)="closeModal()"
+    >
+      <app-icon name="close" />
+    </button>
+  </div>
+  @if(modal==='privacy'){
+  <div class="modal-content">
+    <p>
+      Esta es una propuesta de sitio y una demostración funcional para el
+      proyecto del Dr. Marco Antonio De Nova Macedo.
+    </p>
+    <p>
+      Los pacientes, notas, productos, equipos e importes son ficticios. Los
+      cambios permanecen en el almacenamiento local de este navegador; no se
+      envían al consultorio ni a Doctoralia.
+    </p>
+    <p>
+      No hay autenticación, firma clínica, recetas válidas, pagos reales ni un
+      sistema certificado de expedientes. No captures datos personales o de
+      salud reales.
+    </p>
+    <p>
+      El sitio oficial requerirá identidad, contenidos, avisos de privacidad y
+      operación aprobados por sus responsables.
+    </p>
+    <button class="button primary" (click)="closeModal()">Entendido</button>
+  </div>
+  } @else if(modal==='service'){
+  <div class="modal-content">
+    <p>{{serviceDetail}}</p>
+    <a
+      class="button primary"
+      [href]="doctoralia"
+      target="_blank"
+      rel="noopener noreferrer"
+      >Ver perfil en Doctoralia <app-icon name="arrowup"
+    /></a>
+  </div>
+  } @else {
+  <form (ngSubmit)="submit()" class="modal-content">
+    <p class="modal-hint">
+      Usa únicamente información ficticia. Esta acción solo afecta a la demo de
+      tu navegador.
+    </p>
+    @switch(modal){ @case('patient'){<label
+      >Nombre ficticio<input
+        name="name"
+        [(ngModel)]="form.name"
+        required
+        maxlength="70"
+        placeholder="Ej. Carolina Demo"
+    /></label>
+    <div class="form-columns">
+      <label
+        >Fecha de nacimiento ficticia<input
+          name="birth"
+          type="date"
+          [(ngModel)]="form.birth"
+          [max]="date"
+          required /></label
+      ><label
+        >Tipo de atención<select name="tag" [(ngModel)]="form.tag">
+          <option>Primera visita</option>
+          <option>Seguimiento</option>
+          <option>Estudio</option>
+        </select></label
+      >
+    </div>
+    } @case('visit'){<label
+      >Paciente de ejemplo<select name="patient" [(ngModel)]="form.patientId">
+        @for(p of state().patients;track p.id){
+        <option [value]="p.id">{{p.name}}</option>
+        }
+      </select></label
+    >
+    <div class="form-columns">
+      <label
+        >Fecha simulada<input
+          name="date"
+          type="date"
+          [(ngModel)]="form.date"
+          required /></label
+      ><label
+        >Hora simulada<input
+          name="time"
+          type="time"
+          [(ngModel)]="form.time"
+          required
+      /></label>
+    </div>
+    <label
+      >Servicio<select name="service" [(ngModel)]="form.service">
+        <option>Primera consulta</option>
+        <option>Consulta de seguimiento</option>
+        <option>Espirometría</option>
+      </select></label
+    >
+    <p class="muted">
+      No envía reservas a Doctoralia ni confirma una cita real.
+    </p>
+    } @case('movement'){
+    <div class="selected-lot">
+      <strong>{{selectedLot()?.product}}</strong
+      ><span
+        >Lote {{selectedLot()?.batch}} · {{selectedLot()?.quantity}}
+        unidades</span
+      ><small>Primero en vencer entre lotes aptos: {{suggestedLot()}}</small>
+    </div>
+    <div class="form-columns">
+      <label
+        >Tipo de movimiento<select name="kind" [(ngModel)]="form.kind">
+          <option>Salida</option>
+          <option>Entrada</option>
+        </select></label
+      ><label
+        >Cantidad de unidades<input
+          name="quantity"
+          type="number"
+          min="1"
+          step="1"
+          [(ngModel)]="form.quantity"
+          required
+      /></label>
+    </div>
+    <label
+      >Motivo<input
+        name="reason"
+        [(ngModel)]="form.reason"
+        maxlength="140"
+        placeholder="Ej. Consumo simulado en consulta"
+        required /></label
+    >} @case('payment'){<label
+      >Paciente de ejemplo<select name="patient" [(ngModel)]="form.patientId">
+        @for(p of state().patients;track p.id){
+        <option [value]="p.id">{{p.name}}</option>
+        }
+      </select></label
+    ><label
+      >Concepto<input
+        name="reason"
+        [(ngModel)]="form.reason"
+        required
+        maxlength="100"
+        placeholder="Ej. Consulta de demostración"
+    /></label>
+    <div class="form-columns">
+      <label
+        >Importe ilustrativo (MXN)<input
+          name="amount"
+          type="number"
+          min="0.01"
+          step="0.01"
+          [(ngModel)]="form.amount"
+          required /></label
+      ><label
+        >Medio de pago<select name="method" [(ngModel)]="form.method">
+          <option>Efectivo</option>
+          <option>Tarjeta</option>
+          <option>Transferencia</option>
+        </select></label
+      >
+    </div>
+    <label
+      >Referencia única<input
+        name="reference"
+        [(ngModel)]="form.reference"
+        required
+        maxlength="60" /></label
+    >} @case('reverse'){
+    <p>
+      El cobro original se conserva y se excluye del total vigente. No se hace
+      ninguna devolución bancaria.
+    </p>
+    <label
+      >Motivo del reverso<input
+        name="reason"
+        [(ngModel)]="form.reason"
+        required
+        maxlength="140" /></label
+    >} @case('addendum'){<label
+      >Motivo y corrección de ejemplo<textarea
+        name="addendum"
+        [(ngModel)]="form.text"
+        rows="5"
+        required
+        maxlength="2000"
+      ></textarea>
+    </label>
+    <p class="muted">El contenido original de la nota se conserva.</p>
+    } @case('reset'){
+    <p>
+      Se eliminarán los cambios ficticios de este navegador y se restaurarán los
+      ejemplos iniciales. Puedes exportar tus ejemplos antes de hacerlo.
+    </p>
+    } } @if(error){
+    <p role="alert" class="error-message">{{error}}</p>
+    }
+    <div class="form-actions">
+      <button type="button" class="button outline" (click)="closeModal()">
+        Cancelar</button
+      ><button type="submit" class="button primary">
+        {{modal==='reset'?'Restablecer demo':'Guardar ejemplo'}}
+        <app-icon name="check" />
+      </button>
+    </div>
+  </form>
+  }
+</dialog>
+@if(toast()){
+<div class="toast" role="status">
+  <app-icon name="check" />{{toast()}}<button
+    class="icon-button"
+    aria-label="Cerrar notificación"
+    (click)="toast.set('')"
+  >
+    <app-icon name="close" />
+  </button>
+</div>
+}
