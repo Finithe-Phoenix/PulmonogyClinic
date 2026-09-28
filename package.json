@@ -1,6 +1,6 @@
 {
   "name": "pulmonogy-clinic",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "type": "module",
   "engines": {
@@ -11,7 +11,9 @@
     "build": "ng build",
     "build:pages": "ng build --base-href /PulmonogyClinic/",
     "test": "node --test tests/*.test.ts",
-    "check": "npm test && npm run build:pages"
+    "check": "npm test && npm run build:pages && npm run test:e2e",
+    "preview": "node scripts/preview.mjs",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@angular/common": "21.2.24",
@@ -26,6 +28,7 @@
     "@angular/build": "21.2.24",
     "@angular/cli": "21.2.24",
     "@angular/compiler-cli": "21.2.24",
+    "@playwright/test": "1.63.0",
     "typescript": "5.9.3"
   }
 }

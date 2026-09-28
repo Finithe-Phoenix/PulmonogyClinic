@@ -77,6 +77,11 @@ export interface DemoState {
   equipment: Equipment[];
 }
 export const DEMO_DATE = "2026-09-28";
+export function isCalendarDate(value: string): boolean {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value) || value.startsWith("0000-")) return false;
+  const parsed = new Date(value + "T00:00:00.000Z");
+  return Number.isFinite(parsed.getTime()) && parsed.toISOString().slice(0, 10) === value;
+}
 export function requireQuantity(value: number): void {
   if (!Number.isSafeInteger(value) || value < 1)
     throw new Error("La cantidad debe ser un entero mayor que cero.");
@@ -127,7 +132,7 @@ export function eligibleFEFO(lots: Lot[], sku: string, date: string): Lot[] {
 }
 export function addVisit(visits: Visit[], visit: Visit): Visit[] {
   if (
-    !/^\d{4}-\d{2}-\d{2}$/.test(visit.date) ||
+    !isCalendarDate(visit.date) ||
     !/^([01]\d|2[0-3]):[0-5]\d$/.test(visit.time)
   )
     throw new Error("Fecha u hora inválida.");

@@ -11,6 +11,7 @@ import {
   dispense,
   eligibleFEFO,
   isExpired,
+  isCalendarDate,
   postPayment,
   receive,
   toCSV,
@@ -135,6 +136,7 @@ export class AppComponent {
       done: false,
     },
   ];
+  storageUnavailable = signal(false);
   state = signal<DemoState>(this.load());
   page = signal("inicio");
   mobileMenu = false;
@@ -397,7 +399,7 @@ export class AppComponent {
       switch (this.modal) {
         case "patient": {
           if (!f.name.trim()) throw new Error("Escribe un nombre ficticio.");
-          if (!f.birth || f.birth > this.date)
+          if (!isCalendarDate(f.birth) || f.birth > this.date)
             throw new Error("Revisa la fecha de nacimiento.");
           if (
             s.patients.some(
@@ -640,10 +642,9 @@ export class AppComponent {
     this.state.set(state);
     try {
       localStorage.setItem(STORAGE, JSON.stringify(state));
+      this.storageUnavailable.set(false);
     } catch {
-      this.notify(
-        "Modo temporal: este navegador no permite guardar los cambios.",
-      );
+      this.storageUnavailable.set(true);
     }
   }
   private message(e: unknown) {
@@ -651,7 +652,9 @@ export class AppComponent {
   }
   private notify(text: string) {
     clearTimeout(this.toastTimer);
-    this.toast.set(text);
+    this.toast.set(this.storageUnavailable()
+      ? "Modo temporal: los cambios se pierden al recargar."
+      : text);
     this.toastTimer = setTimeout(() => this.toast.set(""), 5000);
   }
 }

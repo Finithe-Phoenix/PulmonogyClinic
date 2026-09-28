@@ -13,6 +13,8 @@ El workflow no incluye token personal ni intenta ampliar permisos de la cuenta. 
 ## Comportamiento
 
 - Cada push a `main` ejecuta pruebas y compila antes de desplegar.
+- La validación ejecuta también Playwright en escritorio y pantalla móvil sobre la compilación estática, servida bajo el prefijo real `/PulmonogyClinic/`.
+- Actions conserva el reporte y las capturas ficticias en el artefacto `demo-browser-report` durante siete días.
 - En PR solo valida; no despliega el contenido de una contribución sin integrar.
 - `npm ci` usa `package-lock.json`. Node 24; Angular 21 LTS.
 - Solo se publica `dist/clinic/browser`. No se despliega el repositorio completo.

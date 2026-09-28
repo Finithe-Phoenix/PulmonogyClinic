@@ -607,6 +607,7 @@ dialog::backdrop {
 }
 .floating-note strong {
   display: block;
+  color: var(--ink);
   font-size: 12px;
   font-weight: 600;
 }
@@ -2658,4 +2659,18 @@ dialog::backdrop {
     scroll-behavior: auto !important;
     transition: none !important;
   }
+}
+/* Keep storage failure visible after the toast disappears. */
+.storage-warning {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 80;
+  padding: 12px 20px;
+  background: #fff4d6;
+  border-top: 1px solid #c28c20;
+  color: #583b06;
+  text-align: center;
+  font-size: 14px;
 }

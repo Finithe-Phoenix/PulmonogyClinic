@@ -2,7 +2,11 @@
 
 Primera entrega del proyecto digital del Dr. Marco Antonio De Nova Macedo: sitio profesional propuesto y plataforma de demostración para consultorio, farmacia y caja.
 
-**Estado: demo estática v0.1.0. Todos los pacientes, notas, productos, lotes, equipos y cobros son ficticios. No usar para atención clínica ni capturar datos reales.**
+**Estado: demo estática v0.1.1. Todos los pacientes, notas, productos, lotes, equipos y cobros son ficticios. No usar para atención clínica ni capturar datos reales.**
+
+![Propuesta del sitio del doctor](docs/previews/sitio-desktop.jpg)
+
+[Ver el panel de gestión](docs/previews/panel-desktop.png) · [Guion para presentar la demo](docs/DEMO_GUIDE.md) · [Validaciones y límites](docs/VALIDATION.md)
 
 ## Ejecutar
 
@@ -19,6 +23,17 @@ Abrir la dirección que indique Angular. Para compilar como proyecto de GitHub P
 npm test
 npm run build:pages
 ```
+
+Para comprobar los flujos en navegador, instalar Chromium de Playwright una vez y ejecutar:
+
+```bash
+npx playwright install chromium
+npm run check
+```
+
+`check` ejecuta reglas de dominio, compilación de producción y pruebas de navegación, agenda, inventario, notas y caja en escritorio y pantalla móvil. La emulación móvil usa Chromium; no sustituye una prueba en Safari/iPhone real. Para revisar el resultado compilado localmente: `npm run preview` y abrir `http://127.0.0.1:4173/PulmonogyClinic/`.
+
+Si el navegador bloquea el almacenamiento, la interfaz muestra un aviso permanente de modo temporal: los cambios de esa sesión se pierden al recargar.
 
 Salida: `dist/clinic/browser`. Base pública: `/PulmonogyClinic/`. La navegación de los módulos usa fragmentos `#/panel/...` para soportar recarga y enlaces directos en GitHub Pages.
 

@@ -1069,7 +1069,7 @@
       } }
       <footer class="app-footer">
         <span>De Nova · Plataforma de demostración</span
-        ><span>v0.1.0 · Datos sintéticos · Sin conexión clínica</span>
+        ><span>v0.1.1 · Datos sintéticos · Sin conexión clínica</span>
       </footer>
     </main>
   </div>
@@ -1307,5 +1307,10 @@
   >
     <app-icon name="close" />
   </button>
+</div>
+}
+@if(storageUnavailable()){
+<div class="storage-warning" role="alert">
+  Modo temporal: este navegador no permite guardar los ejemplos. Los cambios se pierden al recargar.
 </div>
 }

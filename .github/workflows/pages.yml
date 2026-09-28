@@ -25,6 +25,20 @@ jobs:
       - run: npm ci --no-fund
       - run: npm test
       - run: npm run build:pages
+      - name: Install browser for demo checks
+        run: npx playwright install --with-deps chromium
+      - name: Exercise desktop and mobile demo
+        run: npm run test:e2e
+      - name: Save browser report and demo screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: demo-browser-report
+          path: |
+            playwright-report/
+            test-results/
+          if-no-files-found: ignore
+          retention-days: 7
       - name: Upload static demo
         if: github.event_name != 'pull_request'
         uses: actions/upload-pages-artifact@v4
@@ -46,3 +60,9 @@ jobs:
       - name: Deploy demo
         id: deployment
         uses: actions/deploy-pages@v4
+      - name: Explain a pending Pages activation
+        if: failure()
+        run: |
+          echo '### Revisar configuración de GitHub Pages' >> "$GITHUB_STEP_SUMMARY"
+          echo 'Si Configure Pages devuelve Not Found, abrir Settings → Pages → Source: GitHub Actions y volver a ejecutar este workflow.' >> "$GITHUB_STEP_SUMMARY"
+          echo 'https://github.com/Finithe-Phoenix/PulmonogyClinic/settings/pages' >> "$GITHUB_STEP_SUMMARY"

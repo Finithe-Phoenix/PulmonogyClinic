@@ -9,10 +9,19 @@ import {
   eligibleFEFO,
   postPayment,
   receive,
+  isCalendarDate,
   toCSV,
 } from "../src/app/domain.ts";
 import type { ClinicalNote, Lot, Payment, Visit } from "../src/app/domain.ts";
 const day = "2026-09-28";
+test("el calendario rechaza días inexistentes y admite años bisiestos", () => {
+  for (const date of ["2026-02-29", "2026-04-31", "2026-13-01", "0000-01-01", "2026-9-1", ""]) {
+    assert.equal(isCalendarDate(date), false, date);
+    assert.throws(() => addVisit([], { ...visit, date }), /Fecha/);
+  }
+  assert.equal(isCalendarDate("2028-02-29"), true);
+  assert.equal(isCalendarDate(day), true);
+});
 const lot: Lot = {
   id: "l1",
   product: "Producto ficticio",
