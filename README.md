@@ -56,6 +56,8 @@ Los cambios se conservan en `localStorage` de ese navegador. **La interfaz públ
 
 La v0.4.0 agrega al servidor **proveedores, órdenes de varias partidas y recepciones parciales**. Crear una orden no cambia el stock. Confirmar una entrega guarda lote, entrada, costo de la partida, saldo recibido y auditoría en una sola transacción; una cancelación administrativa conserva lo recibido y cierra únicamente lo pendiente. Incluye migración desde la v0.3.0 y pruebas de reintentos, permisos y concurrencia. [Contrato de compras](backend/docs/PURCHASING_API.md).
 
+**Validación:** 86 casos aprobados: 25 de reglas, 22 de navegador y 39 del servidor con PostgreSQL, incluida la migración. [Ejecuciones y límites](docs/VALIDATION.md).
+
 Fecha operativa fija: **28 de septiembre de 2026**, señalada en la interfaz para que los casos de caducidad y conciliación sean reproducibles. Precios y equipos son ejemplos, no información comercial validada.
 
 ## Publicación en GitHub Pages

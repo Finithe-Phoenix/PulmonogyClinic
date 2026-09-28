@@ -8,7 +8,7 @@ Repositorio: `Finithe-Phoenix/PulmonogyClinic`. Se respeta la ortografía existe
 4. Esperar `validate` y `deploy` en verde. La URL publicada aparece en el environment `github-pages` y en la salida `page_url`.
 5. Probar la raíz del proyecto y `#/panel/resumen`, navegación, recarga y versión móvil. Comprobar que el sitio dice Demo y no contiene datos reales.
 
-El workflow no incluye token personal ni intenta ampliar permisos de la cuenta. `configure-pages` normalmente requiere que Pages esté habilitado; su opción de auto-habilitación no funciona con el `GITHUB_TOKEN` ordinario. No insertar PAT en código o variables públicas.
+El workflow no incluye token personal ni intenta ampliar permisos de la cuenta. `configure-pages` normalmente requiere que Pages esté habilitado; su opción de auto-habilitación no funciona con el `GITHUB_TOKEN` ordinario, según el [contrato de la acción v5](https://github.com/actions/configure-pages/blob/v5/action.yml). No insertar PAT en código o variables públicas.
 
 ## Comportamiento
 
