@@ -29,8 +29,12 @@ El workflow no incluye token personal ni intenta ampliar permisos de la cuenta. 
 | Validación verde, error `Get Pages site` / `Not Found` en deploy | Habilitar Source: GitHub Actions en Pages; volver a ejecutar.                              |
 | CSS/JS 404                                                       | Confirmar nombre del repositorio y base-href.                                              |
 | Cambios ficticios anteriores                                     | Botón Restablecer datos; afecta únicamente al almacenamiento de esa demo en ese navegador. |
-| Cambios no aparecen en otro dispositivo                          | Es el comportamiento esperado: no existe backend en esta versión.                          |
+| Cambios no aparecen en otro dispositivo                          | La demo conserva ejemplos locales; todavía no se conecta a la API privada.                          |
 
 ## Revertir una entrega
 
 Crear un commit de reversión del cambio defectuoso y ejecutar el mismo workflow. No reescribir el historial. No hay datos clínicos que migrar en esta demo.
+
+## Servidor privado
+
+Pages publica únicamente Angular. La API Spring Boot se compila y prueba con PostgreSQL en `.github/workflows/api.yml`; no se despliega desde este workflow. Su arranque local y variables de identidad están descritos en [backend/README.md](../backend/README.md). No añadir claves ni credenciales de base al build de Angular. El hosting privado, HTTPS, proveedor de identidad y respaldos se configurarán por separado.

@@ -18,7 +18,7 @@ En un entorno privado, configurar HTTPS, límite de cuerpo JSON en el proxy, ide
 
 ## Identidad y permisos
 
-Cada llamada privada lleva `Authorization: Bearer <access_token>` firmado por el proveedor. Se verifican firma, emisor, audiencia y vigencia. El claim `roles` es una lista; la identidad de los movimientos proviene de `sub`, nunca del cuerpo enviado por el cliente.
+Cada llamada privada lleva `Authorization: Bearer <access_token>` firmado por el proveedor. Se verifican firma, emisor, audiencia y vigencia; se exige identidad `sub` y fecha de vencimiento `exp`. El claim `roles` es una lista; la identidad de los movimientos proviene de `sub`, nunca del cuerpo enviado por el cliente.
 
 | Rol | Leer inventario | Crear productos | Crear lotes / entradas / salidas | Liberar o poner en cuarentena / bajas | Leer auditoría |
 | --- | --- | --- | --- | --- | --- |
@@ -51,7 +51,7 @@ Ejemplo de cuerpo para crear un producto sintético:
 {"sku":"DEMO-001","name":"Producto de demostración","category":"FARMACIA","unit":"pieza","minimumStock":5}
 ```
 
-Crear después un lote con el `productId` devuelto y registrar la entrada como movimiento. Las unidades son enteras de la unidad del catálogo; aún no hay conversiones caja/pieza. Farmacia exige caducidad ISO `AAAA-MM-DD`; los insumos pueden no tenerla. Un lote se considera caducado después de su fecha según `America/Mexico_City`.
+Crear después un lote con el `productId` devuelto y registrar la entrada como movimiento. Las unidades son enteras de la unidad del catálogo; aún no hay conversiones caja/pieza. `quarantined` debe enviarse expresamente como `true` o `false`; omitirlo o enviar `null` se rechaza. Farmacia exige caducidad ISO `AAAA-MM-DD`; los insumos pueden no tenerla. Un lote se considera caducado después de su fecha según `America/Mexico_City`.
 
 Respuesta: 201 en altas y movimientos, 200 en consultas/cuarentena. Los reintentos exitosos devuelven el mismo resultado y código original, incluso si el saldo actual cambió después; consultar el lote para el saldo vigente. Errores de dominio usan Problem Details con `code`: 400 datos inválidos, 401 autenticación, 403 permisos, 404 recurso inexistente, 409 conflicto de stock/duplicado/idempotencia. Los rechazos de autenticación/autorización provienen de Spring Security y pueden no incluir cuerpo Problem Details.
 

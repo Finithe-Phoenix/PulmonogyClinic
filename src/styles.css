@@ -2804,3 +2804,6 @@ dialog::backdrop {
   .contact-band h2 { font-size: 29px; }
   .contact-band .button { font-size: 12px; }
 }
+.page-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; max-width: 460px; }
+.page-actions .button { white-space: nowrap; }
+@media (max-width: 700px) { .page-actions { justify-content: flex-start; width: 100%; } }

@@ -6,7 +6,7 @@ Base: plan de 18 semanas acordado como referencia, operación actual en papel y 
 | ------- | --------- | -------------------------------------------------------------------------------------------- | --------------------------- |
 | WEB-01  | P0        | Sitio adaptable con servicios, ubicación, enlace al perfil y etiqueta de propuesta.          | Demo implementada           |
 | OPS-01  | P0        | Pacientes ficticios, estados de atención y vista diaria reproducible.                        | Demo implementada           |
-| INV-01  | P0        | Lotes, entradas/salidas, alertas, bloqueos y exportación.                                    | Demo implementada           |
+| INV-01  | P0        | Alta de productos/lotes, entradas/salidas, alertas, bloqueos y exportación.                  | Demo implementada en v0.3.0 |
 | COM-01  | P0        | Proveedores, órdenes, entregas parciales, trazabilidad por lote, bloqueo de duplicados y cancelación del saldo. | Demo implementada en v0.2.0 |
 | CAJ-01  | P0        | Cobros en centavos, referencias únicas, reversos y cierre ilustrativo.                       | Demo implementada           |
 | CLI-01  | P0        | Flujo de borrador, cierre y adenda, identificado sin validez clínica.                        | Demo implementada           |

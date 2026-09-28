@@ -144,6 +144,38 @@ export function requireQuantity(value: number): void {
 export function isExpired(lot: Lot, date: string): boolean {
   return lot.expires < date;
 }
+export interface InventoryLotDraft {
+  id: string;
+  sku: string;
+  batch: string;
+  expires: string;
+  quarantined: boolean;
+  catalog?: Pick<Lot, "product" | "category" | "minimum" | "priceCents">;
+}
+export function createInventoryLot(lots: Lot[], draft: InventoryLotDraft, date: string): Lot[] {
+  const sku = draft.sku.trim().toUpperCase(), batch = draft.batch.trim().toUpperCase();
+  if (!draft.id.trim() || lots.some(l => l.id === draft.id)) throw new Error("El identificador de lote ya existe o no es válido.");
+  if (!/^[A-Z0-9-]{2,40}$/.test(sku)) throw new Error("Usa un SKU de 2 a 40 letras, números o guiones.");
+  if (!batch || batch.length > 80) throw new Error("Escribe un lote de hasta 80 caracteres.");
+  if (!isCalendarDate(date) || !isCalendarDate(draft.expires) || draft.expires < date)
+    throw new Error("La caducidad debe ser una fecha válida, igual o posterior a la fecha de la demo.");
+  if (typeof draft.quarantined !== "boolean") throw new Error("Selecciona la condición del lote.");
+  const existing = lots.find(l => l.sku.toUpperCase() === sku);
+  if (draft.catalog && existing) throw new Error("El SKU ya existe. Usa Agregar lote para ese producto.");
+  if (!draft.catalog && !existing) throw new Error("Selecciona un producto del catálogo.");
+  if (lots.some(l => l.sku.toUpperCase() === sku && l.batch.trim().toUpperCase() === batch))
+    throw new Error("Ese lote ya existe para este producto. Registra una entrada para aumentar sus unidades.");
+  const catalog = draft.catalog || existing!;
+  if (!catalog.product.trim() || catalog.product.trim().length > 160) throw new Error("Escribe un nombre de producto de hasta 160 caracteres.");
+  if (!["Farmacia", "Insumos"].includes(catalog.category)) throw new Error("Selecciona la categoría del producto.");
+  if (!Number.isSafeInteger(catalog.minimum) || catalog.minimum < 0 || catalog.minimum > 1000000)
+    throw new Error("El mínimo debe ser un entero entre 0 y 1000000.");
+  if (!Number.isSafeInteger(catalog.priceCents) || catalog.priceCents < 0 || catalog.priceCents > 10000000000)
+    throw new Error("Revisa el precio ilustrativo; admite hasta dos decimales.");
+  return [...lots, { id: draft.id, sku, batch, expires: draft.expires, quarantined: draft.quarantined,
+    product: catalog.product.trim(), category: catalog.category, minimum: catalog.minimum,
+    priceCents: catalog.priceCents, quantity: 0 }];
+}
 export function dispense(
   lots: Lot[],
   lotId: string,

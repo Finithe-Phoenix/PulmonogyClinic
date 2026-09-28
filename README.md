@@ -46,7 +46,7 @@ Salida: `dist/clinic/browser`. Base pública: `/PulmonogyClinic/`. La navegació
 | Recepción       | Filtrar citas, simular una cita, impedir un horario duplicado, llegada, inicio, finalización y cancelación.             |
 | Pacientes       | Buscar perfiles ficticios y agregar ejemplos con identificador propio.                                                  |
 | Consultas       | Seleccionar paciente, crear notas, guardar borradores, cerrar ejemplos, agregar adendas y exportar JSON.                |
-| Inventario      | Buscar y filtrar lotes, entradas y salidas, bloqueo de caducados/cuarentena/faltantes, sugerencia FEFO, bitácora y CSV. |
+| Inventario      | Dar de alta productos y lotes, buscar, registrar entradas/salidas, bloquear caducados/cuarentena/faltantes, FEFO y CSV. |
 | Compras         | Proveedores ficticios, órdenes de varias partidas, recepción parcial por lote, cuarentena, cancelación del saldo y CSV. |
 | Equipos         | Activos ilustrativos y cambio de disponibilidad/mantenimiento.                                                          |
 | Caja            | Cobros simulados en centavos, referencia única, reversos con motivo, conciliación de efectivo y CSV.                    |

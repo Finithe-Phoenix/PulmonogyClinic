@@ -23,6 +23,7 @@ import {
   purchaseTotal,
   restoreDemoState,
   requireQuantity,
+  createInventoryLot,
 } from "./domain";
 import type { ClinicalNote, DemoState, Lot, VisitStatus, PurchaseDraft, PurchaseOrder } from "./domain";
 import { seed } from "./seed";
@@ -64,6 +65,9 @@ const freshForm = () => ({
   batch: "",
   expires: "2027-09-30",
   quarantined: false,
+  category: "Farmacia" as Lot["category"],
+  minimum: 5,
+  price: 100,
 });
 
 @Component({
@@ -116,7 +120,7 @@ export class AppComponent {
       phase: "04",
       title: "Sistema privado",
       detail: "API de inventario con PostgreSQL, permisos y bitácora; conexión del portal pendiente.",
-      state: "Primera API en construcción",
+      state: "API probada · conexión pendiente",
       done: false,
     },
     {
@@ -369,6 +373,8 @@ export class AppComponent {
           patient: "Paciente de demostración",
           visit: "Simular cita",
           movement: "Movimiento de inventario",
+          product: "Nuevo producto de ejemplo",
+          lot: "Agregar lote al catálogo",
           payment: "Registrar cobro de ejemplo",
           reset: "Restablecer la demo",
           addendum: "Agregar adenda de ejemplo",
@@ -382,6 +388,10 @@ export class AppComponent {
         } as Record<string, string>
       )[kind] || kind;
     if (kind === "movement") this.form.lotId = context;
+    if (kind === "product" || kind === "lot") {
+      this.form.sku = kind === "product" ? "" : this.productCatalog()[0]?.sku || "";
+      this.form.batch = "LOTE-DEMO-" + crypto.randomUUID().slice(0, 6).toUpperCase();
+    }
     if (kind === "reverse") this.paymentId = context;
     if (kind === "purchase") {
       this.purchaseDraftLines = [];
@@ -463,6 +473,23 @@ export class AppComponent {
         f = this.form,
         id = crypto.randomUUID();
       switch (this.modal) {
+        case "product":
+        case "lot": {
+          if (this.modal === "product" && (!Number.isFinite(f.price) || !Number.isSafeInteger(f.minimum)))
+            throw new Error("Completa el precio y el mínimo de unidades.");
+          const cents = Number(f.price) * 100;
+          if (this.modal === "product" && (!Number.isFinite(cents) || Math.abs(cents - Math.round(cents)) > 0.000001))
+            throw new Error("El precio admite hasta dos decimales.");
+          const catalog = this.modal === "product" ? {
+            product: f.name.trim() ? f.name.trim() + " · Demo" : "", category: f.category,
+            minimum: Number(f.minimum), priceCents: Math.round(cents),
+          } : undefined;
+          this.save({ ...s, lots: createInventoryLot(s.lots, { id: "LOT-" + id, sku: f.sku, batch: f.batch,
+            expires: f.expires, quarantined: f.quarantined, catalog }, this.date) });
+          this.query = f.sku.trim();
+          this.inventoryFilter = "Todos";
+          break;
+        }
         case "supplier":
           this.save(addSupplier(s, { id, reference: f.reference, name: f.name.trim() ? f.name.trim() + " · Demo" : "" }));
           break;

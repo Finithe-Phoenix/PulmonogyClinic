@@ -30,3 +30,9 @@ Las devoluciones al proveedor, impuestos, descuentos, unidades fraccionarias y c
 ## Casos a validar con el equipo
 
 Recepción: identidad y orden de llegada. Doctor: estructura documental y sistema clínico. Farmacia: unidades, lotes, caducidad, devolución y catálogo regulado. Administración: fondo de caja, descuentos, cortes y facturación. Titular: nombre comercial, permisos de uso de marca/fotos y responsables de datos.
+
+## Catálogo y lotes nuevos · v0.3.0
+
+En Inventario, usar **Nuevo producto** con un nombre ficticio y SKU propio. Completar categoría, mínimo, precio ilustrativo y primer lote; aparece con cero unidades. Registrar una entrada con motivo o crear una orden de compra para ese SKU y recibirla. **Agregar lote** reutiliza los datos del producto y no permite repetir el mismo lote. Una condición de cuarentena sigue bloqueando las salidas. Las altas se conservan en este navegador y aparecen en el selector de Compras.
+
+En el sitio del consultorio se pueden abrir las cuatro tarjetas de servicios, recorrer la guía de visita y desplegar las seis preguntas frecuentes. El menú para celular permite saltar a estas secciones.

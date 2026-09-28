@@ -785,9 +785,11 @@
           <h1>Inventario bajo control.</h1>
           <p>Existencias, lotes y caducidades en una sola vista.</p>
         </div>
+        <div class="page-actions"><button class="button primary" (click)="openModal('product')"><app-icon name="plus" /> Nuevo producto</button>
+        <button class="button outline" (click)="openModal('lot')">Agregar lote</button>
         <button class="button outline" (click)="exportInventory()">
           <app-icon name="download" /> Exportar CSV
-        </button>
+        </button></div>
       </div>
       <div class="stat-grid three">
         <article class="stat-card">
@@ -1211,6 +1213,14 @@
       tu navegador.
     </p>
     @switch(modal){
+    @case('product'){
+      <label>Nombre del producto ficticio<input name="productName" [(ngModel)]="form.name" maxlength="145" required placeholder="Ej. Consumible de ejemplo" /></label>
+      <div class="form-columns"><label>SKU del producto<input name="newSku" [(ngModel)]="form.sku" maxlength="40" required placeholder="Ej. DEMO-003" /></label><label>Categoría<select name="category" [(ngModel)]="form.category"><option>Farmacia</option><option>Insumos</option></select></label></div>
+      <div class="form-columns"><label>Mínimo de unidades por lote<input name="minimum" type="number" min="0" max="1000000" step="1" [(ngModel)]="form.minimum" required /></label><label>Precio ilustrativo por unidad (MXN)<input name="price" type="number" min="0" step="0.01" [(ngModel)]="form.price" required /></label></div>
+    }
+    @case('lot'){
+      <label>Producto del catálogo ficticio<select name="existingSku" [(ngModel)]="form.sku" required>@for(p of productCatalog();track p.sku){<option [value]="p.sku">{{p.product}} · {{p.sku}}</option>}</select></label>
+    }
     @case('supplier'){
       <label>Nombre ficticio del proveedor<input name="supplierName" [(ngModel)]="form.name" required maxlength="70" placeholder="Ej. Suministros Demo" /></label>
       <label>Referencia del proveedor<input name="supplierReference" [(ngModel)]="form.reference" required maxlength="80" /></label>
@@ -1405,7 +1415,13 @@
       Se eliminarán los cambios ficticios de este navegador y se restaurarán los
       ejemplos iniciales. Puedes exportar tus ejemplos antes de hacerlo.
     </p>
-    } } @if(error){
+    } }
+    @if(modal==='product'||modal==='lot'){
+      <div class="form-columns"><label>Lote de ejemplo<input name="inventoryBatch" [(ngModel)]="form.batch" required maxlength="80" /></label><label>Caducidad de ejemplo<input name="inventoryExpiry" type="date" [(ngModel)]="form.expires" [min]="date" required /></label></div>
+      <label>Condición del lote<select name="inventoryCondition" [(ngModel)]="form.quarantined"><option [ngValue]="false">Disponible</option><option [ngValue]="true">Cuarentena</option></select></label>
+      <p class="muted">El lote comienza con cero unidades. Después registra una entrada con motivo o recíbelo desde una orden de compra. El alta por sí sola no incrementa las existencias.</p>
+    }
+    @if(error){
     <p role="alert" class="error-message">{{error}}</p>
     }
     <div class="form-actions">
