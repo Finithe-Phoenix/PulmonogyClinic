@@ -62,6 +62,8 @@ class InventoryApiTest {
         for (var token : List.of("forged.jwt.value",
                 identity.token("a", "ADMIN", "https://other.example.test", "clinic-api", Instant.now().plusSeconds(60)),
                 identity.token("a", "ADMIN", identity.issuer, "other-api", Instant.now().plusSeconds(60)),
+                identity.token("a", "ADMIN", identity.issuer, "clinic-api", null),
+                identity.token("", "ADMIN", identity.issuer, "clinic-api", Instant.now().plusSeconds(60)),
                 identity.token("a", "ADMIN", identity.issuer, "clinic-api", Instant.now().minusSeconds(300))))
             assertEquals(401, get(ROOT + "/products", token).statusCode());
         try (var otherIdentity = new JwtFixture()) {
@@ -106,7 +108,9 @@ class InventoryApiTest {
         assertEquals(400, post(ROOT + "/lots", pharmacy, UUID.randomUUID(), Map.of("productId", product, "batch", "A", "quarantined", false)).statusCode());
         var supply = post(ROOT + "/products", admin, UUID.randomUUID(), Map.of("sku", "INS-01", "name", "Insumo ficticio", "category", "INSUMOS", "unit", "pieza", "minimumStock", 2));
         assertEquals(201, supply.statusCode());
-        assertEquals(201, post(ROOT + "/lots", pharmacy, UUID.randomUUID(), Map.of("productId", body(supply).get("id").asString(), "batch", "A")).statusCode());
+        var nonPerishable = post(ROOT + "/lots", pharmacy, UUID.randomUUID(), Map.of("productId", body(supply).get("id").asString(), "batch", "A", "quarantined", false));
+        assertEquals(201, nonPerishable.statusCode(), nonPerishable.body());
+        assertTrue(body(nonPerishable).get("expiresOn").isNull());
     }
     @Test void rejectsInvalidAndFractionalQuantitiesUnknownFieldsAndMissingKeys() throws Exception {
         UUID lot = lot(false);
@@ -181,6 +185,7 @@ class InventoryApiTest {
         assertEquals(409, move(lot, "ISSUE", 1, pharmacy, UUID.randomUUID()).statusCode());
         var input = Map.of("quarantined", false, "reason", "Revisión ficticia completada");
         assertEquals(403, post(ROOT + "/lots/" + lot + "/quarantine", pharmacy, UUID.randomUUID(), input).statusCode());
+        assertEquals(400, post(ROOT + "/lots/" + lot + "/quarantine", admin, UUID.randomUUID(), Map.of("reason", "Falta condición explícita")).statusCode());
         assertEquals(200, post(ROOT + "/lots/" + lot + "/quarantine", admin, UUID.randomUUID(), input).statusCode());
         assertEquals(201, move(lot, "ISSUE", 1, pharmacy, UUID.randomUUID()).statusCode());
         assertEquals(2, stock(lot));
@@ -198,9 +203,11 @@ class InventoryApiTest {
     }
     @Test void fefoExcludesBlockedEmptyAndExpiredLots() throws Exception {
         UUID product = product();
-        for (int day : new int[]{20, 5, 10}) {
+        for (int day : new int[]{20, 5, 10, 30, 40}) {
             var response = post(ROOT + "/lots", pharmacy, UUID.randomUUID(), Map.of("productId", product, "batch", "FEFO-" + day, "expiresOn", today().plusDays(day).toString(), "quarantined", day == 5));
-            move(UUID.fromString(body(response).get("id").asString()), "RECEIPT", 1, pharmacy, UUID.randomUUID());
+            UUID lot = UUID.fromString(body(response).get("id").asString());
+            if (day != 30) move(lot, "RECEIPT", 1, pharmacy, UUID.randomUUID());
+            if (day == 40) jdbc.update("UPDATE inventory_lot SET expires_on = ? WHERE id = ?", today().minusDays(1), lot);
         }
         var lots = body(get(ROOT + "/lots?productId=" + product + "&availableOnly=true", pharmacy)).get("items");
         assertEquals(2, lots.size());

@@ -16,6 +16,9 @@ public class SecurityConfiguration {
     @Bean SecurityFilterChain security(HttpSecurity http) throws Exception {
         var converter = new JwtAuthenticationConverter();
         converter.setJwtGrantedAuthoritiesConverter(jwt -> {
+            if (jwt.getSubject() == null || jwt.getSubject().isBlank() || jwt.getSubject().length() > 200 || jwt.getExpiresAt() == null)
+                throw new org.springframework.security.oauth2.core.OAuth2AuthenticationException(
+                    new org.springframework.security.oauth2.core.OAuth2Error("invalid_token", "Se requiere identidad y vencimiento del token.", null));
             Object claim = jwt.getClaims().get("roles");
             if (!(claim instanceof List<?> roles)) return List.of();
             return roles.stream().filter(String.class::isInstance).map(String.class::cast)

@@ -38,7 +38,7 @@ final class JwtFixture implements AutoCloseable {
     String token(String subject, String role, String tokenIssuer, String audience, Instant expiry) {
         try {
             var claims = new JWTClaimsSet.Builder().subject(subject).issuer(tokenIssuer).audience(audience)
-                .issueTime(Date.from(Instant.now().minusSeconds(600))).expirationTime(Date.from(expiry))
+                .issueTime(Date.from(Instant.now().minusSeconds(600))).expirationTime(expiry == null ? null : Date.from(expiry))
                 .claim("roles", List.of(role)).build();
             var jwt = new SignedJWT(new JWSHeader.Builder(JWSAlgorithm.RS256).keyID(key.getKeyID()).build(), claims);
             jwt.sign(new RSASSASigner(key));

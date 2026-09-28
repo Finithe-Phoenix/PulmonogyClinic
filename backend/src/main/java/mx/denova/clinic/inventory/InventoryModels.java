@@ -18,12 +18,12 @@ public final class InventoryModels {
     }
     public record Lot(UUID id, UUID productId, String batch, LocalDate expiresOn, int quantity, boolean quarantined) {}
     public record LotInput(@NotNull UUID productId, @NotBlank @Size(max=80) String batch,
-            LocalDate expiresOn, boolean quarantined) { public LotInput { batch = normalize(batch); } }
+            LocalDate expiresOn, @NotNull Boolean quarantined) { public LotInput { batch = normalize(batch); } }
     public record Movement(UUID id, UUID lotId, MovementKind kind, int quantity, int balanceAfter,
             String reason, String actor, Instant createdAt) {}
     public record MovementInput(@NotNull MovementKind kind, @Min(1) @Max(1000000) int quantity,
             @NotBlank @Size(max=240) String reason) { public MovementInput { reason = trim(reason); } }
-    public record QuarantineInput(boolean quarantined, @NotBlank @Size(max=240) String reason) {
+    public record QuarantineInput(@NotNull Boolean quarantined, @NotBlank @Size(max=240) String reason) {
         public QuarantineInput { reason = trim(reason); }
     }
     public record AuditEvent(long id, UUID commandId, String action, UUID entityId, String actor, String reason, Instant createdAt) {}
