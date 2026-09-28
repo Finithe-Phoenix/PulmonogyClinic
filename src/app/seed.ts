@@ -1,7 +1,16 @@
 import type { DemoState } from "./domain";
 export function seed(): DemoState {
   return {
-    version: 1,
+    version: 2,
+    suppliers: [
+      { id: "SUP-001", reference: "PROV-DEMO-01", name: "Suministros del Valle · Ficticio" },
+      { id: "SUP-002", reference: "PROV-DEMO-02", name: "Distribuidora Norte · Ficticia" },
+    ],
+    purchases: [{
+      id: "OC-001", reference: "OC-DEMO-001", supplierId: "SUP-001", date: "2026-09-28", expectedDate: "2026-10-02", cancelled: false,
+      lines: [{ id: "LINE-001", sku: "MED-DEMO-01", product: "Inhalador de demostración A", category: "Farmacia", ordered: 20, received: 0, unitCostCents: 20000, minimum: 10, priceCents: 32000 }],
+    }],
+    receipts: [],
     patients: [
       {
         id: "DEMO-001",

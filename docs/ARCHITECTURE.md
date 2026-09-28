@@ -3,9 +3,11 @@
 ## Decisiones ejecutadas
 
 - Angular 21 LTS, componentes standalone y estado con signals. Compilación estática para GitHub Pages.
-- Un sitio propuesto y ocho vistas de operación, navegación por fragmentos para evitar errores de recarga en Pages.
+- Un sitio propuesto y nueve vistas de operación, navegación por fragmentos para evitar errores de recarga en Pages.
 - Reglas puras separadas de la interfaz en `src/app/domain.ts`; dinero en centavos enteros.
 - Datos exclusivamente sintéticos. Persistencia de demostración en `localStorage`, sin transmisión al consultorio.
+- Versión 2 del estado: agrega proveedores, órdenes y recepciones; migra el estado v1 conservando pacientes, notas, caja y stock. Se mantiene la clave de almacenamiento existente para poder reconocer los ejemplos anteriores.
+- Las compras conservan cantidades pedidas/recibidas y costos por partida. Cada recepción enlaza orden, partida, lote y movimiento; un folio repetido con los mismos datos devuelve el estado existente. Un folio con otros datos se rechaza. Son invariantes secuenciales de la demo, pendientes de transacciones y concurrencia en el servidor.
 - CSV con escape de comillas y neutralización de prefijos de fórmulas; interpolación Angular, sin HTML de usuario.
 - Documentos de consulta de ejemplo cerrados conservan el contenido desde la interfaz; las correcciones se agregan como adendas. Esto no implementa firma electrónica ni inmutabilidad del almacenamiento.
 - Sin rastreadores, fuentes externas, formularios de captación, credenciales ni fotos de terceros. SVG decorativo propio y marca provisional.

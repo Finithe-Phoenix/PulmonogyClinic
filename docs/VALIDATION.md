@@ -1,4 +1,4 @@
-# Validación de la demo v0.1.1
+# Validación de la demo v0.2.0
 
 Esta entrega es una demostración estática con datos ficticios. La validación de interfaz no acredita una aplicación multiusuario ni un sistema clínico apto para producción.
 
@@ -10,8 +10,8 @@ npx playwright install chromium
 npm run check
 ```
 
-- 13 pruebas de dominio: cantidades y caducidades, cuarentena, FEFO, fechas reales del calendario, horarios duplicados, importes en centavos, referencias únicas, adendas y exportación CSV.
-- 12 pruebas de navegador: seis recorridos en escritorio y seis con viewport/touch móvil de Chromium. Verifican navegación de los ocho módulos, recarga de rutas con prefijo de Pages, citas duplicadas, persistencia local de movimientos, bloqueo de caducados, nota cerrada con adenda, conciliación/reverso de caja y almacenamiento bloqueado.
+- 22 pruebas de dominio: cantidades y caducidades, cuarentena, FEFO, fechas reales del calendario, horarios duplicados, importes en centavos, referencias únicas, adendas y exportación CSV; órdenes de compra, recepción parcial, referencias repetidas, cuarentena, cancelación del saldo y migración del estado v1.
+- 18 pruebas de navegador: nueve recorridos en escritorio y nueve con viewport/touch móvil de Chromium. Verifican navegación de los nueve módulos, recarga de rutas con prefijo de Pages, citas duplicadas, persistencia local de movimientos, bloqueo de caducados, nota cerrada con adenda, conciliación/reverso de caja y almacenamiento bloqueado. Se agregan compras de varias partidas, recepciones parciales, cancelación y migración de ejemplos guardados.
 - Compilación de producción con `base-href` igual al nombre real del repositorio.
 - Revisión visual de sitio y panel en escritorio y pantalla móvil; corrección del contraste del texto en la tarjeta del encabezado.
 
@@ -25,6 +25,6 @@ Esta emulación móvil no equivale a haber probado Safari ni un iPhone físico. 
 
 ## Publicación
 
-El primer workflow de `main` compiló y pasó sus pruebas, pero `Configure Pages` devolvió `Get Pages site failed / Not Found`. Es necesario activar **Settings → Pages → Source: GitHub Actions** y volver a ejecutar el workflow. La preparación del workflow por sí sola no demuestra que el sitio ya esté publicado.
+El workflow de la entrega anterior compiló y pasó sus pruebas, pero `Configure Pages` devolvió `Get Pages site failed / Not Found`. Es necesario activar **Settings → Pages → Source: GitHub Actions** y volver a ejecutar el workflow. La preparación del workflow por sí sola no demuestra que el sitio ya esté publicado.
 
 El siguiente despliegue debe comprobarse en Actions y después abrirse en la URL devuelta por `Deploy demo`. El artefacto `demo-browser-report` contiene el reporte y capturas del CI por siete días.

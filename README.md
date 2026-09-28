@@ -2,7 +2,7 @@
 
 Primera entrega del proyecto digital del Dr. Marco Antonio De Nova Macedo: sitio profesional propuesto y plataforma de demostración para consultorio, farmacia y caja.
 
-**Estado: demo estática v0.1.1. Todos los pacientes, notas, productos, lotes, equipos y cobros son ficticios. No usar para atención clínica ni capturar datos reales.**
+**Estado: demo estática v0.2.0. Todos los pacientes, proveedores, compras, notas, productos, lotes, equipos y cobros son ficticios. No usar para atención clínica ni capturar datos reales.**
 
 ![Propuesta del sitio del doctor](docs/previews/sitio-desktop.jpg)
 
@@ -47,6 +47,7 @@ Salida: `dist/clinic/browser`. Base pública: `/PulmonogyClinic/`. La navegació
 | Pacientes       | Buscar perfiles ficticios y agregar ejemplos con identificador propio.                                                  |
 | Consultas       | Seleccionar paciente, crear notas, guardar borradores, cerrar ejemplos, agregar adendas y exportar JSON.                |
 | Inventario      | Buscar y filtrar lotes, entradas y salidas, bloqueo de caducados/cuarentena/faltantes, sugerencia FEFO, bitácora y CSV. |
+| Compras         | Proveedores ficticios, órdenes de varias partidas, recepción parcial por lote, cuarentena, cancelación del saldo y CSV. |
 | Equipos         | Activos ilustrativos y cambio de disponibilidad/mantenimiento.                                                          |
 | Caja            | Cobros simulados en centavos, referencia única, reversos con motivo, conciliación de efectivo y CSV.                    |
 | Proyecto        | Estado visible de lo demostrado y lo pendiente para producción.                                                         |

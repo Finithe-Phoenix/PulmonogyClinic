@@ -15,8 +15,16 @@ import {
   postPayment,
   receive,
   toCSV,
+  addSupplier,
+  createPurchase,
+  cancelPurchase,
+  receivePurchase,
+  purchaseStatus,
+  purchaseTotal,
+  restoreDemoState,
+  requireQuantity,
 } from "./domain";
-import type { ClinicalNote, DemoState, Lot, VisitStatus } from "./domain";
+import type { ClinicalNote, DemoState, Lot, VisitStatus, PurchaseDraft, PurchaseOrder } from "./domain";
 import { seed } from "./seed";
 
 const STORAGE = "pulmonogy.demo.v1";
@@ -47,6 +55,14 @@ const freshForm = () => ({
   method: "Efectivo" as "Efectivo" | "Tarjeta" | "Transferencia",
   kind: "Salida" as "Salida" | "Entrada",
   text: "",
+  supplierId: "SUP-001",
+  sku: "MED-DEMO-01",
+  unitCost: 200,
+  expectedDate: "2026-10-02",
+  lineId: "",
+  batch: "",
+  expires: "2027-09-30",
+  quarantined: false,
 });
 
 @Component({
@@ -65,6 +81,7 @@ export class AppComponent {
     { id: "pacientes", label: "Pacientes", icon: "users" },
     { id: "consultas", label: "Consultas", icon: "file" },
     { id: "inventario", label: "Inventario", icon: "box" },
+    { id: "compras", label: "Compras", icon: "cart" },
     { id: "equipos", label: "Equipos", icon: "pulse" },
     { id: "caja", label: "Caja", icon: "wallet" },
     { id: "proyecto", label: "Plan del proyecto", icon: "route" },
@@ -110,7 +127,7 @@ export class AppComponent {
     {
       phase: "03",
       title: "Farmacia y equipos",
-      detail: "Lotes, caducidades, movimientos y mantenimiento.",
+      detail: "Compras, recepción parcial, lotes, caducidades y equipos.",
       state: "Flujos de demostración",
       done: true,
     },
@@ -156,6 +173,12 @@ export class AppComponent {
   paymentId = "";
   cashCount: number | null = null;
   cashResult: string | null = null;
+  purchaseFilter = "Todas";
+  purchaseId = "";
+  purchaseDraftLines: PurchaseDraft["lines"] = [];
+  readonly productCatalog = computed(() => [...new Map(this.state().lots.map(l => [l.sku, l])).values()]);
+  readonly pendingPurchases = computed(() => this.state().purchases.filter(p => !p.cancelled && purchaseStatus(p) !== "Recibida"));
+  readonly pendingPurchaseValue = computed(() => this.pendingPurchases().reduce((total, order) => total + purchaseTotal(order, true), 0));
   private toastTimer: ReturnType<typeof setTimeout> | undefined;
   readonly title = computed(
     () => this.nav.find((n) => n.id === this.page())?.label || "Inicio",
@@ -261,6 +284,8 @@ export class AppComponent {
             "Cuarentena",
             "En mantenimiento",
             "Borrador",
+            "Pendiente",
+            "Parcial",
           ].includes(value)
         ? "warning"
         : ["En consulta", "Confirmada"].includes(value)
@@ -364,10 +389,25 @@ export class AppComponent {
           reverse: "Reversar cobro",
           privacy: "Acerca de esta demostración",
           service: context,
+          supplier: "Proveedor de demostración",
+          purchase: "Nueva orden de compra",
+          receipt: "Recibir mercancía de ejemplo",
+          cancelPurchase: "Cancelar saldo pendiente",
         } as Record<string, string>
       )[kind] || kind;
     if (kind === "movement") this.form.lotId = context;
     if (kind === "reverse") this.paymentId = context;
+    if (kind === "purchase") {
+      this.purchaseDraftLines = [];
+      this.form.supplierId = this.state().suppliers[0]?.id || "";
+      this.form.reference = "OC-" + this.form.reference;
+    }
+    if (kind === "receipt" || kind === "cancelPurchase") this.purchaseId = context;
+    if (kind === "receipt") {
+      this.form.lineId = this.selectedPurchase()?.lines.find(l => l.received < l.ordered)?.id || "";
+      this.form.reference = "REC-" + this.form.reference;
+      this.form.batch = "LOTE-DEMO-" + crypto.randomUUID().slice(0, 6).toUpperCase();
+    }
     setTimeout(() =>
       document.querySelector<HTMLDialogElement>("#modal")?.showModal(),
     );
@@ -391,12 +431,67 @@ export class AppComponent {
           "Ningún lote apto"
       : "";
   }
+  supplierName(id: string) {
+    return this.state().suppliers.find(s => s.id === id)?.name || id;
+  }
+  orderReference(id: string) { return this.state().purchases.find(p => p.id === id)?.reference || id; }
+  productName(sku: string) {
+    return this.productCatalog().find(p => p.sku === sku)?.product || sku;
+  }
+  orderStatus(order: PurchaseOrder) { return purchaseStatus(order); }
+  orderTotal(order: PurchaseOrder) { return purchaseTotal(order); }
+  selectedPurchase() { return this.state().purchases.find(p => p.id === this.purchaseId); }
+  selectedPurchaseLine() { return this.selectedPurchase()?.lines.find(l => l.id === this.form.lineId); }
+  orders() {
+    const q = this.query.trim().toLocaleLowerCase("es-MX");
+    return this.state().purchases.filter(p =>
+      (this.purchaseFilter === "Todas" || purchaseStatus(p) === this.purchaseFilter) &&
+      [p.reference, this.supplierName(p.supplierId), ...p.lines.map(l => l.product)].join(" ").toLocaleLowerCase("es-MX").includes(q));
+  }
+  addPurchaseLine() {
+    try {
+      const quantity = Number(this.form.quantity);
+      const cents = Number(this.form.unitCost) * 100;
+      requireQuantity(quantity);
+      if (!Number.isFinite(cents) || Math.abs(cents - Math.round(cents)) > 0.000001)
+        throw new Error("Usa un costo con hasta dos decimales.");
+      requireQuantity(Math.round(cents));
+      if (!this.productCatalog().some(p => p.sku === this.form.sku)) throw new Error("Selecciona un producto.");
+      if (this.purchaseDraftLines.some(l => l.sku === this.form.sku))
+        throw new Error("El producto ya está agregado. Quita la partida para cambiar su cantidad.");
+      this.purchaseDraftLines = [...this.purchaseDraftLines, { id: crypto.randomUUID(), sku: this.form.sku, ordered: quantity, unitCostCents: Math.round(cents) }];
+      this.error = "";
+    } catch(e) { this.error = this.message(e); }
+  }
+  removePurchaseLine(id: string) { this.purchaseDraftLines = this.purchaseDraftLines.filter(l => l.id !== id); }
+  draftPurchaseTotal() { return this.purchaseDraftLines.reduce((sum, l) => sum + l.ordered * l.unitCostCents, 0); }
+  exportPurchases() {
+    this.download("compras-ficticias.csv", toCSV([
+      ["Orden", "Proveedor ficticio", "SKU", "Producto", "Pedido", "Recibido", "Costo unitario (centavos MXN)", "Entrega esperada", "Estado"],
+      ...this.state().purchases.flatMap(p => p.lines.map(l => [p.reference, this.supplierName(p.supplierId), l.sku, l.product, l.ordered, l.received, l.unitCostCents, p.expectedDate, purchaseStatus(p)])),
+    ]), "text/csv;charset=utf-8");
+  }
   submit() {
     try {
       const s = this.state(),
         f = this.form,
         id = crypto.randomUUID();
       switch (this.modal) {
+        case "supplier":
+          this.save(addSupplier(s, { id, reference: f.reference, name: f.name.trim() ? f.name.trim() + " · Demo" : "" }));
+          break;
+        case "purchase":
+          this.save(createPurchase(s, { id, reference: f.reference, supplierId: f.supplierId,
+            date: this.date, expectedDate: f.expectedDate, lines: this.purchaseDraftLines }));
+          break;
+        case "receipt":
+          this.save(receivePurchase(s, { id, reference: f.reference, purchaseId: this.purchaseId,
+            lineId: f.lineId, date: this.date, batch: f.batch, expires: f.expires,
+            quantity: Number(f.quantity), quarantined: f.quarantined, newLotId: "LOT-" + id }));
+          break;
+        case "cancelPurchase":
+          this.save(cancelPurchase(s, this.purchaseId, f.reason));
+          break;
         case "patient": {
           if (!f.name.trim()) throw new Error("Escribe un nombre ficticio.");
           if (!isCalendarDate(f.birth) || f.birth > this.date)
@@ -622,19 +717,7 @@ export class AppComponent {
   private load(): DemoState {
     try {
       const saved = JSON.parse(localStorage.getItem(STORAGE) || "null");
-      if (
-        saved?.version === 1 &&
-        [
-          "patients",
-          "visits",
-          "lots",
-          "movements",
-          "notes",
-          "payments",
-          "equipment",
-        ].every((k) => Array.isArray(saved[k]))
-      )
-        return saved;
+      return restoreDemoState(saved, seed());
     } catch {}
     return seed();
   }

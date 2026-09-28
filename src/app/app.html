@@ -871,6 +871,60 @@
         </p>
         }
       </section>
+      } @case('compras') {
+      <div class="page-heading">
+        <div><span class="eyebrow">ABASTECIMIENTO DE FARMACIA</span><h1>Compras y recepción</h1>
+          <p>Del pedido a las existencias, con cada entrega identificada.</p></div>
+        <div class="purchase-actions">
+          <button class="button outline" (click)="exportPurchases()"><app-icon name="download" /> Exportar compras</button>
+          <button class="button primary" (click)="openModal('purchase')"><app-icon name="plus" /> Nueva orden</button>
+        </div>
+      </div>
+      <div class="stat-grid three">
+        <article class="stat-card"><span>Órdenes pendientes <app-icon name="cart" /></span><strong>{{pendingPurchases().length}}</strong><small>Incluye entregas parciales</small></article>
+        <article class="stat-card"><span>Costo pendiente ilustrativo</span><strong>{{money(pendingPurchaseValue())}}</strong><small>No representa un pago ni una deuda real</small></article>
+        <article class="stat-card"><span>Recepciones registradas</span><strong>{{state().receipts.length}}</strong><small>Cada folio afecta el stock una sola vez</small></article>
+      </div>
+      <div class="info-banner"><app-icon name="info" /><p>Crear una orden <strong>no aumenta el inventario</strong>. Las existencias cambian al recibir mercancía. Todos los proveedores, costos y documentos son ficticios.</p></div>
+      <section class="panel spaced">
+        <div class="toolbar">
+          <label class="search"><app-icon name="search" /><input aria-label="Buscar compra" [(ngModel)]="query" placeholder="Orden, proveedor o producto..." /></label>
+          <select aria-label="Filtrar estado de compra" [(ngModel)]="purchaseFilter">
+            <option>Todas</option><option>Pendiente</option><option>Parcial</option><option>Recibida</option><option>Cancelada</option>
+          </select>
+        </div>
+        <div class="table-scroll">
+          <table class="purchase-table"><thead><tr><th>Orden / proveedor</th><th>Productos y avance</th><th>Costo de la orden</th><th>Estado</th><th>Acciones</th></tr></thead>
+            <tbody>@for(p of orders();track p.id){
+              <tr>
+                <td><strong>{{p.reference}}</strong><small>{{supplierName(p.supplierId)}}</small><small>Entrega esperada: {{p.expectedDate}}</small></td>
+                <td>@for(line of p.lines;track line.id){<div class="purchase-line"><strong>{{line.product}}</strong><small>{{line.received}} / {{line.ordered}} unidades recibidas · {{money(line.unitCostCents)}} por unidad</small></div>}</td>
+                <td>{{money(orderTotal(p))}}<small>Importe ilustrativo</small></td>
+                <td><span class="pill" [ngClass]="pill(orderStatus(p))">{{orderStatus(p)}}</span>@if(p.cancelled){<small>{{p.cancellationReason}}</small>}</td>
+                <td><div class="purchase-row-actions">@if(!p.cancelled&&orderStatus(p)!=='Recibida'){
+                  <button class="button compact" (click)="openModal('receipt',p.id)">Recibir <app-icon name="box" /></button>
+                  <button class="plain danger-text" (click)="openModal('cancelPurchase',p.id)">Cancelar pendiente</button>
+                }@else{<span class="muted">Sin saldo por recibir</span>}</div></td>
+              </tr>
+            }@empty{<tr><td colspan="5" class="empty-state">No hay órdenes con este filtro. Crea una orden de ejemplo para comenzar.</td></tr>}</tbody>
+          </table>
+        </div>
+      </section>
+      <section class="panel spaced">
+        <div class="panel-heading"><div><h2>Entregas recibidas</h2><p>Folio, lote y condición conservados en cada entrada.</p></div><span class="pill blue">{{state().receipts.length}}</span></div>
+        <div class="table-scroll"><table><thead><tr><th>Recepción / orden</th><th>Lote / caducidad</th><th>Unidades</th><th>Costo recibido</th><th>Condición</th></tr></thead>
+          <tbody>@for(r of state().receipts;track r.id){<tr>
+            <td><strong>{{r.reference}}</strong><small>{{orderReference(r.purchaseId)}} · {{r.date}}</small></td>
+            <td>{{r.batch}}<small>{{r.expires}}</small></td><td>{{r.quantity}}</td><td>{{money(r.quantity*r.unitCostCents)}}</td>
+            <td><span class="pill" [ngClass]="r.quarantined?'warning':'green'">{{r.quarantined?'Cuarentena':'Disponible'}}</span></td>
+          </tr>}@empty{<tr><td colspan="5" class="empty-state">Aún no se ha recibido mercancía en esta demo.</td></tr>}</tbody>
+        </table></div>
+      </section>
+      <section class="panel spaced">
+        <div class="panel-heading"><div><h2>Proveedores de ejemplo</h2><p>Directorio ilustrativo para relacionar pedidos y entregas.</p></div>
+          <button class="button outline" (click)="openModal('supplier')"><app-icon name="plus" /> Agregar proveedor</button></div>
+        <div class="supplier-list">@for(s of state().suppliers;track s.id){<div><span class="soft-icon"><app-icon name="cart" /></span><span><strong>{{s.name}}</strong><small>{{s.reference}}</small></span></div>}</div>
+      </section>
       } @case('equipos') {
       <div class="page-heading">
         <div>
@@ -1069,7 +1123,7 @@
       } }
       <footer class="app-footer">
         <span>De Nova · Plataforma de demostración</span
-        ><span>v0.1.1 · Datos sintéticos · Sin conexión clínica</span>
+        ><span>v0.2.0 · Datos sintéticos · Sin conexión clínica</span>
       </footer>
     </main>
   </div>
@@ -1134,7 +1188,52 @@
       Usa únicamente información ficticia. Esta acción solo afecta a la demo de
       tu navegador.
     </p>
-    @switch(modal){ @case('patient'){<label
+    @switch(modal){
+    @case('supplier'){
+      <label>Nombre ficticio del proveedor<input name="supplierName" [(ngModel)]="form.name" required maxlength="70" placeholder="Ej. Suministros Demo" /></label>
+      <label>Referencia del proveedor<input name="supplierReference" [(ngModel)]="form.reference" required maxlength="80" /></label>
+    }
+    @case('purchase'){
+      <div class="form-columns">
+        <label>Folio de la orden<input name="orderReference" [(ngModel)]="form.reference" required maxlength="80" /></label>
+        <label>Entrega esperada<input name="expectedDate" type="date" [(ngModel)]="form.expectedDate" [min]="date" required /></label>
+      </div>
+      <label>Proveedor de ejemplo<select name="supplier" [(ngModel)]="form.supplierId" required>@for(s of state().suppliers;track s.id){<option [value]="s.id">{{s.name}}</option>}</select></label>
+      <div class="purchase-line-builder">
+        <h3>Agregar productos</h3>
+        <label>Producto del catálogo ficticio<select name="sku" [(ngModel)]="form.sku">@for(p of productCatalog();track p.sku){<option [value]="p.sku">{{p.product}}</option>}</select></label>
+        <div class="form-columns"><label>Unidades a pedir<input name="ordered" type="number" min="1" step="1" [(ngModel)]="form.quantity" /></label>
+          <label>Costo unitario ilustrativo (MXN)<input name="unitCost" type="number" min="0.01" step="0.01" [(ngModel)]="form.unitCost" /></label></div>
+        <button class="button outline" type="button" (click)="addPurchaseLine()"><app-icon name="plus" /> Agregar partida</button>
+      </div>
+      <div class="purchase-draft">@for(line of purchaseDraftLines;track line.id){
+        <div><span><strong>{{productName(line.sku)}}</strong><small>{{line.ordered}} unidades × {{money(line.unitCostCents)}}</small></span>
+          <button type="button" class="icon-button" [attr.aria-label]="'Quitar partida '+productName(line.sku)" (click)="removePurchaseLine(line.id)"><app-icon name="close" /></button></div>
+      }@empty{<p class="muted">Agrega al menos una partida antes de crear la orden.</p>}</div>
+      <div class="purchase-total"><span>Total ilustrativo</span><strong>{{money(draftPurchaseTotal())}}</strong></div>
+      <p class="muted">La orden queda pendiente; no registra existencias, pagos ni envía pedidos al proveedor.</p>
+    }
+    @case('receipt'){
+      <div class="selected-lot"><strong>{{selectedPurchase()?.reference}}</strong><span>{{supplierName(selectedPurchase()?.supplierId||'')}}</span></div>
+      <label>Partida a recibir<select name="receiptLine" [(ngModel)]="form.lineId">
+        @for(line of selectedPurchase()?.lines||[];track line.id){@if(line.received<line.ordered){<option [value]="line.id">{{line.product}} · Pendiente: {{line.ordered-line.received}}</option>}}
+      </select></label>
+      <label>Folio de recepción<input name="receiptReference" [(ngModel)]="form.reference" required maxlength="80" /></label>
+      <div class="form-columns">
+        <label>Unidades recibidas<input name="received" type="number" min="1" step="1" [(ngModel)]="form.quantity" required /></label>
+        <label>Condición de recepción<select name="quarantined" [(ngModel)]="form.quarantined"><option [ngValue]="false">Disponible</option><option [ngValue]="true">Cuarentena</option></select></label>
+      </div>
+      <div class="form-columns">
+        <label>Lote del fabricante<input name="batch" [(ngModel)]="form.batch" required maxlength="80" /></label>
+        <label>Caducidad del lote<input name="expires" type="date" [(ngModel)]="form.expires" [min]="date" required /></label>
+      </div>
+      <p class="muted">Saldo de esta partida: {{(selectedPurchaseLine()?.ordered||0)-(selectedPurchaseLine()?.received||0)}} unidades. Cada entrega debe llevar su propio folio. Los lotes en cuarentena no permiten salidas.</p>
+    }
+    @case('cancelPurchase'){
+      <p>Se cancelará únicamente lo pendiente de {{selectedPurchase()?.reference}}. Las recepciones y existencias ya registradas se conservan.</p>
+      <label>Motivo de cancelación<input name="cancellationReason" [(ngModel)]="form.reason" required maxlength="140" /></label>
+    }
+    @case('patient'){<label
       >Nombre ficticio<input
         name="name"
         [(ngModel)]="form.name"
@@ -1291,7 +1390,7 @@
       <button type="button" class="button outline" (click)="closeModal()">
         Cancelar</button
       ><button type="submit" class="button primary">
-        {{modal==='reset'?'Restablecer demo':'Guardar ejemplo'}}
+        {{modal==='reset'?'Restablecer demo':modal==='purchase'?'Crear orden':modal==='receipt'?'Confirmar recepción':'Guardar ejemplo'}}
         <app-icon name="check" />
       </button>
     </div>

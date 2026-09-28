@@ -7,6 +7,7 @@ const paths: Record<string, string> = {
     "M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2m20 0v-2a4 4 0 0 0-3-3.87M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8m8-8a4 4 0 0 1 0 8",
   file: "M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zm0 0v6h6M8 13h8m-8 4h5",
   box: "m12 3 9 5-9 5-9-5 9-5zM3 8v9l9 5 9-5V8m-9 5v9M7 5.8l9 5",
+  cart: "M2 3h3l3 12h10l3-9H6M10 20h.01M18 20h.01M8 15l-1 3h12",
   pulse: "M2 12h4l3-8 6 16 3-8h4",
   wallet: "M3 6h16v14H3V6zm0 0V4h14m4 7h-6v5h6v-5zm-4 2v1",
   arrow: "M5 12h14m-6-6 6 6-6 6",

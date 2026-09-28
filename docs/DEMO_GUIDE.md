@@ -15,6 +15,18 @@
 
 "Esta versión permite revisar cómo trabajaríamos. Toda la información operativa es ficticia. La siguiente entrega construye la parte privada y conecta los sistemas que se acuerden. El expediente clínico real requiere selección y validación propias."
 
+## Recorrido adicional: compras y recepción
+
+1. Abrir **Compras**. La orden `OC-DEMO-001` contiene 20 unidades ficticias pendientes. Crear una orden no suma existencias ni registra un pago.
+2. Pulsar **Recibir** y capturar 5 unidades, un folio nuevo, un lote ficticio y una caducidad vigente. La orden pasa a **Parcial** y el lote aparece en Inventario con 5 unidades.
+3. Intentar recibir 16 unidades adicionales: debe rechazarse porque quedan 15. Un lote ya conocido debe conservar la misma caducidad y condición.
+4. Recibir el saldo restante con otro folio: el estado pasa a **Recibida**. Si se usa el mismo lote, se incrementa ese lote; no se crea una copia.
+5. Crear otra orden con varios productos y costos ilustrativos. Recibir una parte en **Cuarentena**; el inventario bloquea su salida.
+6. **Cancelar pendiente** conserva las entregas y las existencias ya registradas; requiere un motivo y bloquea nuevas recepciones.
+7. Agregar un proveedor ficticio y exportar compras a CSV. No se envían pedidos, pagos ni comunicaciones al proveedor.
+
+Las devoluciones al proveedor, impuestos, descuentos, unidades fraccionarias y cuentas por pagar quedan fuera de esta versión. Todas las cantidades de la demo son unidades enteras del catálogo ilustrativo.
+
 ## Casos a validar con el equipo
 
 Recepción: identidad y orden de llegada. Doctor: estructura documental y sistema clínico. Farmacia: unidades, lotes, caducidad, devolución y catálogo regulado. Administración: fondo de caja, descuentos, cortes y facturación. Titular: nombre comercial, permisos de uso de marca/fotos y responsables de datos.
