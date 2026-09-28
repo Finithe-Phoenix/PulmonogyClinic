@@ -28,3 +28,9 @@ Esta emulación móvil no equivale a haber probado Safari ni un iPhone físico. 
 El workflow de la entrega anterior compiló y pasó sus pruebas, pero `Configure Pages` devolvió `Get Pages site failed / Not Found`. Es necesario activar **Settings → Pages → Source: GitHub Actions** y volver a ejecutar el workflow. La preparación del workflow por sí sola no demuestra que el sitio ya esté publicado.
 
 El siguiente despliegue debe comprobarse en Actions y después abrirse en la URL devuelta por `Deploy demo`. El artefacto `demo-browser-report` contiene el reporte y capturas del CI por siete días.
+
+## Evidencia de esta entrega
+
+Código verificado: `8ab4310`. [Ejecución de GitHub Actions](https://github.com/Finithe-Phoenix/PulmonogyClinic/actions/runs/36369206390): el job `validate` pasó las 22 pruebas de dominio, la compilación y las 18 pruebas de navegador. El job `deploy` sigue fallando en la configuración inicial de Pages; no se declara una publicación exitosa.
+
+Las capturas de `docs/previews/compras-desktop.png`, `compras-mobile.png` y `panel-desktop.png` proceden de esa ejecución. Las vistas de compras se revisaron después del ajuste para celular.

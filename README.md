@@ -6,7 +6,7 @@ Primera entrega del proyecto digital del Dr. Marco Antonio De Nova Macedo: sitio
 
 ![Propuesta del sitio del doctor](docs/previews/sitio-desktop.jpg)
 
-[Ver el panel de gestión](docs/previews/panel-desktop.png) · [Guion para presentar la demo](docs/DEMO_GUIDE.md) · [Validaciones y límites](docs/VALIDATION.md)
+[Ver el panel de gestión](docs/previews/panel-desktop.png) · [Compras en escritorio](docs/previews/compras-desktop.png) · [Compras en celular](docs/previews/compras-mobile.png) · [Guion para presentar la demo](docs/DEMO_GUIDE.md) · [Validaciones y límites](docs/VALIDATION.md)
 
 ## Ejecutar
 
