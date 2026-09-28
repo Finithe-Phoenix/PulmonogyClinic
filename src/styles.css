@@ -2706,3 +2706,39 @@ dialog::backdrop {
 .purchase-total { font-size: 18px; border: 0; }
 .supplier-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr)); gap: 18px; padding: 24px; }
 .supplier-list > div { display: flex; gap: 14px; align-items: center; }
+@media (max-width: 760px) {
+  .table-scroll table.purchase-table, .table-scroll table.receipt-table { min-width: 0; width: 100%; }
+  .purchase-table thead, .receipt-table thead { display: none; }
+  .purchase-table tbody, .receipt-table tbody { display: block; }
+  .purchase-table tr, .receipt-table tr {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 16px;
+    padding: 20px;
+    border-bottom: 1px solid var(--border);
+  }
+  .purchase-table tr:last-child, .receipt-table tr:last-child { border: 0; }
+  .purchase-table td, .receipt-table td {
+    display: block;
+    padding: 0;
+    border: 0;
+    min-width: 0;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+  .purchase-table td:first-child, .purchase-table td:nth-child(2), .purchase-table td:last-child,
+  .receipt-table td:first-child, .receipt-table td:nth-child(2), .receipt-table td:last-child { grid-column: 1 / -1; }
+  .purchase-table td:nth-child(3)::before, .purchase-table td:nth-child(4)::before,
+  .receipt-table td:nth-child(3)::before, .receipt-table td:nth-child(4)::before {
+    display: block;
+    color: var(--muted);
+    font-size: 11px;
+    margin-bottom: 7px;
+  }
+  .purchase-table td:nth-child(3)::before { content: "Costo de la orden"; }
+  .purchase-table td:nth-child(4)::before { content: "Estado"; }
+  .receipt-table td:nth-child(3)::before { content: "Unidades recibidas"; }
+  .receipt-table td:nth-child(4)::before { content: "Costo recibido"; }
+  .purchase-row-actions { justify-content: space-between; }
+  .supplier-list { padding: 20px; }
+}

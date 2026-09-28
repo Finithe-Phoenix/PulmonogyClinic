@@ -133,6 +133,8 @@ test('una compra de dos productos se recibe por lotes y conserva sus saldos', as
   await dialog.getByRole('button', { name: 'Confirmar recepción', exact: true }).click();
   await expect(order).toContainText('Parcial');
   await expect(order).toContainText('3 / 5');
+  await page.getByRole('button', { name: 'Cerrar notificación' }).click();
+  expect(await page.locator('.purchase-table').evaluate(el => el.scrollWidth <= el.parentElement!.clientWidth)).toBe(true);
   await page.screenshot({ path: info.outputPath('compras.png'), fullPage: true });
   await page.goto(base + '#/panel/inventario');
   await page.getByLabel('Buscar inventario').fill('BATCH-E2E-001');

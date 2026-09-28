@@ -19,7 +19,7 @@ Los contextos de navegador se aíslan por prueba. Nunca se envían reservas a Do
 
 ## Entorno de verificación local
 
-La descarga estándar del navegador desde CDN devolvió HTML en este entorno. Se usó Chromium 153 del paquete público `@sparticuz/chromium` para ejecutar las mismas pruebas. El paquete auxiliar no forma parte de las dependencias de la aplicación. Playwright permite usar un ejecutable ya instalado mediante `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH`; el workflow de GitHub instala el navegador oficial de Playwright.
+En v0.1.1, la descarga estándar del navegador desde CDN devolvió HTML en el entorno local y se usó Chromium 153 del paquete público `@sparticuz/chromium`. Ese paquete auxiliar no forma parte de la aplicación. Para v0.2.0, las 22 pruebas de dominio y la compilación se ejecutaron localmente; las 18 pruebas de navegador se ejecutaron en GitHub Actions con el navegador oficial de Playwright. Las capturas del CI se revisaron y se ajustó la vista de compras en celular para mostrar fichas sin desplazamiento horizontal.
 
 Esta emulación móvil no equivale a haber probado Safari ni un iPhone físico. Tampoco valida concurrencia, recuperación de una base de datos, autenticación ni cumplimiento clínico; esas pruebas corresponden al sistema privado posterior.
 

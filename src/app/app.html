@@ -912,7 +912,7 @@
       </section>
       <section class="panel spaced">
         <div class="panel-heading"><div><h2>Entregas recibidas</h2><p>Folio, lote y condición conservados en cada entrada.</p></div><span class="pill blue">{{state().receipts.length}}</span></div>
-        <div class="table-scroll"><table><thead><tr><th>Recepción / orden</th><th>Lote / caducidad</th><th>Unidades</th><th>Costo recibido</th><th>Condición</th></tr></thead>
+        <div class="table-scroll"><table class="receipt-table"><thead><tr><th>Recepción / orden</th><th>Lote / caducidad</th><th>Unidades</th><th>Costo recibido</th><th>Condición</th></tr></thead>
           <tbody>@for(r of state().receipts;track r.id){<tr>
             <td><strong>{{r.reference}}</strong><small>{{orderReference(r.purchaseId)}} · {{r.date}}</small></td>
             <td>{{r.batch}}<small>{{r.expires}}</small></td><td>{{r.quantity}}</td><td>{{money(r.quantity*r.unitCostCents)}}</td>
