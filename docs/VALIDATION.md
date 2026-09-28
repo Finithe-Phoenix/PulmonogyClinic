@@ -2,6 +2,8 @@
 
 ## Evidencia local actual · 28/09/2026
 
+**Confirmación remota del código `e8218e90d6b0438bd321b0ae81641dba83cceff6`:** los tres workflows terminaron en verde: [API, 39 casos](https://github.com/Finithe-Phoenix/PulmonogyClinic/actions/runs/36442084871), [demo, 25 reglas + 22 navegador y despliegue](https://github.com/Finithe-Phoenix/PulmonogyClinic/actions/runs/36442085049), [portal privado, 10 E2E](https://github.com/Finithe-Phoenix/PulmonogyClinic/actions/runs/36442085420). Total remoto: 96 aprobados. La anotación de compatibilidad Node de acciones heredadas no impidió el despliegue; su actualización queda como mantenimiento independiente.
+
 En Windows se ejecutaron **96 casos, cero fallos y cero omisiones** en las ejecuciones finales: 25 de reglas (`npm test`), 22 de demo en navegador (`npm run test:e2e`), 39 API/migración (`npm run test:api:local`) y 10 de portal (`npm run test:portal`). Compilaciones separadas de Pages y portal aprobadas. El backend se compiló y probó con Java 21 y PostgreSQL 17.11 en Docker.
 
 Los 10 nuevos casos son cinco recorridos en escritorio y cinco en móvil Chromium: inicio de sesión Keycloak/PKCE, compra/recepción parcial/auditoría y persistencia al cerrar/iniciar sesión; respuesta perdida después del commit y reintento tras recarga; competencia admin/farmacia por una unidad; auditor con lectura y POST denegado en servidor; acceso anónimo 401 y recepción sin módulos autorizados. No se simula la API ni se omite JWT. Solo el caso de fallo de red intercepta y descarta una respuesta después de recibirla del servidor real.
