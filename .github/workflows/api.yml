@@ -1,4 +1,4 @@
-name: Validate private inventory API
+name: Validate private operations API
 on:
   push:
     branches: [main]

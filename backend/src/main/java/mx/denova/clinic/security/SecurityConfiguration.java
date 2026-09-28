@@ -37,6 +37,9 @@ public class SecurityConfiguration {
                 .requestMatchers(HttpMethod.POST, "/api/v1/inventory/products").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.POST, "/api/v1/inventory/lots/*/quarantine").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.POST, "/api/v1/inventory/lots", "/api/v1/inventory/lots/*/movements").hasAnyRole("ADMIN", "FARMACIA")
+                .requestMatchers(HttpMethod.GET, "/api/v1/purchasing/**").hasAnyRole("ADMIN", "FARMACIA", "AUDITOR")
+                .requestMatchers(HttpMethod.POST, "/api/v1/purchasing/suppliers", "/api/v1/purchasing/orders/*/cancel").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.POST, "/api/v1/purchasing/orders", "/api/v1/purchasing/orders/*/receipts").hasAnyRole("ADMIN", "FARMACIA")
                 .anyRequest().denyAll())
             .oauth2ResourceServer(resource -> resource.jwt(jwt -> jwt.jwtAuthenticationConverter(converter)))
             .build();

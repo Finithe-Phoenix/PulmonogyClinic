@@ -13,9 +13,11 @@ Base: plan de 18 semanas acordado como referencia, operación actual en papel y 
 | DEV-01  | P0        | Compilación y pruebas en Actions; artefacto estático para Pages.                             | Workflow implementado       |
 | DISC-01 | P0        | Confirmar nombre, razón social, sedes, servicios, personal, horarios y plan Doctoralia.      | Pendiente del levantamiento |
 | CLI-02  | P0        | Seleccionar sistema clínico y verificar certificación/versión/alcance, exportación y firma.  | Pendiente de evaluación     |
-| SEC-01  | P0        | Portal privado, identidad/MFA, RBAC en API y pruebas negativas por rol/recurso.              | API de inventario con RBAC; identidad/MFA y portal pendientes |
-| API-01  | P0        | Spring Boot modular, PostgreSQL, migraciones y repositorios con transacciones.               | Primera API de inventario implementada en v0.3.0 |
-| INV-02  | P0        | Catálogo y lotes reales, conteo inicial, compras, recepción parcial, FEFO y concurrencia.    | API de catálogo/lotes/movimientos/FEFO; compras privadas y conteo pendientes |
+| SEC-01  | P0        | Portal privado, identidad/MFA, RBAC en API y pruebas negativas por rol/recurso.              | Inventario y compras con RBAC; identidad/MFA y portal pendientes |
+| API-01  | P0        | Spring Boot modular, PostgreSQL, migraciones y repositorios con transacciones.               | API de inventario y compras implementada en v0.4.0 |
+| INV-02  | P0        | Catálogo y lotes reales, conteo inicial, compras, recepción parcial, FEFO y concurrencia.    | API de catálogo/lotes/movimientos/FEFO/compras; conexión y conteo real pendientes |
+| COM-02  | P0        | Proveedores y órdenes persistentes; recibir por lote, evitar duplicados/sobreentrega y cancelar saldos con permiso. | API implementada en v0.4.0; conexión del portal pendiente |
+| COM-03  | P1        | Devoluciones, correcciones de entrega, impuestos y documentos acordados con el responsable. | Pendiente del levantamiento |
 | INV-03  | P0        | Procedimientos de antibióticos y categorías reguladas acordes al catálogo real.              | Pendiente del responsable   |
 | CAJ-02  | P0        | Turnos de caja, fondo inicial, autorizaciones de reverso y persistencia privada.             | Pendiente                   |
 | MIG-01  | P0        | Ensayo sintético; medir archivo; migrar pacientes activos y validar identidad con recepción. | Pendiente                   |
@@ -33,4 +35,4 @@ Nombre comercial confirmado; servicios/horarios; lista de personal y responsabil
 
 ## Secuencia siguiente
 
-Cerrar descubrimiento y sistema clínico; configurar identidad/MFA y conectar el portal a la API; extender compras, recepción, caja y equipos al servidor; preparar conteo e importación; realizar pruebas integrales y piloto. La demo adelanta diseño y conversación con el doctor, no omite estas etapas.
+Cerrar descubrimiento y sistema clínico; configurar identidad/MFA y conectar inventario/compras del portal a la API; extender pacientes administrativos, recepción, caja y equipos al servidor; preparar conteo e importación; realizar pruebas integrales y piloto. La demo adelanta diseño y conversación con el doctor, no omite estas etapas.

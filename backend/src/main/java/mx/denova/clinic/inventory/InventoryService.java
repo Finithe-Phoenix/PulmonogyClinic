@@ -5,11 +5,14 @@ import java.time.Clock;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.UUID;
+import java.util.Objects;
 import mx.denova.clinic.api.ApiProblem;
 import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class InventoryService {
@@ -61,20 +64,42 @@ public class InventoryService {
             throw new ApiProblem(HttpStatus.FORBIDDEN, "ADMIN_REQUIRED", "La baja requiere autorización administrativa.");
         return commands.execute(key, actor, "MOVE:" + lotId, input, Movement.class, () -> {
             Lot lot = findLot(lotId, true);
-            boolean expired = lot.expiresOn() != null && lot.expiresOn().isBefore(LocalDate.now(clock));
-            if (input.kind() != MovementKind.DISPOSAL && expired)
-                throw ApiProblem.conflict("LOT_EXPIRED", "El lote está caducado.");
-            if (input.kind() == MovementKind.ISSUE && lot.quarantined())
-                throw ApiProblem.conflict("LOT_QUARANTINED", "El lote está en cuarentena.");
-            long balance = (long)lot.quantity() + (input.kind() == MovementKind.RECEIPT ? input.quantity() : -input.quantity());
-            if (balance < 0) throw ApiProblem.conflict("INSUFFICIENT_STOCK", "No hay unidades suficientes.");
-            if (balance > 1000000000) throw ApiProblem.conflict("STOCK_LIMIT", "La cantidad supera el límite permitido.");
-            UUID id = UUID.randomUUID();
-            jdbc.update("UPDATE inventory_lot SET quantity = ? WHERE id = ?", balance, lotId);
-            jdbc.update("INSERT INTO inventory_movement(id, command_id, lot_id, kind, quantity, balance_after, reason, actor) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", id, key, lotId, input.kind().name(), input.quantity(), balance, input.reason(), actor);
-            audit(key, input.kind().name(), lotId, actor, input.reason());
-            return jdbc.queryForObject("SELECT * FROM inventory_movement WHERE id = ?", MOVEMENT, id);
+            return writeMovement(key, actor, lot, input);
         });
+    }
+    // Internal purchasing operation: it must join the receipt's existing transaction.
+    // This method has no controller route and does not reserve a second command key.
+    @Transactional(propagation = Propagation.MANDATORY)
+    public Movement receivePurchaseStock(UUID key, String actor, UUID productId, String batch,
+            LocalDate expiresOn, boolean quarantined, int quantity, String reason) {
+        var products = jdbc.query("SELECT * FROM inventory_product WHERE id = ?", PRODUCT, productId);
+        if (products.isEmpty()) throw ApiProblem.missing();
+        if (products.getFirst().category() == Category.FARMACIA && expiresOn == null)
+            throw new ApiProblem(HttpStatus.BAD_REQUEST, "EXPIRY_REQUIRED", "Los productos de farmacia requieren caducidad.");
+        if (expiresOn != null && expiresOn.isBefore(LocalDate.now(clock)))
+            throw ApiProblem.conflict("LOT_EXPIRED", "No se recibe mercancía caducada.");
+        int created = jdbc.update("INSERT INTO inventory_lot(id, product_id, batch, expires_on, quantity, quarantined) VALUES (?, ?, ?, ?, 0, ?) ON CONFLICT (product_id, batch) DO NOTHING",
+                UUID.randomUUID(), productId, batch, expiresOn, quarantined);
+        Lot lot = jdbc.queryForObject("SELECT * FROM inventory_lot WHERE product_id = ? AND batch = ? FOR UPDATE", LOT, productId, batch);
+        if (!Objects.equals(lot.expiresOn(), expiresOn) || lot.quarantined() != quarantined)
+            throw ApiProblem.conflict("LOT_CONDITION_MISMATCH", "La caducidad o condición no coincide con el lote existente.");
+        if (created == 1) audit(key, "LOT_CREATED", lot.id(), actor, "Lote creado desde recepción de compra");
+        return writeMovement(key, actor, lot, new MovementInput(MovementKind.RECEIPT, quantity, reason));
+    }
+    private Movement writeMovement(UUID key, String actor, Lot lot, MovementInput input) {
+        boolean expired = lot.expiresOn() != null && lot.expiresOn().isBefore(LocalDate.now(clock));
+        if (input.kind() != MovementKind.DISPOSAL && expired)
+            throw ApiProblem.conflict("LOT_EXPIRED", "El lote está caducado.");
+        if (input.kind() == MovementKind.ISSUE && lot.quarantined())
+            throw ApiProblem.conflict("LOT_QUARANTINED", "El lote está en cuarentena.");
+        long balance = (long)lot.quantity() + (input.kind() == MovementKind.RECEIPT ? input.quantity() : -input.quantity());
+        if (balance < 0) throw ApiProblem.conflict("INSUFFICIENT_STOCK", "No hay unidades suficientes.");
+        if (balance > 1000000000) throw ApiProblem.conflict("STOCK_LIMIT", "La cantidad supera el límite permitido.");
+        UUID id = UUID.randomUUID();
+        jdbc.update("UPDATE inventory_lot SET quantity = ? WHERE id = ?", balance, lot.id());
+        jdbc.update("INSERT INTO inventory_movement(id, command_id, lot_id, kind, quantity, balance_after, reason, actor) VALUES (?, ?, ?, ?, ?, ?, ?, ?)", id, key, lot.id(), input.kind().name(), input.quantity(), balance, input.reason(), actor);
+        audit(key, input.kind().name(), lot.id(), actor, input.reason());
+        return jdbc.queryForObject("SELECT * FROM inventory_movement WHERE id = ?", MOVEMENT, id);
     }
     public Lot quarantine(UUID key, String actor, UUID lotId, QuarantineInput input) {
         return commands.execute(key, actor, "QUARANTINE:" + lotId, input, Lot.class, () -> {

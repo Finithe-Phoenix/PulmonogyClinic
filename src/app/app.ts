@@ -119,7 +119,7 @@ export class AppComponent {
     {
       phase: "04",
       title: "Sistema privado",
-      detail: "API de inventario con PostgreSQL, permisos y bitácora; conexión del portal pendiente.",
+      detail: "Inventario y compras en servidor, con permisos y bitácora; conexión del portal pendiente.",
       state: "API probada · conexión pendiente",
       done: false,
     },

@@ -1,4 +1,4 @@
-# Arquitectura y límites · v0.3.0
+# Arquitectura y límites · v0.4.0
 
 ## Decisiones ejecutadas
 
@@ -7,16 +7,18 @@
 - Reglas puras separadas de la interfaz en `src/app/domain.ts`; dinero en centavos enteros.
 - Datos exclusivamente sintéticos. Persistencia de demostración en `localStorage`, sin transmisión al consultorio.
 - Versión 2 del estado: agrega proveedores, órdenes y recepciones; migra el estado v1 conservando pacientes, notas, caja y stock. Se mantiene la clave de almacenamiento existente para poder reconocer los ejemplos anteriores.
-- Las compras conservan cantidades pedidas/recibidas y costos por partida. Cada recepción enlaza orden, partida, lote y movimiento; un folio repetido con los mismos datos devuelve el estado existente. Un folio con otros datos se rechaza. Son invariantes secuenciales de la demo, pendientes de transacciones y concurrencia en el servidor.
+- Las compras conservan cantidades pedidas/recibidas y costos por partida. Cada recepción enlaza orden, partida, lote y movimiento; un folio repetido con los mismos datos devuelve el estado existente. Un folio con otros datos se rechaza. Son invariantes secuenciales de la demo; el módulo privado implementa por separado transacciones y concurrencia.
 - CSV con escape de comillas y neutralización de prefijos de fórmulas; interpolación Angular, sin HTML de usuario.
 - Documentos de consulta de ejemplo cerrados conservan el contenido desde la interfaz; las correcciones se agregan como adendas. Esto no implementa firma electrónica ni inmutabilidad del almacenamiento.
 - Sin rastreadores, fuentes externas, formularios de captación, credenciales ni fotos de terceros. SVG decorativo propio y marca provisional.
 
-## Primera API privada implementada
+## API privada implementada
 
-`backend/` contiene Java 21 / Spring Boot 4.0.8, PostgreSQL 17 y migración Flyway. Catálogo, lotes, movimientos y cuarentena se exponen mediante REST autenticado por JWT. Roles ADMIN/FARMACIA/AUDITOR/RECEPCION se aplican en servidor, con denegación predeterminada. Firma, emisor, audiencia y vigencia se validan contra el proveedor configurado. El proveedor, MFA, despliegue privado y conexión con Angular todavía no están configurados.
+`backend/` contiene Java 21 / Spring Boot 4.0.8, PostgreSQL 17 y migraciones Flyway V1/V2. Inventario y compras se exponen mediante REST autenticado por JWT. Roles ADMIN/FARMACIA/AUDITOR/RECEPCION se aplican en servidor, con denegación predeterminada. Firma, emisor, audiencia y vigencia se validan contra el proveedor configurado. El proveedor, MFA, despliegue privado y conexión con Angular todavía no están configurados.
 
 Las escrituras reservan una clave de idempotencia, bloquean el lote y confirman saldo, movimiento, auditoría y resultado en una transacción. La suite HTTP/PostgreSQL cubre concurrencia y permisos, con claves efímeras solo en fuentes de prueba. Triggers protegen UPDATE/DELETE de historia; un administrador de BD con privilegios DDL puede alterar esa protección. No hay afirmación de inmutabilidad criptográfica. Ver [contrato y operación](../backend/README.md).
+
+Compras conserva el producto/unidad/costo de cada partida tal como se ordenó. Toda recepción o cancelación bloquea primero su orden; la recepción bloquea después el lote. La restricción única producto/lote coordina entregas simultáneas de órdenes distintas. Las condiciones del lote existente deben coincidir; compras no puede liberar una cuarentena. El costo recibido es informativo y no crea un pago ni una deuda contable. El detalle de orden se lee en una transacción de solo lectura con una instantánea consistente; sus listados agregan los totales en una sola consulta. [Contrato detallado](../backend/docs/PURCHASING_API.md).
 
 ## Arquitectura objetivo y trabajo restante
 
@@ -30,10 +32,12 @@ Las escrituras reservan una clave de idempotencia, bloquean el lote y confirman 
 
 ## Invariantes y cobertura
 
-| Operación            | Validación obligatoria en el servidor futuro                                                                             |
+| Operación            | Estado y validación en servidor                                                                             |
 | -------------------- | ------------------------------------------------------------------------------------------------------------------------ |
 | Salida de inventario | Implementado en API: bloquear lote, comprobar disponibilidad, caducidad y estado; registrar movimiento y descuento en una transacción.        |
 | Reintento            | Implementado en API: clave única; repetir la misma solicitud devuelve el resultado original; contenido distinto con misma clave es conflicto. |
+| Recepción de compra  | Implementado en API: bloquear orden/lote, respetar el saldo pedido, conservar costo y registrar entrada, recepción e historia conjuntamente. |
+| Cancelar compra      | Implementado en API: solo ADMIN con motivo; cerrar el saldo pendiente sin descontar ni eliminar las entregas anteriores. |
 | Cobro/reverso        | Importe en centavos, referencia única, relación con original y motivo; no borrar eventos.                                |
 | Identidad            | IDs propios; homónimos revisados con segundo dato; no unir por nombre automáticamente.                                   |
 | Cierre clínico       | Solo profesional autorizado, firma aplicable, adendas y trazabilidad en el sistema clínico validado.                     |

@@ -46,7 +46,7 @@ class InventoryApiTest {
     }
     static String env(String key, String fallback) { return System.getenv().getOrDefault(key, fallback); }
     @BeforeEach void before() {
-        jdbc.execute("TRUNCATE inventory_movement, audit_event, inventory_command, inventory_lot, inventory_product RESTART IDENTITY CASCADE");
+        jdbc.execute("TRUNCATE purchase_receipt, purchase_line, purchase_order, purchase_supplier, inventory_movement, audit_event, inventory_command, inventory_lot, inventory_product RESTART IDENTITY CASCADE");
         admin = identity.token("admin-test", "ADMIN");
         pharmacy = identity.token("pharmacy-test", "FARMACIA");
     }
