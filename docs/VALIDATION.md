@@ -1,8 +1,30 @@
-# Validación de la demo v0.2.0
+# Validación de la entrega v0.3.0
 
-Esta entrega es una demostración estática con datos ficticios. La validación de interfaz no acredita una aplicación multiusuario ni un sistema clínico apto para producción.
+La web y el panel de Pages contienen únicamente ejemplos. La API de inventario es un módulo independiente; todavía no está conectada a ese panel ni desplegada para uso del personal.
 
-## Comprobaciones reproducibles
+## Evidencia verificada
+
+En el commit `f9ed37f` pasaron **65 casos**:
+
+| Componente | Casos | Evidencia |
+| --- | ---: | --- |
+| Reglas de la demo | 25 | [Web: ejecución 36372637978](https://github.com/Finithe-Phoenix/PulmonogyClinic/actions/runs/36372637978), job `validate` |
+| Navegador | 22 | Mismo job: 11 recorridos en escritorio y 11 en pantalla móvil |
+| API HTTP + PostgreSQL 17 | 18 | [API: ejecución 36372638023](https://github.com/Finithe-Phoenix/PulmonogyClinic/actions/runs/36372638023), sin fallos, errores ni casos omitidos |
+
+La compilación Angular y el empaquetado Java también terminaron correctamente. Los reportes se conservan siete días en los artefactos de esas ejecuciones. El job de despliegue de Pages no pasó: sigue devolviendo `Get Pages site failed / Not Found` en la configuración inicial.
+
+## Qué cubren
+
+- **Sitio:** cuatro servicios, preguntas desplegables, menú móvil, enlaces profesionales, anchura de pantalla, recorrido de los nueve módulos y recarga bajo `/PulmonogyClinic/`.
+- **Operación ficticia:** recepción con rechazo de duplicados, notas cerradas y adendas, cobros/reversos, conservación local, aviso de almacenamiento bloqueado y migración desde v1.
+- **Inventario y compras de demo:** nuevo producto, lotes posteriores, cero unidades al alta, entrada con motivo, persistencia, catálogo disponible en Compras, entregas parciales, cancelación del saldo, cuarentena, FEFO y exportación.
+- **Servidor:** JWT con firma real de prueba, emisor/audiencia/vigencia, identidad y vencimiento obligatorios; denegación por rol, validación de cantidades y campos, SKUs/lotes únicos, idempotencia secuencial y concurrente, rollback completo y última unidad retirada por dos usuarios a la vez.
+- **PostgreSQL:** aplicación de la migración Flyway, bloqueos de lote, insumos sin caducidad, caducados/cuarentena excluidos de FEFO, bajas autorizadas y rechazo de UPDATE/DELETE de movimientos y auditoría.
+
+Las capturas revelaron desplazamiento horizontal en Inventario móvil; la vista se ajustó a fichas y el recorrido verifica también la anchura interna de esa tabla. Las capturas guardadas en `docs/previews` provienen del navegador de Actions, con datos ficticios.
+
+## Reproducir la web
 
 ```bash
 npm ci
@@ -10,27 +32,26 @@ npx playwright install chromium
 npm run check
 ```
 
-- 22 pruebas de dominio: cantidades y caducidades, cuarentena, FEFO, fechas reales del calendario, horarios duplicados, importes en centavos, referencias únicas, adendas y exportación CSV; órdenes de compra, recepción parcial, referencias repetidas, cuarentena, cancelación del saldo y migración del estado v1.
-- 18 pruebas de navegador: nueve recorridos en escritorio y nueve con viewport/touch móvil de Chromium. Verifican navegación de los nueve módulos, recarga de rutas con prefijo de Pages, citas duplicadas, persistencia local de movimientos, bloqueo de caducados, nota cerrada con adenda, conciliación/reverso de caja y almacenamiento bloqueado. Se agregan compras de varias partidas, recepciones parciales, cancelación y migración de ejemplos guardados.
-- Compilación de producción con `base-href` igual al nombre real del repositorio.
-- Revisión visual de sitio y panel en escritorio y pantalla móvil; corrección del contraste del texto en la tarjeta del encabezado.
+25 pruebas de dominio, compilación de producción y 22 recorridos de navegador. La fecha operativa de la demo es fija: 28/09/2026. Los contextos se aíslan por prueba. No se envían citas, recetas ni pagos a servicios externos.
 
-Los contextos de navegador se aíslan por prueba. Nunca se envían reservas a Doctoralia, recetas, cobros o datos de pacientes a un servicio externo.
+Se ejecutaron localmente las pruebas de dominio y las compilaciones Angular/Java. Las pruebas de navegador y API se ejecutaron en GitHub Actions. El entorno local no proporcionó PostgreSQL operativo; no se declara una ejecución local de la integración.
 
-## Entorno de verificación local
+## Reproducir la API
 
-En v0.1.1, la descarga estándar del navegador desde CDN devolvió HTML en el entorno local y se usó Chromium 153 del paquete público `@sparticuz/chromium`. Ese paquete auxiliar no forma parte de la aplicación. Para v0.2.0, las 22 pruebas de dominio y la compilación se ejecutaron localmente; las 18 pruebas de navegador se ejecutaron en GitHub Actions con el navegador oficial de Playwright. Las capturas del CI se revisaron y se ajustó la vista de compras en celular para mostrar fichas sin desplazamiento horizontal.
+JDK 21, Maven y **una base PostgreSQL 17 exclusiva y desechable**. Exportar `TEST_DB_URL`, `TEST_DB_USER` y `TEST_DB_PASSWORD` para esa base y ejecutar:
 
-Esta emulación móvil no equivale a haber probado Safari ni un iPhone físico. Tampoco valida concurrencia, recuperación de una base de datos, autenticación ni cumplimiento clínico; esas pruebas corresponden al sistema privado posterior.
+```bash
+mvn -B -ntp -f backend/pom.xml verify
+```
 
-## Publicación
+La suite trunca las tablas entre casos. Nunca apuntarla a una base de operación. Los tokens usan claves efímeras y un JWKS local dentro de las fuentes de prueba; esa identidad no se empaqueta en la aplicación. Se utiliza PostgreSQL real, sin H2 ni omisión silenciosa de integración.
 
-El workflow de la entrega anterior compiló y pasó sus pruebas, pero `Configure Pages` devolvió `Get Pages site failed / Not Found`. Es necesario activar **Settings → Pages → Source: GitHub Actions** y volver a ejecutar el workflow. La preparación del workflow por sí sola no demuestra que el sitio ya esté publicado.
+## Límites de la evidencia
 
-El siguiente despliegue debe comprobarse en Actions y después abrirse en la URL devuelta por `Deploy demo`. El artefacto `demo-browser-report` contiene el reporte y capturas del CI por siete días.
+La emulación móvil es Chromium con viewport/touch de iPhone 13, no Safari ni un teléfono físico. Estas pruebas no acreditan certificación clínica, seguridad integral, recuperación ante desastre, aislamiento de varias clínicas, carga de producción ni integración con un proveedor real de identidad. El servidor necesita hosting privado, HTTPS, MFA, permisos de base mínimos, conexión del portal y pruebas de respaldo/restauración antes del piloto.
 
-## Evidencia de esta entrega
+El sitio oficial requiere validación de marca, fotografías, servicios y contenidos por el consultorio. No se han cargado datos reales ni exportaciones de Doctoralia al repositorio.
 
-Código verificado: `8ab4310`. [Ejecución de GitHub Actions](https://github.com/Finithe-Phoenix/PulmonogyClinic/actions/runs/36369206390): el job `validate` pasó las 22 pruebas de dominio, la compilación y las 18 pruebas de navegador. El job `deploy` sigue fallando en la configuración inicial de Pages; no se declara una publicación exitosa.
+## Publicación pendiente
 
-Las capturas de `docs/previews/compras-desktop.png`, `compras-mobile.png` y `panel-desktop.png` proceden de esa ejecución. Las vistas de compras se revisaron después del ajuste para celular.
+Habilitar [Settings → Pages](https://github.com/Finithe-Phoenix/PulmonogyClinic/settings/pages), seleccionar **GitHub Actions** y volver a ejecutar el job fallido. La conexión de GitHub permite subir código y administrar ejecuciones, pero no ofrece la operación para cambiar esa configuración; el intento por navegador no respondió. No se declara una URL de demo funcionando hasta verificar el despliegue.

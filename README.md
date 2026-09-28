@@ -6,7 +6,7 @@ Proyecto digital del Dr. Marco Antonio De Nova Macedo: sitio profesional propues
 
 ![Propuesta del sitio del doctor](docs/previews/sitio-desktop.jpg)
 
-[Ver el panel de gestión](docs/previews/panel-desktop.png) · [Compras en escritorio](docs/previews/compras-desktop.png) · [Compras en celular](docs/previews/compras-mobile.png) · [Guion para presentar la demo](docs/DEMO_GUIDE.md) · [Validaciones y límites](docs/VALIDATION.md)
+[Sitio completo](docs/previews/sitio-completo.png) · [Sitio en celular](docs/previews/sitio-mobile.jpg) · [Inventario en escritorio](docs/previews/inventario-desktop.png) · [Inventario en celular](docs/previews/inventario-mobile.png) · [Ver el panel de gestión](docs/previews/panel-desktop.png) · [Compras en escritorio](docs/previews/compras-desktop.png) · [Compras en celular](docs/previews/compras-mobile.png) · [Guion para presentar la demo](docs/DEMO_GUIDE.md) · [Validaciones y límites](docs/VALIDATION.md)
 
 ## Ejecutar
 
