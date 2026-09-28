@@ -1,0 +1,46 @@
+name: Validate private inventory API
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: api-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  integration:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_DB: clinic_test
+          POSTGRES_USER: clinic_test
+          POSTGRES_PASSWORD: synthetic-ci-only
+        ports: [5432:5432]
+        options: >-
+          --health-cmd "pg_isready -U clinic_test -d clinic_test"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+      - name: Compile and exercise real PostgreSQL and signed JWT requests
+        run: mvn -B -ntp -f backend/pom.xml verify
+        env:
+          TEST_DB_URL: jdbc:postgresql://127.0.0.1:5432/clinic_test
+          TEST_DB_USER: clinic_test
+          TEST_DB_PASSWORD: synthetic-ci-only
+      - name: Save API test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: private-api-test-report
+          path: backend/target/surefire-reports/
+          retention-days: 7

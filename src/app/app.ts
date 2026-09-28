@@ -26,6 +26,7 @@ import {
 } from "./domain";
 import type { ClinicalNote, DemoState, Lot, VisitStatus, PurchaseDraft, PurchaseOrder } from "./domain";
 import { seed } from "./seed";
+import { publicServices, patientQuestions } from "./public-content";
 
 const STORAGE = "pulmonogy.demo.v1";
 const emptyNote = (patientId: string): ClinicalNote => ({
@@ -86,29 +87,9 @@ export class AppComponent {
     { id: "caja", label: "Caja", icon: "wallet" },
     { id: "proyecto", label: "Plan del proyecto", icon: "route" },
   ];
-  readonly services = [
-    {
-      icon: "lungs",
-      title: "Consulta de neumología",
-      text: "Una valoración especializada para conocer tu salud respiratoria.",
-      detail:
-        "En esta propuesta, la primera visita reúne antecedentes, síntomas y estudios previos. La duración y preparación se confirmarán con el consultorio.",
-    },
-    {
-      icon: "pulse",
-      title: "Estudios respiratorios",
-      text: "Información para comprender cómo funcionan tus pulmones.",
-      detail:
-        "El perfil público incluye espirometría y caminata de seis minutos. La indicación, disponibilidad y preparación deben confirmarse con el médico.",
-    },
-    {
-      icon: "shield",
-      title: "Seguimiento y cuidado",
-      text: "Acompañamiento para dar continuidad a tu atención.",
-      detail:
-        "Espacio para seguimiento y revisión de estudios. Los tratamientos y la frecuencia de las visitas los determina el profesional durante la consulta.",
-    },
-  ];
+  readonly services = publicServices;
+  readonly patientQuestions = patientQuestions;
+  siteMenu = false;
   readonly milestones = [
     {
       phase: "01",
@@ -134,8 +115,8 @@ export class AppComponent {
     {
       phase: "04",
       title: "Sistema privado",
-      detail: "Backend, base de datos, autenticación y permisos en servidor.",
-      state: "Siguiente entrega",
+      detail: "API de inventario con PostgreSQL, permisos y bitácora; conexión del portal pendiente.",
+      state: "Primera API en construcción",
       done: false,
     },
     {
@@ -211,6 +192,7 @@ export class AppComponent {
     const id = location.hash.replace("#/panel/", "");
     this.page.set(this.nav.some((n) => n.id === id) ? id : "inicio");
     this.mobileMenu = false;
+    this.siteMenu = false;
     this.query = "";
     window.scrollTo({ top: 0 });
   }
@@ -218,7 +200,11 @@ export class AppComponent {
     location.hash = id === "inicio" ? "/" : "/panel/" + id;
   }
   scroll(id: string) {
+    this.siteMenu = false;
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+  }
+  focusMain() {
+    document.getElementById('main')?.focus();
   }
   money(cents: number) {
     return new Intl.NumberFormat("es-MX", {

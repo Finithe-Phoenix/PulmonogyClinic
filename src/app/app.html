@@ -1,4 +1,5 @@
 @if (page() === 'inicio') {
+<button class="skip-link" (click)="focusMain()">Ir al contenido</button>
 <div class="preview-bar">
   <span
     ><span class="live-dot"></span> Propuesta de sitio · Versión de
@@ -12,10 +13,13 @@
       ><strong>Dr. De Nova</strong><small>NEUMOLOGÍA · TOLUCA</small></span
     ></a
   >
-  <nav aria-label="Sitio del doctor">
+  <button class="site-menu-toggle" (click)="siteMenu=!siteMenu" [attr.aria-expanded]="siteMenu" aria-controls="site-navigation" aria-label="Menú del consultorio"><app-icon name="menu" /></button>
+  <nav id="site-navigation" aria-label="Sitio del doctor" [class.site-nav-open]="siteMenu">
     <button (click)="scroll('doctor')">El doctor</button
     ><button (click)="scroll('servicios')">Servicios</button
-    ><button (click)="scroll('ubicacion')">Ubicación</button>
+    ><button (click)="scroll('consultorio')">Tu visita</button
+    ><button (click)="scroll('ubicacion')">Ubicación</button
+    ><button (click)="scroll('preguntas')">Preguntas</button>
   </nav>
   <a
     class="button primary small"
@@ -25,7 +29,7 @@
     >Ver perfil en Doctoralia <app-icon name="arrowup"
   /></a>
 </header>
-<main id="main">
+<main id="main" tabindex="-1">
   <section class="hero wrap">
     <div class="hero-copy">
       <div class="eyebrow">
@@ -164,9 +168,11 @@
         consulta en Toluca.
       </p>
       <p>
-        Este espacio reunirá su trayectoria validada, los servicios del
-        consultorio y la información que necesitas para preparar tu visita.
+        Su perfil profesional reúne opciones de primera valoración, estudios
+        respiratorios y seguimiento. Revisa el servicio que buscas y confirma
+        con el equipo los detalles de tu próxima visita.
       </p>
+      <div class="doctor-facts"><span><strong>Neumología</strong>Especialidad publicada</span><span><strong>Toluca</strong>Consulta privada</span></div>
       <a
         class="button outline"
         [href]="doctoralia"
@@ -177,6 +183,17 @@
         >Fotografía, marca de la clínica y textos finales pendientes de
         aprobación.</small
       >
+    </div>
+  </section>
+  <section class="section wrap care-section" id="consultorio">
+    <div class="section-heading">
+      <div><span class="eyebrow">TU VISITA, PASO A PASO</span><h2>Más claridad.<br />Desde la primera cita.</h2></div>
+      <p>Un lugar para consultar la información práctica<br />y preparar tus preguntas con calma.</p>
+    </div>
+    <div class="care-steps">
+      <article><span class="step-number">01</span><h3>Encuentra tu cita</h3><p>Consulta la disponibilidad en Doctoralia y confirma el servicio que necesitas con recepción.</p><a [href]="doctoralia" target="_blank" rel="noopener noreferrer">Consultar disponibilidad <app-icon name="arrowup" /></a></article>
+      <article><span class="step-number">02</span><h3>Prepara tu visita</h3><p>Reúne tus estudios previos y la información que quieras compartir. Confirma las indicaciones de cualquier estudio.</p><button (click)="scroll('ubicacion')">Cómo llegar <app-icon name="arrow" /></button></article>
+      <article><span class="step-number">03</span><h3>Da continuidad</h3><p>Acuerda con el profesional los siguientes pasos y con recepción los detalles de tu próxima cita.</p><button (click)="scroll('preguntas')">Resolver dudas prácticas <app-icon name="arrow" /></button></article>
     </div>
   </section>
   <section class="section wrap location-section" id="ubicacion">
@@ -221,6 +238,11 @@
       </p>
     </div>
   </section>
+  <section class="section wrap faq-section" id="preguntas">
+    <div class="faq-intro"><span class="eyebrow">INFORMACIÓN PARA PACIENTES</span><h2>Antes de venir,<br />resuelve tus dudas.</h2><p>Para preguntas sobre tu atención o un estudio, confirma los detalles directamente con el consultorio.</p><a [href]="doctoralia" target="_blank" rel="noopener noreferrer" class="button outline">Abrir perfil y contacto <app-icon name="arrowup" /></a></div>
+    <div class="faq-list">@for(item of patientQuestions; track item.question){<details><summary>{{item.question}}<span aria-hidden="true">+</span></summary><p>{{item.answer}}</p></details>}</div>
+  </section>
+  <section class="contact-band wrap"><div><span class="eyebrow">DA EL SIGUIENTE PASO</span><h2>Organiza tu próxima visita.</h2><p>Revisa horarios disponibles y solicita tu cita en el perfil profesional.</p></div><a class="button primary" [href]="doctoralia" target="_blank" rel="noopener noreferrer">Ver disponibilidad en Doctoralia <app-icon name="arrowup" /></a></section>
   <section class="demo-invite wrap">
     <div>
       <span class="eyebrow">LA CLÍNICA, MEJOR ORGANIZADA</span>

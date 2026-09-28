@@ -1,8 +1,8 @@
 # PulmonogyClinic
 
-Primera entrega del proyecto digital del Dr. Marco Antonio De Nova Macedo: sitio profesional propuesto y plataforma de demostración para consultorio, farmacia y caja.
+Proyecto digital del Dr. Marco Antonio De Nova Macedo: sitio profesional propuesto y plataforma de demostración para consultorio, farmacia y caja.
 
-**Estado: demo estática v0.2.0. Todos los pacientes, proveedores, compras, notas, productos, lotes, equipos y cobros son ficticios. No usar para atención clínica ni capturar datos reales.**
+**Estado: v0.3.0 — sitio y demo Angular + primera API privada de inventario. Todos los pacientes, proveedores, compras, notas, productos, lotes, equipos y cobros son ficticios. No usar para atención clínica ni capturar datos reales.**
 
 ![Propuesta del sitio del doctor](docs/previews/sitio-desktop.jpg)
 
@@ -41,7 +41,7 @@ Salida: `dist/clinic/browser`. Base pública: `/PulmonogyClinic/`. La navegació
 
 | Área            | Disponible en esta demo                                                                                                 |
 | --------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| Sitio propuesto | Diseño adaptable, información profesional pública, servicios, ubicación y enlace externo a Doctoralia.                  |
+| Sitio propuesto | Diseño adaptable, cuatro servicios, guía de visita, seis preguntas frecuentes, ubicación y contacto en Doctoralia.                  |
 | Resumen         | Indicadores derivados de los ejemplos, jornada, alertas y accesos rápidos.                                              |
 | Recepción       | Filtrar citas, simular una cita, impedir un horario duplicado, llegada, inicio, finalización y cancelación.             |
 | Pacientes       | Buscar perfiles ficticios y agregar ejemplos con identificador propio.                                                  |
@@ -52,19 +52,20 @@ Salida: `dist/clinic/browser`. Base pública: `/PulmonogyClinic/`. La navegació
 | Caja            | Cobros simulados en centavos, referencia única, reversos con motivo, conciliación de efectivo y CSV.                    |
 | Proyecto        | Estado visible de lo demostrado y lo pendiente para producción.                                                         |
 
-Los cambios se conservan en `localStorage` de ese navegador. **No hay backend, autenticación, control de roles, sincronización entre dispositivos, reservas en Doctoralia, firma electrónica, recetas válidas, pagos, CFDI ni certificación clínica.** El cierre de una nota es una demostración visual y lógica, no una firma médica. Los bloqueos de inventario son locales: no prueban concurrencia multiusuario ni transacciones de base de datos.
+Los cambios se conservan en `localStorage` de ese navegador. **La interfaz pública no está conectada a la API privada. No hay sincronización entre dispositivos, reservas en Doctoralia, firma electrónica, recetas válidas, pagos, CFDI ni certificación clínica.** El cierre de una nota es una demostración visual y lógica, no una firma médica. Los bloqueos de la demo son locales. El módulo `backend` implementa por separado transacciones PostgreSQL, permisos por JWT, lotes, movimientos, cuarentena e idempotencia. Su conexión al portal y al proveedor de identidad aún está pendiente; ver [API privada y puesta en marcha](backend/README.md).
 
 Fecha operativa fija: **28 de septiembre de 2026**, señalada en la interfaz para que los casos de caducidad y conciliación sean reproducibles. Precios y equipos son ejemplos, no información comercial validada.
 
 ## Publicación en GitHub Pages
 
-El workflow `.github/workflows/pages.yml` ejecuta pruebas, compila y publica únicamente el resultado estático. En pull requests solo valida.
+El workflow `.github/workflows/api.yml` valida la API en PostgreSQL 17 con tokens firmados de prueba. El workflow `.github/workflows/pages.yml` ejecuta pruebas, compila y publica únicamente el resultado estático. En pull requests solo valida.
 
 El administrador debe habilitar **Settings → Pages → Build and deployment → Source: GitHub Actions** una sola vez. No se incluye ningún token personal en el repositorio. Si Pages todavía no está habilitado, el job de validación puede pasar y el job de despliegue fallará; después de habilitarlo, volver a ejecutar el workflow. Ver [guía de publicación](docs/DEPLOYMENT.md).
 
 ## Organización
 
 ```text
+backend/       API Java 21 + Spring Boot, PostgreSQL, migraciones y pruebas HTTP
 src/app/       Interfaz Angular, datos sintéticos y reglas de la demo
 tests/         Pruebas de reglas de inventario, agenda, notas, caja y exportación
 docs/          Alcance, arquitectura, ruta a producción y validaciones

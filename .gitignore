@@ -9,3 +9,7 @@ test-results/
 playwright-report/
 *.log
 .DS_Store
+backend/target/
+*.jks
+*.p12
+*.pem

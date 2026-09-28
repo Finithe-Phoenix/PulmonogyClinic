@@ -19,3 +19,7 @@ Fuentes técnicas:
 - [Docplanner: integración](https://integrations.docplanner.com/guide/integration-process.html). El acceso y la aceptación del proveedor son independientes de la demo.
 
 Para la fase privada, revisar con los responsables la NOM-004-SSA3-2012, NOM-024-SSA3-2012, normativa de datos personales vigente y requisitos de farmacia según el catálogo real. Esta demo no acredita su cumplimiento.
+
+Actualización 27/09/2026 (México), v0.3.0: se volvió a consultar el perfil profesional para separar consulta, espirometría, caminata de seis minutos y seguimiento/terapia. Se añadieron preguntas prácticas y contacto mediante el perfil, sin copiar reseñas ni publicar tarifas. Los textos son una propuesta editorial, no indicaciones individuales.
+
+API: [Spring Boot 4.0.8](https://docs.spring.io/spring-boot/4.0/system-requirements.html) y [validación JWT de Spring Security](https://docs.spring.io/spring-security/reference/servlet/oauth2/resource-server/jwt.html). Versiones verificadas en documentación oficial y Maven Central.

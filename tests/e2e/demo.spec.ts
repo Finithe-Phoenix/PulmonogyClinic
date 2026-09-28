@@ -207,3 +207,26 @@ test('los ejemplos guardados en v1 se conservan al migrar y agregar un proveedor
   await page.goto(base + '#/panel/inventario');
   await expect(page.getByRole('row').filter({ hasText: 'SIM-2601' })).toContainText('3 uds.');
 });
+
+test('el sitio explica servicios, abre preguntas y permite navegar en celular', async ({ page, isMobile }) => {
+  await page.goto(base);
+  await expect(page.locator('.service-card')).toHaveCount(4);
+  await page.getByRole('button', { name: /Espirometría/ }).click();
+  await expect(page.getByRole('dialog')).toContainText('broncodilatador');
+  await page.keyboard.press('Escape');
+  await expect(page.getByRole('dialog')).not.toBeVisible();
+  if (isMobile) {
+    const menu = page.getByRole('button', { name: 'Menú del consultorio' });
+    await expect(menu).toHaveAttribute('aria-expanded', 'false');
+    await menu.click();
+    await expect(menu).toHaveAttribute('aria-expanded', 'true');
+  }
+  await page.getByRole('navigation', { name: 'Sitio del doctor' }).getByRole('button', { name: 'Preguntas', exact: true }).click();
+  if (isMobile) await expect(page.getByRole('button', { name: 'Menú del consultorio' })).toHaveAttribute('aria-expanded', 'false');
+  const question = page.locator('details').filter({ hasText: '¿Cómo puedo agendar una consulta?' });
+  await question.locator('summary').click();
+  await expect(question).toHaveAttribute('open', '');
+  await expect(question.locator('p')).toContainText('Doctoralia');
+  await expect(page.getByRole('link', { name: 'Ver disponibilidad en Doctoralia', exact: true })).toHaveAttribute('href', /doctoralia\.com\.mx/);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+});

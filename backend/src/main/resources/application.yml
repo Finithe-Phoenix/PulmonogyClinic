@@ -1,0 +1,37 @@
+spring:
+  application:
+    name: clinic-api
+  jackson:
+    deserialization:
+      accept-float-as-int: false
+      fail-on-unknown-properties: true
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+    hikari:
+      maximum-pool-size: 10
+      connection-timeout: 10000
+  flyway:
+    enabled: true
+    clean-disabled: true
+    user: ${MIGRATION_USER:${DB_USER}}
+    password: ${MIGRATION_PASSWORD:${DB_PASSWORD}}
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${OIDC_ISSUER_URI}
+          jwk-set-uri: ${OIDC_JWK_SET_URI}
+          audiences: ${OIDC_AUDIENCE:clinic-api}
+server:
+  port: ${PORT:8080}
+  error:
+    include-message: never
+    include-stacktrace: never
+    include-binding-errors: never
+  tomcat:
+    max-http-form-post-size: 64KB
+    max-swallow-size: 64KB
+clinic:
+  timezone: America/Mexico_City

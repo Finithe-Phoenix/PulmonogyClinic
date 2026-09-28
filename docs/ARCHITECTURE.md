@@ -1,4 +1,4 @@
-# Arquitectura y límites de la primera entrega
+# Arquitectura y límites · v0.3.0
 
 ## Decisiones ejecutadas
 
@@ -12,7 +12,13 @@
 - Documentos de consulta de ejemplo cerrados conservan el contenido desde la interfaz; las correcciones se agregan como adendas. Esto no implementa firma electrónica ni inmutabilidad del almacenamiento.
 - Sin rastreadores, fuentes externas, formularios de captación, credenciales ni fotos de terceros. SVG decorativo propio y marca provisional.
 
-## Arquitectura objetivo, pendiente de construcción
+## Primera API privada implementada
+
+`backend/` contiene Java 21 / Spring Boot 4.0.8, PostgreSQL 17 y migración Flyway. Catálogo, lotes, movimientos y cuarentena se exponen mediante REST autenticado por JWT. Roles ADMIN/FARMACIA/AUDITOR/RECEPCION se aplican en servidor, con denegación predeterminada. Firma, emisor, audiencia y vigencia se validan contra el proveedor configurado. El proveedor, MFA, despliegue privado y conexión con Angular todavía no están configurados.
+
+Las escrituras reservan una clave de idempotencia, bloquean el lote y confirman saldo, movimiento, auditoría y resultado en una transacción. La suite HTTP/PostgreSQL cubre concurrencia y permisos, con claves efímeras solo en fuentes de prueba. Triggers protegen UPDATE/DELETE de historia; un administrador de BD con privilegios DDL puede alterar esa protección. No hay afirmación de inmutabilidad criptográfica. Ver [contrato y operación](../backend/README.md).
+
+## Arquitectura objetivo y trabajo restante
 
 1. Sitio público separado del portal privado. El nombre de la clínica y su identidad jurídica aún se confirman.
 2. Portal Angular y API Spring Boot modular: identidad, pacientes administrativos, recepción, inventario, compras, caja, activos y auditoría.
@@ -22,12 +28,12 @@
 6. Adjuntos privados cifrados, autorización por descarga, bitácora sin contenido clínico, retención definida, respaldos y restauración probados.
 7. Doctoralia conserva la disponibilidad. Primera etapa: enlace/widget autorizado y conciliación por recepción. Conector API solo después de acceso, acuerdo y pruebas de aceptación de Docplanner.
 
-## Invariantes a llevar al backend
+## Invariantes y cobertura
 
 | Operación            | Validación obligatoria en el servidor futuro                                                                             |
 | -------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| Salida de inventario | Bloquear lote, comprobar disponibilidad, caducidad y estado; registrar movimiento y descuento en una transacción.        |
-| Reintento            | Clave única; repetir la misma solicitud devuelve el resultado original; contenido distinto con misma clave es conflicto. |
+| Salida de inventario | Implementado en API: bloquear lote, comprobar disponibilidad, caducidad y estado; registrar movimiento y descuento en una transacción.        |
+| Reintento            | Implementado en API: clave única; repetir la misma solicitud devuelve el resultado original; contenido distinto con misma clave es conflicto. |
 | Cobro/reverso        | Importe en centavos, referencia única, relación con original y motivo; no borrar eventos.                                |
 | Identidad            | IDs propios; homónimos revisados con segundo dato; no unir por nombre automáticamente.                                   |
 | Cierre clínico       | Solo profesional autorizado, firma aplicable, adendas y trazabilidad en el sistema clínico validado.                     |
