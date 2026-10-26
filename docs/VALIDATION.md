@@ -1,5 +1,11 @@
 # Validación y evidencia
 
+## v0.6.0 · 26/10/2026 · PR #14
+
+Ejecución local en Windows sobre el código integrado: `npm test` **462/462**; `npm run test:api:local` **100/100** (Java 21 + PostgreSQL 17); `npm run test:e2e` **32/32**; `npm run test:portal` **67/67** en ejecución completa. Dos ejecuciones completas previas mostraron fallos intermitentes, que pasaron al reejecutarse: cuatro por la carga de la página de Keycloak en frío (justo después de `dev:private`) y uno del recorrido de caja (no reproducido en 9 repeticiones aisladas). Se mantienen como riesgo de estabilidad, no como defecto confirmado. `scripts/check-private-leaks.mjs` sin coincidencias.
+
+En CI (Linux), axe detectó `scrollable-region-focusable` en Compras a 768 px de la demo pública. Las tablas de la demo ahora usan el mismo patrón del portal (`role="region"`, `tabindex="0"`, etiqueta y foco visible). Tras la corrección, los tres workflows del PR pasaron: API (integración y privilegios de base de datos), portal privado E2E y validación de la demo.
+
 ## Iteración de rediseño posterior a v0.5.0 · ejecución local
 
 **En integración, no entrega remota declarada.** Se conservan abajo las ejecuciones históricas; no acreditan los cambios nuevos por sí solas.
