@@ -1,10 +1,10 @@
-# API privada de inventario y compras · v0.4.0
+# API privada del consultorio · integración v0.6.0
 
-**Integración v0.5.0:** el contrato y las migraciones de esta API se conservan. Ahora existe un [portal privado local conectado](../docs/PRIVATE_PORTAL.md), compilado por separado, con Keycloak de desarrollo y pruebas de navegador. La demo pública continúa aislada. La identidad productiva/MFA y el hosting privado siguen pendientes. Puede ejecutar Java 21 y las pruebas mediante Docker, aunque su host tenga otra versión de Java.
+Se conservan V1/V2 y se añaden V3/V4/V5 para pacientes/agenda, caja y equipos. El [portal privado local conectado](../docs/PRIVATE_PORTAL.md) tiene compilación separada, Keycloak de desarrollo y pruebas de navegador. La demo pública continúa aislada. La identidad productiva/MFA y el hosting privado siguen pendientes. Puede ejecutar Java 21 y las pruebas mediante Docker, aunque su host tenga otra versión de Java. La versión interna del artefacto Maven sigue siendo `0.4.0`; la integración del producto es v0.6.0.
 
-Servidor del consultorio: catálogo, lotes, movimientos, cuarentena, proveedores, órdenes de compra, recepciones parciales y auditoría en PostgreSQL. Java 21, Spring Boot 4.0.8, Spring Security y Flyway. **La demo Angular de Pages todavía usa sus ejemplos locales; no está conectada a esta API.**
+Servidor del consultorio: catálogo, lotes, movimientos, cuarentena, proveedores, órdenes/recepciones parciales, pacientes administrativos/agenda, turnos/cobros/reversos, activos/mantenimiento y auditoría en PostgreSQL. Java 21, Spring Boot 4.0.8, Spring Security y Flyway. **La demo Angular de Pages usa sus ejemplos locales; no está conectada a esta API.**
 
-El servidor inicia sin productos ni usuarios de ejemplo. No almacena pacientes ni notas clínicas. Su entrega es una base de desarrollo con pruebas de integración, no una autorización para utilizarla con datos reales.
+El servidor inicia sin productos ni pacientes de ejemplo; los usuarios pertenecen al proveedor de identidad. Permite registros administrativos de pacientes exclusivamente sintéticos y todavía no notas clínicas privadas. El expediente propio y el vínculo opcional cobro–cita están confirmados para la siguiente vertical, no implementados aquí. La entrega es una base de desarrollo con pruebas de integración, no una autorización para utilizarla con datos reales.
 
 ## Arranque local
 
@@ -39,15 +39,18 @@ Prefijo de inventario: `/api/v1/inventory`. Los listados devuelven `{items, limi
 
 | Método / ruta | Uso |
 | --- | --- |
-| GET /products | Catálogo ordenado por SKU |
+| GET /products | Catálogo ordenado por SKU; búsqueda opcional `q` por SKU/nombre/categoría |
+| GET /products/{id} | Detalle de producto sin depender de la página cargada |
 | POST /products | `{sku, name, category, unit, minimumStock}`; category: FARMACIA o INSUMOS |
-| GET /lots | Filtros `productId`, `availableOnly`; orden FEFO, sin caducidad al final |
+| GET /lots | Filtros `productId`, `availableOnly`, `q`; orden FEFO, sin caducidad al final |
 | GET /lots/{id} | Estado actual de un lote |
 | POST /lots | `{productId, batch, expiresOn, quarantined}`; crea lote con cero unidades |
 | POST /lots/{id}/movements | `{kind, quantity, reason}`; kind: RECEIPT, ISSUE, DISPOSAL |
 | POST /lots/{id}/quarantine | `{quarantined, reason}`; solo ADMIN |
 | GET /movements | Historia, filtro opcional `lotId` |
 | GET /api/v1/audit/events | Auditoría administrativa; ruta fuera del prefijo de inventario |
+
+La [búsqueda de inventario y compras](docs/SEARCH_API.md) se aplica en servidor antes de paginar. GET de lotes agrega `productName` y `productSku` mediante un JOIN; los comandos POST conservan su contrato anterior.
 
 Ejemplo de cuerpo para crear un producto sintético:
 

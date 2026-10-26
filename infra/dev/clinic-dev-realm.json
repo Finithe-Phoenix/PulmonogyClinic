@@ -2,6 +2,10 @@
   "realm": "clinic-dev",
   "enabled": true,
   "displayName": "Consultorio · desarrollo sintético",
+  "loginTheme": "pulmonogy",
+  "internationalizationEnabled": true,
+  "supportedLocales": ["es"],
+  "defaultLocale": "es",
   "sslRequired": "none",
   "registrationAllowed": false,
   "resetPasswordAllowed": false,
@@ -21,6 +25,9 @@
       },
       {
         "name": "RECEPCION"
+      },
+      {
+        "name": "MEDICO"
       }
     ]
   },

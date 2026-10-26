@@ -1,0 +1,316 @@
+/* PulmonogyClinic. Inherits the supported Keycloak 26.7.4 / PatternFly 5 forms. */
+:root {
+  /* Primitive palette and scales, shared with the portal's design direction. */
+  --clinic-ivory: #f6f5f1;
+  --clinic-white: #ffffff;
+  --clinic-ink: #202b39;
+  --clinic-graphite: #172333;
+  --clinic-blue: #294f88;
+  --clinic-blue-deep: #203f6d;
+  --clinic-blue-light: #cbdaf0;
+  --clinic-slate: #596575;
+  --clinic-line: #8794a4;
+  --clinic-line-soft: #e6e8eb;
+  --clinic-red: #a12835;
+  --clinic-red-wash: #fff2f3;
+  --clinic-amber: #795311;
+  --clinic-amber-wash: #fff8e8;
+  --clinic-space-1: .25rem;
+  --clinic-space-2: .5rem;
+  --clinic-space-3: .75rem;
+  --clinic-space-4: 1rem;
+  --clinic-space-5: 1.25rem;
+  --clinic-space-6: 1.5rem;
+  --clinic-space-8: 2rem;
+  --clinic-space-10: 2.5rem;
+  --clinic-space-12: 3rem;
+  --clinic-radius: .65rem;
+  --clinic-radius-panel: 1.25rem;
+  --clinic-shadow: 0 18px 64px rgb(23 35 51 / 8%);
+  --clinic-font: "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --clinic-motion: 140ms;
+  /* Semantic tokens. */
+  --clinic-page-bg: var(--clinic-ivory);
+  --clinic-surface: var(--clinic-white);
+  --clinic-text: var(--clinic-ink);
+  --clinic-text-muted: var(--clinic-slate);
+  --clinic-accent: var(--clinic-blue);
+  --clinic-accent-hover: var(--clinic-blue-deep);
+  --clinic-focus: var(--clinic-blue);
+  --clinic-error: var(--clinic-red);
+  --clinic-border: var(--clinic-line);
+  /* Component tokens and PatternFly globals. */
+  --clinic-input-height: 3rem;
+  --clinic-card-padding: var(--clinic-space-10);
+  --clinic-button-bg: var(--clinic-accent);
+  --clinic-button-fg: var(--clinic-white);
+  --pf-v5-global--FontFamily--text: var(--clinic-font);
+  --pf-v5-global--FontFamily--heading: var(--clinic-font);
+  --pf-v5-global--Color--100: var(--clinic-text);
+  --pf-v5-global--Color--200: var(--clinic-text-muted);
+  --pf-v5-global--primary-color--100: var(--clinic-accent);
+  --pf-v5-global--primary-color--200: var(--clinic-accent-hover);
+  --pf-v5-global--active-color--100: var(--clinic-focus);
+  --pf-v5-global--danger-color--100: var(--clinic-error);
+  --pf-v5-global--danger-color--200: var(--clinic-error);
+  --pf-v5-global--link--Color: var(--clinic-accent);
+  --pf-v5-global--link--Color--hover: var(--clinic-accent-hover);
+  color-scheme: light;
+}
+
+html.login-pf,
+html.login-pf body#keycloak-bg {
+  min-height: 100%;
+  margin: 0;
+  background: var(--clinic-page-bg);
+  color: var(--clinic-text);
+  font-family: var(--clinic-font);
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+.pf-v5-c-login {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  min-height: 100svh;
+  padding: var(--clinic-space-8);
+  background: var(--clinic-page-bg);
+}
+
+.pf-v5-c-login__container {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+  grid-template-areas: "header main";
+  width: 100%;
+  max-width: 64rem;
+  gap: 0;
+  padding: 0;
+  border: 1px solid var(--clinic-line-soft);
+  border-radius: var(--clinic-radius-panel);
+  background: var(--clinic-surface);
+  box-shadow: var(--clinic-shadow);
+}
+
+#kc-header {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  min-height: 34rem;
+  margin: 0;
+  padding: var(--clinic-space-12);
+  border-radius: var(--clinic-radius-panel) 0 0 var(--clinic-radius-panel);
+  background: var(--clinic-graphite);
+}
+
+#kc-header-wrapper {
+  min-width: 0;
+  padding: 0;
+  color: var(--clinic-white) !important;
+  font-family: var(--clinic-font);
+  font-size: 1rem;
+  letter-spacing: 0;
+  line-height: 1.5;
+  text-align: left;
+  text-transform: none;
+  overflow-wrap: anywhere;
+}
+
+#kc-header-wrapper::before {
+  content: "";
+  display: block;
+  width: 3rem;
+  height: 3rem;
+  margin-bottom: var(--clinic-space-5);
+  background: url("../img/clinic-mark.svg") center / contain no-repeat;
+}
+
+#kc-header-wrapper > span:first-child {
+  display: block;
+  font-size: 1.25rem;
+  font-weight: 650;
+  letter-spacing: -.025em;
+}
+
+#kc-header-wrapper > strong {
+  display: block;
+  margin-block: var(--clinic-space-10) var(--clinic-space-6);
+  font-size: clamp(2rem, 3vw, 2.75rem);
+  font-weight: 550;
+  letter-spacing: -.045em;
+  line-height: 1.15;
+}
+
+#kc-header-wrapper > span:last-child {
+  display: block;
+  max-width: 22rem;
+  color: var(--clinic-blue-light);
+  line-height: 1.7;
+}
+
+.pf-v5-c-login__main {
+  align-self: center;
+  min-width: 0;
+  width: 100%;
+  padding-block: var(--clinic-space-5);
+  border: 0;
+  border-radius: 0 var(--clinic-radius-panel) var(--clinic-radius-panel) 0;
+  background: var(--clinic-surface);
+  box-shadow: none;
+}
+
+.pf-v5-c-login__main-header {
+  display: block;
+  padding: var(--clinic-space-6) var(--clinic-card-padding);
+  border: 0;
+}
+
+#kc-page-title {
+  margin: 0;
+  color: var(--clinic-text);
+  font-family: var(--clinic-font);
+  font-size: 1.65rem;
+  font-weight: 650;
+  letter-spacing: -.035em;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+.pf-v5-c-login__main-body { padding: 0 var(--clinic-card-padding); }
+.pf-v5-c-form { row-gap: var(--clinic-space-5); }
+.pf-v5-c-form__label { color: var(--clinic-text); font-size: .875rem; font-weight: 600; }
+.pf-v5-c-form__group-label { padding-bottom: var(--clinic-space-2); }
+
+.pf-v5-c-form-control {
+  --pf-v5-c-form-control--BackgroundColor: var(--clinic-surface);
+  --pf-v5-c-form-control--BorderTopColor: var(--clinic-border);
+  --pf-v5-c-form-control--BorderRightColor: var(--clinic-border);
+  --pf-v5-c-form-control--BorderBottomColor: var(--clinic-border);
+  --pf-v5-c-form-control--BorderLeftColor: var(--clinic-border);
+  min-width: 0;
+  min-height: var(--clinic-input-height);
+  border-radius: var(--clinic-radius);
+  border: 1px solid var(--clinic-border);
+  color: var(--clinic-text);
+}
+
+.pf-v5-c-form-control::before,
+.pf-v5-c-form-control::after { border-radius: inherit; border: 0; }
+.pf-v5-c-form-control > input:focus-visible { outline: none; }
+.pf-v5-c-form-control > input,
+.pf-v5-c-form-control > select,
+.pf-v5-c-form-control > textarea {
+  min-width: 0;
+  min-height: var(--clinic-input-height);
+  max-width: 100%;
+  padding-inline: var(--clinic-space-3);
+  color: var(--clinic-text);
+  font-family: var(--clinic-font);
+  font-size: 1rem;
+  border-radius: inherit;
+}
+
+.pf-v5-c-input-group,
+.pf-v5-c-input-group__item { min-width: 0; }
+.pf-v5-c-input-group__item.pf-m-fill { flex: 1 1 0; }
+.pf-v5-c-form-control:focus-within {
+  outline: 3px solid var(--clinic-focus);
+  outline-offset: 2px;
+}
+
+.pf-v5-c-button {
+  min-height: var(--clinic-input-height);
+  border-radius: var(--clinic-radius);
+  font-family: var(--clinic-font);
+  font-size: .95rem;
+  font-weight: 600;
+  transition: background-color var(--clinic-motion), box-shadow var(--clinic-motion);
+}
+.pf-v5-c-button::after { border-radius: inherit; }
+.pf-v5-c-button.pf-m-primary {
+  --pf-v5-c-button--m-primary--BackgroundColor: var(--clinic-button-bg);
+  --pf-v5-c-button--m-primary--hover--BackgroundColor: var(--clinic-accent-hover);
+  --pf-v5-c-button--m-primary--focus--BackgroundColor: var(--clinic-accent-hover);
+  --pf-v5-c-button--m-primary--active--BackgroundColor: var(--clinic-accent-hover);
+  background: var(--clinic-button-bg);
+  color: var(--clinic-button-fg);
+}
+.pf-v5-c-button.pf-m-primary:hover,
+.pf-v5-c-button.pf-m-primary:active { background: var(--clinic-accent-hover); }
+.pf-v5-c-button.pf-m-control { min-width: 3rem; color: var(--clinic-accent); }
+.pf-v5-c-button:disabled,
+.pf-v5-c-button[aria-disabled="true"] { cursor: not-allowed; opacity: .6; }
+
+a { color: var(--clinic-accent); text-underline-offset: .2em; }
+a:hover { color: var(--clinic-accent-hover); text-decoration: underline; }
+button:focus-visible,
+a:focus-visible,
+select:focus-visible,
+input[type="checkbox"]:focus-visible {
+  outline: 3px solid var(--clinic-focus);
+  outline-offset: 3px;
+}
+
+.pf-v5-c-form-control.pf-m-error {
+  border-color: var(--clinic-error);
+  --pf-v5-c-form-control--BorderBottomColor: var(--clinic-error);
+  --pf-v5-c-form-control--BorderTopColor: var(--clinic-error);
+  --pf-v5-c-form-control--BorderRightColor: var(--clinic-error);
+  --pf-v5-c-form-control--BorderLeftColor: var(--clinic-error);
+}
+.kc-feedback-text.pf-m-error,
+.pf-v5-c-helper-text__item.pf-m-error,
+.pf-v5-c-form-control.pf-m-error .pf-m-status { color: var(--clinic-error); }
+.pf-v5-c-helper-text { font-size: .875rem; line-height: 1.5; }
+.pf-v5-c-alert { border-radius: var(--clinic-radius); overflow-wrap: anywhere; }
+.pf-v5-c-alert.pf-m-danger { background: var(--clinic-red-wash); color: var(--clinic-error); }
+.pf-v5-c-alert.pf-m-warning { background: var(--clinic-amber-wash); color: var(--clinic-amber); }
+
+.pf-v5-c-login__main-footer { padding: 0; }
+.pf-v5-c-login__main-footer-band {
+  margin-block: var(--clinic-space-4) 0;
+  padding: var(--clinic-space-4) 0;
+  background: var(--clinic-surface);
+}
+.clinic-login-footer {
+  margin: var(--clinic-space-8) var(--clinic-card-padding) var(--clinic-space-5);
+  padding-top: var(--clinic-space-5);
+  border-top: 1px solid var(--clinic-line-soft);
+  color: var(--clinic-text-muted);
+  font-size: .8125rem;
+  line-height: 1.6;
+}
+.clinic-login-footer p { margin: 0; }
+.clinic-login-footer p + p { margin-top: var(--clinic-space-2); }
+.clinic-login-footer strong { color: var(--clinic-text); font-weight: 600; }
+
+/* Native form fields, errors, keyboard behavior and password reveal remain inherited. */
+@media (max-width: 850px) {
+  .pf-v5-c-login { padding: var(--clinic-space-6); }
+  .pf-v5-c-login__container {
+    max-width: 33rem;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: "header" "main";
+  }
+  #kc-header {
+    min-height: 0;
+    padding: var(--clinic-space-8) var(--clinic-card-padding);
+    border-radius: var(--clinic-radius-panel) var(--clinic-radius-panel) 0 0;
+  }
+  #kc-header-wrapper::before { width: 2.25rem; height: 2.25rem; margin-bottom: var(--clinic-space-3); }
+  #kc-header-wrapper > strong { display: none; }
+  #kc-header-wrapper > span:last-child { margin-top: var(--clinic-space-2); font-size: .875rem; }
+  .pf-v5-c-login__main { border-radius: 0 0 var(--clinic-radius-panel) var(--clinic-radius-panel); }
+}
+@media (max-width: 480px) {
+  :root { --clinic-card-padding: var(--clinic-space-6); }
+  .pf-v5-c-login { padding: var(--clinic-space-4); }
+  #kc-header { padding-block: var(--clinic-space-6); }
+  #kc-page-title { font-size: 1.45rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; scroll-behavior: auto !important; }
+}

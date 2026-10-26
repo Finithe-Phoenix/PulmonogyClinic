@@ -8,7 +8,7 @@ test('sitio adaptable y navegación de los nueve módulos sin errores', async ({
   await page.goto(base);
   await expect(page.getByRole('heading', { level: 1 })).toContainText('Respirar mejor');
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', /noindex/);
-  await expect(page.getByRole('link', { name: 'Consultar citas en Doctoralia' })).toHaveAttribute('href', /doctoralia\.com\.mx/);
+  await expect(page.getByRole('link', { name: 'Conocer al especialista' })).toHaveAttribute('href', /doctoralia\.com\.mx/);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   await page.screenshot({ path: info.outputPath('sitio.png'), fullPage: true });
   await page.screenshot({ path: info.outputPath('sitio-viewport.jpg'), type: 'jpeg', quality: 85 });
@@ -227,7 +227,7 @@ test('el sitio explica servicios, abre preguntas y permite navegar en celular', 
   await question.locator('summary').click();
   await expect(question).toHaveAttribute('open', '');
   await expect(question.locator('p')).toContainText('Doctoralia');
-  await expect(page.getByRole('link', { name: 'Ver disponibilidad en Doctoralia', exact: true })).toHaveAttribute('href', /doctoralia\.com\.mx/);
+  await expect(page.getByRole('link', { name: 'Ver perfil del especialista', exact: true })).toHaveAttribute('href', /doctoralia\.com\.mx/);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
 });
 

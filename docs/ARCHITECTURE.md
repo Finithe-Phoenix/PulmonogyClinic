@@ -1,60 +1,57 @@
-# Arquitectura y límites · v0.5.0
+# Arquitectura y límites
 
-## Portal privado local añadido en v0.5.0
+## Tres superficies separadas
 
-`src/portal-main.ts` inicia otra aplicación Angular; la configuración `portal` compila a `dist/portal/browser` con HTML y CSS propios. Pages conserva `src/main.ts` y `dist/clinic/browser`. No hay enrutamiento accidental del panel público a la API ni credenciales en sus bundles.
+| Superficie | Código / salida | Datos y despliegue |
+| --- | --- | --- |
+| Sitio y demo | src/main.ts, src/app; dist/clinic/browser | Sitio propuesto y ejemplos en localStorage; solo esta salida se publica en Pages |
+| Portal privado | src/portal-main.ts, src/app/portal; dist/portal/browser | Aplicación por rutas con API real, compilación independiente; servicio local4180 |
+| API e identidad | backend; infra/dev | SpringBoot/PostgreSQL en8181 y Keycloak en8180, loopback; no producción |
 
-El gateway local (`scripts/portal-server.mjs`) sirve el portal y reenvía `/api/` a Spring manteniendo Bearer explícito. Keycloak 26.7.4 corre en otro servicio de loopback, con usuarios sintéticos, roles importados, audiencia clinic-api y PKCE S256 obligatorio. `oidc-client-ts` guarda tokens solo en memoria; una recarga requiere volver a autenticar por la sesión del proveedor. La solicitud pendiente y su clave se conservan en sessionStorage, ligadas al sujeto, para reintentos sin duplicar.
+El gateway local sirve la compilación privada y reenvía únicamente Bearer y cabeceras permitidas a /api/. No comparte cookies con la API ni convierte Pages en una aplicación privada. El repositorio, las capturas publicables y la demo no admiten información real.
 
-Docker Compose separa `clinic_dev` persistente de `clinic_test` desechable y sin puertos de BD públicos. El servidor mantiene intactos RBAC, transacciones, V1 y V2. Los cambios entre usuarios se consultan con Actualizar; no se implementó push en tiempo real. La API valida permisos aunque el cliente muestre u oculte acciones. [Arranque, alcance y límites](PRIVATE_PORTAL.md).
+## Frontend y diseño
 
-Las secciones siguientes describen la base de demo/API v0.4.0. Donde mencionan conexión e identidad pendientes, la conexión ya está resuelta para el entorno local sintético; sigue pendiente la identidad y operación productiva.
+Angular21.2.24, TypeScript5.9.3 y Node24; dependencias exactas y lockfile. El portal usa rutas lazy por módulo, componentes standalone, signals y formularios ajustados a su complejidad. Paper & Ink define tokens primitivos, semánticos y de componente. [Sistema visual](DESIGN_SYSTEM.md).
 
-## Decisiones ejecutadas
+DataPage consulta páginas acotadas y descarta respuestas de consultas/identidades anteriores. Buscar la misma expresión permite reintentar un error. Las cifras de una página no se presentan como totales generales. El usuario solicita Actualizar para cambios de otras sesiones; no hay sincronización push.
 
-- Angular 21 LTS, componentes standalone y estado con signals. Compilación estática para GitHub Pages.
-- Un sitio propuesto y nueve vistas de operación, navegación por fragmentos para evitar errores de recarga en Pages.
-- Reglas puras separadas de la interfaz en `src/app/domain.ts`; dinero en centavos enteros.
-- Datos exclusivamente sintéticos. Persistencia de demostración en `localStorage`, sin transmisión al consultorio.
-- Versión 2 del estado: agrega proveedores, órdenes y recepciones; migra el estado v1 conservando pacientes, notas, caja y stock. Se mantiene la clave de almacenamiento existente para poder reconocer los ejemplos anteriores.
-- Las compras conservan cantidades pedidas/recibidas y costos por partida. Cada recepción enlaza orden, partida, lote y movimiento; un folio repetido con los mismos datos devuelve el estado existente. Un folio con otros datos se rechaza. Son invariantes secuenciales de la demo; el módulo privado implementa por separado transacciones y concurrencia.
-- CSV con escape de comillas y neutralización de prefijos de fórmulas; interpolación Angular, sin HTML de usuario.
-- Documentos de consulta de ejemplo cerrados conservan el contenido desde la interfaz; las correcciones se agregan como adendas. Esto no implementa firma electrónica ni inmutabilidad del almacenamiento.
-- Sin rastreadores, fuentes externas, formularios de captación, credenciales ni fotos de terceros. SVG decorativo propio y marca provisional.
+Los CSV privados proyectan columnas permitidas de la página visible, con contador y nombre parcial. Usan BOM UTF-8, escape de celdas y neutralización explícita de prefijos interpretables como fórmulas. No exportan expedientes ni descargan páginas adicionales silenciosamente.
 
-## API privada implementada
+## Identidad, sesión y recuperación
 
-`backend/` contiene Java 21 / Spring Boot 4.0.8, PostgreSQL 17 y migraciones Flyway V1/V2. Inventario y compras se exponen mediante REST autenticado por JWT. Roles ADMIN/FARMACIA/AUDITOR/RECEPCION se aplican en servidor, con denegación predeterminada. Firma, emisor, audiencia y vigencia se validan contra el proveedor configurado. El proveedor, MFA, despliegue privado y conexión con Angular todavía no están configurados.
+Keycloak26.7.4 de desarrollo, Authorization Code + PKCE S256 y cliente público con retornos exactos. Los JWT se verifican en servidor (firma, emisor, audiencia, sujeto y vigencia). Roles: ADMIN, RECEPCION, FARMACIA, MEDICO y AUDITOR. Ocultar enlaces no constituye autorización.
 
-Las escrituras reservan una clave de idempotencia, bloquean el lote y confirman saldo, movimiento, auditoría y resultado en una transacción. La suite HTTP/PostgreSQL cubre concurrencia y permisos, con claves efímeras solo en fuentes de prueba. Triggers protegen UPDATE/DELETE de historia; un administrador de BD con privilegios DDL puede alterar esa protección. No hay afirmación de inmutabilidad criptográfica. Ver [contrato y operación](../backend/README.md).
+Tokens solo en memoria; el estado transitorio OIDC y las solicitudes ya enviadas de resultado incierto se guardan en sessionStorage. Cada pendiente pertenece a un sujeto y mantiene UUID/cuerpo para reintentar exactamente la misma operación. La identidad de desarrollo usa un volumen persistente tras [mantenimiento verificado](IDENTITY_MAINTENANCE.md); no quedó un cliente administrativo temporal.
 
-Compras conserva el producto/unidad/costo de cada partida tal como se ordenó. Toda recepción o cancelación bloquea primero su orden; la recepción bloquea después el lote. La restricción única producto/lote coordina entregas simultáneas de órdenes distintas. Las condiciones del lote existente deben coincidir; compras no puede liberar una cuarentena. El costo recibido es informativo y no crea un pago ni una deuda contable. El detalle de orden se lee en una transacción de solo lectura con una instantánea consistente; sus listados agregan los totales en una sola consulta. [Contrato detallado](../backend/docs/PURCHASING_API.md).
+La [recuperación de sesión](SESSION_RECOVERY.md) intenta renovación antes de vencer. Ante fallo/401 bloquea la red y oculta el espacio, preservando formularios sin enviar solamente en memoria. El acceso explícito PKCE en popup recupera la misma identidad/roles; un cambio desmonta el contexto anterior. No se reenvían operaciones automáticamente. Su estado de validación se consulta en [VALIDATION](VALIDATION.md). Recargar/cerrar descarta borradores; las solicitudes inciertas tienen una política distinta y deben conciliarse.
 
-## Arquitectura objetivo y trabajo restante
+## Servidor y consistencia
 
-1. Sitio público separado del portal privado. El nombre de la clínica y su identidad jurídica aún se confirman.
-2. Portal Angular y API Spring Boot modular: identidad, pacientes administrativos, recepción, inventario, compras, caja, activos y auditoría.
-3. PostgreSQL como fuente de verdad. Movimientos y cobros inmutables por procedimiento; correcciones por reverso. Control optimista/pesimista según operación, claves de idempotencia y restricciones en BD.
-4. Autenticación de personal con MFA, roles y autorización por recurso en servidor. Recepción no accede a las notas clínicas; farmacia recibe solo la información necesaria para dispensación.
-5. Expediente clínico: evaluar lo contratado en Doctoralia y una solución SIRES adecuada, con evidencia de versión y alcance. Elegir al inicio; no sustituirlo por este prototipo.
-6. Adjuntos privados cifrados, autorización por descarga, bitácora sin contenido clínico, retención definida, respaldos y restauración probados.
-7. Doctoralia conserva la disponibilidad. Primera etapa: enlace/widget autorizado y conciliación por recepción. Conector API solo después de acceso, acuerdo y pruebas de aceptación de Docplanner.
+Java21, SpringBoot4.0.8, PostgreSQL17 y FlywayV1..V5. V1/V2 se conservan; V3 añade pacientes/agenda, V4 caja y V5 equipos. La base clinic_dev es persistente; clinic_test es exclusiva y desechable. Las pruebas que truncan tablas nunca apuntan al entorno operativo.
 
-## Invariantes y cobertura
+| Módulo | Invariantes implementadas |
+| --- | --- |
+| Inventario | Alta sin stock inventado; bloqueo de lote, disponibilidad/caducidad/cuarentena; movimiento/saldo/auditoría atómicos; historia protegida |
+| Compras | Producto/unidad/costo histórico por partida; bloqueo orden→lote; recepción parcial sin sobreentrega; cancelación conserva lo recibido |
+| Pacientes | Identificador propio, búsqueda/homónimos, confirmación de duplicados sin fusión automática, versión optimista; bandera synthetic obligatoria |
+| Agenda | Hora México, estados/transiciones, conflicto de paciente/profesional/recurso, historial, versión; Doctoralia solo referencia manual |
+| Caja | Un turno abierto, centavos enteros, folios únicos, cobro/reverso inmutable, cierre consistente concurrente; referencia operativa manual, no contabilidad/CFDI |
+| Equipos | Activo distinto de consumible; estado/versiones, mantenimiento y próxima intervención; referencia normalizada enlaza disponibilidad con agenda |
+| Auditoría | Actor derivado de JWT y registro transaccional; historial sin UPDATE/DELETE ordinarios |
 
-| Operación            | Estado y validación en servidor                                                                             |
-| -------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| Salida de inventario | Implementado en API: bloquear lote, comprobar disponibilidad, caducidad y estado; registrar movimiento y descuento en una transacción.        |
-| Reintento            | Implementado en API: clave única; repetir la misma solicitud devuelve el resultado original; contenido distinto con misma clave es conflicto. |
-| Recepción de compra  | Implementado en API: bloquear orden/lote, respetar el saldo pedido, conservar costo y registrar entrada, recepción e historia conjuntamente. |
-| Cancelar compra      | Implementado en API: solo ADMIN con motivo; cerrar el saldo pendiente sin descontar ni eliminar las entregas anteriores. |
-| Cobro/reverso        | Importe en centavos, referencia única, relación con original y motivo; no borrar eventos.                                |
-| Identidad            | IDs propios; homónimos revisados con segundo dato; no unir por nombre automáticamente.                                   |
-| Cierre clínico       | Solo profesional autorizado, firma aplicable, adendas y trazabilidad en el sistema clínico validado.                     |
-| Exportación          | Permiso específico, registro de acceso y contenido mínimo; nunca expediente clínico público.                             |
+Las escrituras usan claves de idempotencia y transacciones. Repetir la misma clave/cuerpo devuelve el resultado original; cambiar el contenido es conflicto. Las restricciones y locks de PostgreSQL protegen concurrencia, no el estado del navegador. Un propietario/administrador DDL de la base puede alterar triggers: esto no es inmutabilidad criptográfica.
 
-## Límites que no se resuelven con Pages
+Contratos: [inventario/API](../backend/README.md), [compras](../backend/docs/PURCHASING_API.md), [operaciones](../backend/docs/OPERATIONS_API.md), [caja](../backend/docs/CASH_API.md), [equipos](../backend/docs/EQUIPMENT_API.md), [búsquedas](../backend/docs/SEARCH_API.md).
 
-GitHub Pages sirve archivos públicos. No aloja Spring Boot ni PostgreSQL y no aporta autenticación de personal, permisos clínicos, respaldos de expedientes ni transacciones multiusuario. Ocultar botones o proteger una ruta del frontend no sustituye autorización de servidor. El repositorio público no debe recibir archivos reales, secretos, bases de datos, documentos clínicos, cotizaciones privadas ni exportaciones de Doctoralia.
+## Recuperación y fronteras productivas
 
-La primera versión no automatiza diagnósticos ni prescribe tratamientos. El catálogo ficticio evita nombres de medicamentos reales y no representa disponibilidad comercial.
+El [ensayo de respaldo](BACKUP_RESTORE.md) crea fuente/destino sintéticos propios, aplica Flyway, cifra pg_dump y restaura desde disco. Compara 18 tablas, huellas, esquema, relaciones, secuencia e historial. No accede a bases existentes y retira únicamente sus recursos. El resultado aprobado no cubre identidad, adjuntos, copias externas, retención, custodia independiente ni RPO/RTO de producción.
+
+Siguen pendientes configuración y aprobación productivas: HTTPS, MFA, ciclo de personal, mínimos de BD separados del migrador, observabilidad, hosting/dominio/costos, recuperación integral y piloto supervisado. No desplegar infra/dev como producción.
+
+## Expediente y dependencias externas
+
+La [revisión clínica](CLINICAL_READINESS.md) documenta fuentes oficiales mexicanas y arquitectura propuesta para borradores, firma aplicable, cierre/adendas, acceso, retención y exportación. No implementa certificación, firma médica válida ni expediente oficial. Las notas de demo no son documentos clínicos.
+
+Decisión del titular (28/09/2026): el portal es la agenda principal y Doctoralia solo un canal de exposición/captación, sin función clínica. Los contactos recibidos allí se registran manualmente tras confirmar aquí su disponibilidad; no existe conector Doctoralia/Docplanner. El enlace público remite al perfil profesional, no promete reservas ni sincronización. No se automatizan diagnósticos, prescripciones ni pagos. La marca/contenido del sitio requieren aprobación. [Backlog y decisiones por dependencia](BACKLOG.md).

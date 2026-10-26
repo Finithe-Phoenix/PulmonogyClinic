@@ -2,6 +2,10 @@
 
 Revisión inicial: 27/09/2026 (hora de México). No se copiaron reseñas, fotografías ni textos de terceros. La ilustración y marca provisional se construyeron para la demo.
 
+**Revisión del rediseño, 28/09/2026:** se consultó nuevamente el [perfil profesional publicado en Doctoralia](https://www.doctoralia.com.mx/perfil/marco-antonio-de-nova-macedo). Coinciden el nombre, la especialidad, Toluca y la dirección Plaza PAME/local 3/Blvd. Solidaridad Las Torres 605 usados en la propuesta. El perfil enumera primera consulta, seguimiento, espirometría, caminata de seis minutos y terapia respiratoria. Esto verifica lo publicado por el proveedor, no disponibilidad efectiva ni aprobación del titular. Se mantiene el enlace al perfil como difusión/captación, sin copiar opiniones, fotografías, tarifas, cédulas o afirmaciones de certificación. No se agrega un teléfono ni se promete una integración de agenda. La aceptación comercial y la confirmación antes de acudir siguen pendientes.
+
+**Decisión posterior del titular, 28/09/2026:** Doctoralia solo exposición/captación; el portal será la agenda principal. Sustituye las suposiciones anteriores de disponibilidad o reserva gestionada en Doctoralia. Recepción registrará los contactos confirmados en la agenda propia. No se ha modificado la cuenta/perfil externo ni sus funciones de reserva: el titular deberá alinear su configuración y canales publicados antes del piloto. La demo pública sigue sin aceptar reservas reales.
+
 | Dato                             | Fuente / tratamiento                                                                                                      |
 | -------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
 | Nombre, especialidad y localidad | Perfil profesional de [Doctoralia](https://www.doctoralia.com.mx/perfil/marco-antonio-de-nova-macedo).                    |

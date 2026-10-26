@@ -14,11 +14,12 @@ public class InventoryController {
     private final InventoryService inventory;
     public InventoryController(InventoryService inventory) { this.inventory = inventory; }
     @GetMapping("/health") Map<String, String> health() { return Map.of("status", "up"); }
-    @GetMapping("/api/v1/inventory/products") Page<Product> products(@RequestParam(defaultValue="50") int limit, @RequestParam(defaultValue="0") int offset) { return inventory.products(limit, offset); }
+    @GetMapping("/api/v1/inventory/products") Page<Product> products(@RequestParam(required=false) String q, @RequestParam(defaultValue="50") int limit, @RequestParam(defaultValue="0") int offset) { return inventory.products(q, limit, offset); }
+    @GetMapping("/api/v1/inventory/products/{id}") Product product(@PathVariable UUID id) { return inventory.product(id); }
     @PostMapping("/api/v1/inventory/products") @ResponseStatus(HttpStatus.CREATED)
     Product createProduct(@RequestHeader("Idempotency-Key") UUID key, @RequestBody @Valid ProductInput input, Authentication auth) { return inventory.createProduct(key, actor(auth), input); }
-    @GetMapping("/api/v1/inventory/lots") Page<Lot> lots(@RequestParam(required=false) UUID productId, @RequestParam(defaultValue="false") boolean availableOnly, @RequestParam(defaultValue="50") int limit, @RequestParam(defaultValue="0") int offset) { return inventory.lots(productId, availableOnly, limit, offset); }
-    @GetMapping("/api/v1/inventory/lots/{id}") Lot lot(@PathVariable UUID id) { return inventory.lot(id); }
+    @GetMapping("/api/v1/inventory/lots") Page<LotView> lots(@RequestParam(required=false) UUID productId, @RequestParam(defaultValue="false") boolean availableOnly, @RequestParam(required=false) String q, @RequestParam(defaultValue="50") int limit, @RequestParam(defaultValue="0") int offset) { return inventory.lotViews(productId, availableOnly, q, limit, offset); }
+    @GetMapping("/api/v1/inventory/lots/{id}") LotView lot(@PathVariable UUID id) { return inventory.lotView(id); }
     @PostMapping("/api/v1/inventory/lots") @ResponseStatus(HttpStatus.CREATED)
     Lot createLot(@RequestHeader("Idempotency-Key") UUID key, @RequestBody @Valid LotInput input, Authentication auth) { return inventory.createLot(key, actor(auth), input); }
     @PostMapping("/api/v1/inventory/lots/{id}/movements") @ResponseStatus(HttpStatus.CREATED)

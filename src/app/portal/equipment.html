@@ -1,0 +1,118 @@
+<header class="page-heading">
+  <div><span class="eyebrow">OPERACIÓN / RECURSOS</span><h1 tabindex="-1">Equipos</h1><p>Disponibilidad, ubicación y cuidado de cada equipo.</p></div>
+  @if (store.has('ADMIN')) {
+    <button class="primary" type="button" (click)="openCreate()" [disabled]="store.blocked()"><app-icon name="plus" />Registrar equipo</button>
+  }
+</header>
+
+<section class="panel" aria-label="Equipos del consultorio">
+  <form class="toolbar" (submit)="$event.preventDefault(); applyFilters()">
+    <label class="search-field"><app-icon name="search" /><input type="search" [formField]="filters.q" aria-label="Buscar equipos" placeholder="Buscar por equipo, referencia, ubicación o serie">@if (filters.q().touched() && filters.q().invalid()) { <small class="field-error">Usa hasta 160 caracteres.</small> }</label>
+    <label>Disponibilidad<select [formField]="filters.status"><option value="">Todos los estados</option>@for (status of statuses; track status.value) { <option [value]="status.value">{{status.label}}</option> }</select></label>
+    <button type="submit" [disabled]="filters().invalid()">Buscar</button>
+    @if (filterModel().q || filterModel().status) { <button class="quiet" type="button" (click)="clearFilters()">Limpiar</button> }
+  </form>
+  <div class="table-scroll" role="region" tabindex="0" aria-label="Listado de equipos" [attr.aria-busy]="assets.loading()">
+    <table>
+      <thead><tr><th scope="col">Equipo</th><th scope="col">Ubicación</th><th scope="col">Disponibilidad</th><th scope="col">Próxima intervención</th><th scope="col"><span class="sr-only">Detalle</span></th></tr></thead>
+      <tbody>
+        @for (asset of assets.items(); track asset.id) {
+          <tr [attr.data-reference]="asset.reference">
+            <td><div class="identity-cell"><span class="row-icon"><app-icon name="pulse" /></span><div><strong>{{asset.name}}</strong><small class="mono">{{asset.reference}}</small></div></div></td>
+            <td>{{asset.location}}</td>
+            <td><span class="badge" [class.warning]="asset.status==='MAINTENANCE'" [class.danger]="asset.status==='OUT_OF_SERVICE'">{{statusLabel(asset.status)}}</span></td>
+            <td><span [class.badge]="overdue(asset.nextDueOn)" [class.warning]="overdue(asset.nextDueOn)">{{dueLabel(asset.nextDueOn)}}</span>@if (overdue(asset.nextDueOn)) { <small>{{date(asset.nextDueOn)}}</small> }</td>
+            <td class="row-actions"><button type="button" (click)="openAsset(asset)" [attr.aria-label]="'Ver equipo '+asset.name">Ver detalle <app-icon name="arrow" /></button></td>
+          </tr>
+        } @empty {
+          <tr><td colspan="5" class="empty-state">{{assets.loading() ? 'Consultando equipos…' : assets.failed() ? 'No pudimos consultar los equipos. Reintenta la consulta.' : filterModel().q || filterModel().status ? 'No hay equipos que coincidan con estos filtros.' : store.has('ADMIN') ? 'Registra el primer equipo para organizar su disponibilidad y mantenimiento.' : 'Aún no hay equipos registrados.'}}</td></tr>
+        }
+      </tbody>
+    </table>
+  </div>
+  @if (assets.failed()) { <div class="form-actions"><button type="button" (click)="store.refresh()">Reintentar consulta</button></div> }
+  <clinic-pager [page]="assets" />
+</section>
+
+@if (modal()==='create') {
+  <clinic-dialog heading="Registrar equipo" description="Asigna una referencia propia para identificar el equipo y usarlo como recurso en agenda." (closed)="closeDialog()">
+    <form (submit)="$event.preventDefault(); saveAsset()">
+      <div class="fields">
+        <label>Referencia interna<input [formField]="assetForm.reference" placeholder="EQ-001" autocomplete="off" aria-describedby="equipment-reference-help"><small id="equipment-reference-help">Debe ser única. Se guardará en mayúsculas.</small>
+          @if (assetForm.reference().touched() && assetForm.reference().invalid()) { <small class="field-error">{{assetForm.reference().errors()[0]?.message || 'Revisa la referencia; máximo 80 caracteres.'}}</small> }
+        </label>
+        <label>Número de serie <small>Opcional</small><input [formField]="assetForm.serialNumber" autocomplete="off">@if (assetForm.serialNumber().touched() && assetForm.serialNumber().invalid()) { <small class="field-error">Usa hasta 120 caracteres.</small> }</label>
+      </div>
+      <label>Nombre del equipo<input [formField]="assetForm.name" placeholder="Nombre con el que lo identifica el equipo de trabajo">
+        @if (assetForm.name().touched() && assetForm.name().invalid()) { <small class="field-error">{{assetForm.name().errors()[0]?.message || 'Revisa el nombre; máximo 160 caracteres.'}}</small> }
+      </label>
+      <label>Ubicación<input [formField]="assetForm.location" placeholder="Consultorio o sala">
+        @if (assetForm.location().touched() && assetForm.location().invalid()) { <small class="field-error">{{assetForm.location().errors()[0]?.message || 'Revisa la ubicación; máximo 160 caracteres.'}}</small> }
+      </label>
+      <p class="field-help">El equipo se registra como disponible. Puedes cambiar su condición en el detalle.</p>
+      <div class="form-actions"><button type="button" (click)="closeDialog()" [disabled]="store.busy()">Volver</button><button class="primary" type="submit" [disabled]="store.blocked() || assetForm().invalid()">{{store.busy() ? 'Guardando…' : 'Registrar equipo'}}</button></div>
+    </form>
+  </clinic-dialog>
+}
+
+@if (modal()==='detail') {
+  @if (current(); as asset) {
+    <clinic-dialog [heading]="asset.name" [description]="asset.reference+' · '+asset.location" (closed)="closeDialog()">
+      @if (detail.isLoading()) { <p role="status" class="notice">Actualizando los datos del equipo…</p> }
+      @if (detail.error()) { <div class="notice error"><span>No pudimos comprobar el estado actual. Actualiza para registrar cambios.</span><button type="button" (click)="detail.reload()">Actualizar equipo</button></div> }
+      <div class="detail-metrics">
+        <div><small>Disponibilidad</small><strong class="text-value">{{statusLabel(asset.status)}}</strong></div>
+        <div><small>Próxima intervención</small><strong class="text-value">{{date(asset.nextDueOn)}}</strong></div>
+        <div><small>Número de serie</small><strong class="text-value">{{asset.serialNumber || 'No registrado'}}</strong></div>
+      </div>
+      @if (overdue(asset.nextDueOn)) { <p class="notice warning"><app-icon name="calendar" /><span>La fecha de intervención está pendiente. Revisa el historial y coordina la atención del equipo.</span></p> }
+      @if (asset.status!=='AVAILABLE') { <p class="notice warning">La agenda no permite nuevas reservas ni iniciar citas con la referencia de este equipo. Revisa las citas que ya lo tengan asignado.</p> }
+      @if (store.has('ADMIN')) {
+        <div class="actions"><button class="primary" type="button" (click)="beginOperation('maintenance')" [disabled]="editBlocked()">Registrar mantenimiento</button><button type="button" (click)="beginOperation('status')" [disabled]="editBlocked()">Cambiar disponibilidad</button><button class="quiet" type="button" (click)="detail.reload()" [disabled]="detail.isLoading() || store.blocked()">Actualizar datos</button></div>
+      }
+      @if (changedSinceEdit()) {
+        <div class="notice warning" role="status"><span>Otra operación actualizó este equipo. Revisa su estado actual y el historial antes de confirmar. Conservamos lo que escribiste.</span><button type="button" (click)="acknowledgeCurrentVersion()" [disabled]="editBlocked()">Ya revisé los cambios</button></div>
+      }
+
+      @if (operation()==='status') {
+        <form (submit)="$event.preventDefault(); saveStatus()">
+          <fieldset><legend>Cambiar disponibilidad</legend>
+            <label>Nueva disponibilidad<select [formField]="statusForm.status">@for (status of statuses; track status.value) { <option [value]="status.value">{{status.label}}</option> }</select>
+              @if (statusForm.status().invalid()) { <small class="field-error">{{statusForm.status().errors()[0]?.message}}</small> }
+            </label>
+            <label>Motivo del cambio<textarea [formField]="statusForm.reason" rows="3" placeholder="Explica la situación del equipo y la decisión tomada"></textarea>
+              @if (statusForm.reason().touched() && statusForm.reason().invalid()) { <small class="field-error">{{statusForm.reason().errors()[0]?.message || 'Revisa el motivo; máximo 160 caracteres.'}}</small> }
+            </label>
+            <p class="field-help">El motivo queda en auditoría. Las citas existentes deben revisarse por separado.</p>
+            <div class="form-actions"><button type="button" (click)="operation.set(null)" [disabled]="store.busy()">Volver al detalle</button><button class="primary" type="submit" [disabled]="editBlocked() || statusForm().invalid() || changedSinceEdit()">{{store.busy() ? 'Guardando…' : 'Confirmar disponibilidad'}}</button></div>
+          </fieldset>
+        </form>
+      }
+
+      @if (operation()==='maintenance') {
+        <form (submit)="$event.preventDefault(); saveMaintenance()">
+          <fieldset><legend>Registrar mantenimiento</legend>
+            <div class="fields">
+              <label>Fecha de la intervención<input type="date" [formField]="maintenanceForm.performedOn">
+                @if (maintenanceForm.performedOn().touched() && maintenanceForm.performedOn().invalid()) { <small class="field-error">{{maintenanceForm.performedOn().errors()[0]?.message}}</small> }
+              </label>
+              <label>Próxima intervención <small>Opcional</small><input type="date" [formField]="maintenanceForm.nextDueOn">
+                @if (maintenanceForm.nextDueOn().touched() && maintenanceForm.nextDueOn().invalid()) { <small class="field-error">{{maintenanceForm.nextDueOn().errors()[0]?.message}}</small> }
+              </label>
+            </div>
+            <label>Responsable de la intervención<input [formField]="maintenanceForm.technician" placeholder="Nombre de la persona o del proveedor">
+              @if (maintenanceForm.technician().touched() && maintenanceForm.technician().invalid()) { <small class="field-error">{{maintenanceForm.technician().errors()[0]?.message || 'Revisa el responsable; máximo 160 caracteres.'}}</small> }
+            </label>
+            <label>Trabajo realizado<textarea [formField]="maintenanceForm.description" rows="4" placeholder="Describe qué se revisó, qué se hizo y el resultado observado"></textarea>
+              @if (maintenanceForm.description().touched() && maintenanceForm.description().invalid()) { <small class="field-error">{{maintenanceForm.description().errors()[0]?.message || 'Revisa la descripción; máximo 1000 caracteres.'}}</small> }
+            </label>
+            <p class="field-help">La intervención quedará en el historial. Al terminar, revisa si corresponde cambiar la disponibilidad del equipo.</p>
+            <div class="form-actions"><button type="button" (click)="operation.set(null)" [disabled]="store.busy()">Volver al detalle</button><button class="primary" type="submit" [disabled]="editBlocked() || maintenanceForm().invalid() || changedSinceEdit()">{{store.busy() ? 'Guardando…' : 'Guardar intervención'}}</button></div>
+          </fieldset>
+        </form>
+      }
+
+      <clinic-equipment-history [assetId]="asset.id" />
+    </clinic-dialog>
+  }
+}

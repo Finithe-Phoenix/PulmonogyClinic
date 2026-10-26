@@ -14,10 +14,10 @@ import org.springframework.web.bind.annotation.*;
 public class PurchasingController {
     private final PurchasingService purchasing;
     public PurchasingController(PurchasingService purchasing) { this.purchasing = purchasing; }
-    @GetMapping("/suppliers") Page<Supplier> suppliers(@RequestParam(defaultValue="50") int limit, @RequestParam(defaultValue="0") int offset) { return purchasing.suppliers(limit, offset); }
+    @GetMapping("/suppliers") Page<Supplier> suppliers(@RequestParam(required=false) String q, @RequestParam(defaultValue="50") int limit, @RequestParam(defaultValue="0") int offset) { return purchasing.suppliers(q, limit, offset); }
     @PostMapping("/suppliers") @ResponseStatus(HttpStatus.CREATED)
     Supplier createSupplier(@RequestHeader("Idempotency-Key") UUID key, @RequestBody @Valid SupplierInput input, Authentication auth) { return purchasing.createSupplier(key, auth.getName(), input); }
-    @GetMapping("/orders") Page<OrderSummary> orders(@RequestParam(required=false) UUID supplierId, @RequestParam(defaultValue="50") int limit, @RequestParam(defaultValue="0") int offset) { return purchasing.orders(supplierId, limit, offset); }
+    @GetMapping("/orders") Page<OrderSummary> orders(@RequestParam(required=false) UUID supplierId, @RequestParam(required=false) String q, @RequestParam(defaultValue="50") int limit, @RequestParam(defaultValue="0") int offset) { return purchasing.orders(supplierId, q, limit, offset); }
     @GetMapping("/orders/{id}") Order order(@PathVariable UUID id) { return purchasing.order(id); }
     @PostMapping("/orders") @ResponseStatus(HttpStatus.CREATED)
     Order createOrder(@RequestHeader("Idempotency-Key") UUID key, @RequestBody @Valid OrderInput input, Authentication auth) { return purchasing.createOrder(key, auth.getName(), input); }

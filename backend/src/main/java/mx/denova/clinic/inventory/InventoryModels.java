@@ -17,6 +17,8 @@ public final class InventoryModels {
         public ProductInput { sku = normalize(sku); name = trim(name); unit = trim(unit); }
     }
     public record Lot(UUID id, UUID productId, String batch, LocalDate expiresOn, int quantity, boolean quarantined) {}
+    public record LotView(UUID id, UUID productId, String batch, LocalDate expiresOn, int quantity,
+            boolean quarantined, String productName, String productSku) {}
     public record LotInput(@NotNull UUID productId, @NotBlank @Size(max=80) String batch,
             LocalDate expiresOn, @NotNull Boolean quarantined) { public LotInput { batch = normalize(batch); } }
     public record Movement(UUID id, UUID lotId, MovementKind kind, int quantity, int balanceAfter,

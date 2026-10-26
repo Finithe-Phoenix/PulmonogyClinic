@@ -8,9 +8,9 @@ Prefijo: `/api/v1/purchasing`. Todas las escrituras requieren `Idempotency-Key: 
 
 | Método / ruta | ADMIN | FARMACIA | AUDITOR | Resultado |
 | --- | --- | --- | --- | --- |
-| GET /suppliers | Sí | Sí | Sí | Proveedores ordenados por referencia |
+| GET /suppliers | Sí | Sí | Sí | Proveedores ordenados por referencia; búsqueda opcional `q` |
 | POST /suppliers | Sí | No | No | 201, proveedor creado |
-| GET /orders | Sí | Sí | Sí | Resúmenes; filtro opcional `supplierId` |
+| GET /orders | Sí | Sí | Sí | Resúmenes; filtros opcionales `supplierId` y `q` |
 | GET /orders/{id} | Sí | Sí | Sí | Orden con partidas, cantidades y costos |
 | POST /orders | Sí | Sí | No | 201, orden y partidas creadas, stock intacto |
 | POST /orders/{id}/receipts | Sí | Sí | No | 201, recepción registrada y stock actualizado |
@@ -18,6 +18,8 @@ Prefijo: `/api/v1/purchasing`. Todas las escrituras requieren `Idempotency-Key: 
 | GET /receipts | Sí | Sí | Sí | Historia; filtros opcionales `orderId` y `lotId` |
 
 RECEPCION no accede a estas rutas. No hay endpoints de eliminación ni edición de una compra confirmada. La identidad registrada procede del `sub` del token; no se acepta un actor elegido por el cliente.
+
+La [búsqueda en servidor](SEARCH_API.md) acepta `q` de hasta 160 caracteres, encuentra coincidencias antes de paginar y trata `%`/`_` como texto literal. Proveedores busca referencia/nombre; órdenes busca folio y referencia/nombre del proveedor. Se combina con `supplierId` sin alterar totales.
 
 ## Recorrido de integración
 
