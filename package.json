@@ -14,7 +14,7 @@
     "test:portal": "playwright test --config playwright.portal.config.ts",
     "start": "ng serve --host 0.0.0.0",
     "build": "ng build",
-    "build:pages": "ng build --base-href /PulmonogyClinic/",
+    "build:pages": "ng build --base-href /PulmonogyClinic/ && node scripts/site-mode.mjs dist/clinic/browser",
     "test": "node --test tests/*.test.ts",
     "check": "npm test && npm run build:pages && npm run test:e2e",
     "preview": "node scripts/preview.mjs",
