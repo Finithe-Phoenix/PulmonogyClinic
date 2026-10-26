@@ -19,15 +19,16 @@ export const publicServices = [
   {
     icon: 'shield', title: 'Seguimiento y terapia respiratoria',
     text: 'Opciones para dar continuidad a la atención indicada en consulta.',
-    detail: 'El perfil incluye visitas sucesivas y terapia respiratoria. La modalidad, frecuencia y alcance se acuerdan con el profesional; una reserva en este sitio de demostración no sustituye esa valoración.',
+    detail: 'El perfil incluye visitas sucesivas y terapia respiratoria. La modalidad, frecuencia y alcance se acuerdan con el profesional durante la consulta.',
   },
 ];
 
-export const patientQuestions = [
-  { question: '¿Cómo puedo agendar una consulta?', answer: 'Confirma el servicio y el horario directamente con recepción. La agenda principal será la del portal del consultorio; Doctoralia se utilizará solo para difusión y captación. Esta propuesta y su demo no crean una reserva real.' },
+// `previewNote` is shown only while the site is a proposal (site.config.json official=false).
+export const patientQuestions: { question: string; answer: string; previewNote?: string }[] = [
+  { question: '¿Cómo puedo agendar una consulta?', answer: 'Confirma el servicio y el horario directamente con recepción. La agenda principal es la del consultorio; Doctoralia se utiliza para difusión y para conocer al especialista.', previewNote: 'Esta propuesta y su demo no crean una reserva real.' },
   { question: '¿Qué necesito llevar a mi primera visita?', answer: 'Ten a la mano tus estudios previos y la información de tus tratamientos para compartirlos durante la consulta. Confirma con recepción los documentos solicitados y anota las preguntas que quieras revisar con el doctor.' },
   { question: '¿Un estudio necesita preparación especial?', answer: 'Confirma las indicaciones del estudio con el consultorio antes de acudir. La preparación depende del servicio y de tu situación; el sitio no proporciona instrucciones individuales ni cambios de tratamiento.' },
-  { question: '¿Dónde puedo confirmar horarios y costos?', answer: 'Consulta el perfil profesional y confirma con recepción el servicio, horario, costo y formas de pago antes de tu visita. Los importes que aparecen en la demo de gestión son ejemplos y no representan las tarifas del consultorio.' },
-  { question: '¿Puedo enviar estudios o mi expediente aquí?', answer: 'Esta versión no recibe archivos ni datos de salud. Pregunta al consultorio por el canal autorizado para compartir tus estudios. La plataforma de gestión que puedes explorar contiene únicamente ejemplos ficticios.' },
-  { question: '¿Puedo agendar una consulta para un menor de edad?', answer: 'Confirma directamente con recepción las edades atendidas y la modalidad disponible antes de reservar. Esta propuesta presenta la especialidad de neumología sin atribuir una subespecialidad pediátrica.' },
+  { question: '¿Dónde puedo confirmar horarios y costos?', answer: 'Confirma con recepción el servicio, horario, costo y formas de pago antes de tu visita.', previewNote: 'Los importes que aparecen en la demo de gestión son ejemplos y no representan las tarifas del consultorio.' },
+  { question: '¿Puedo enviar estudios o mi expediente aquí?', answer: 'Este sitio no recibe archivos ni datos de salud. Pregunta al consultorio por el canal autorizado para compartir tus estudios.', previewNote: 'La plataforma de gestión que puedes explorar contiene únicamente ejemplos ficticios.' },
+  { question: '¿Puedo agendar una consulta para un menor de edad?', answer: 'Confirma directamente con recepción las edades atendidas y la modalidad disponible antes de agendar.' },
 ];

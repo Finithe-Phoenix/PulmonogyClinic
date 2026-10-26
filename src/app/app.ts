@@ -28,6 +28,16 @@ import {
 import type { ClinicalNote, DemoState, Lot, VisitStatus, PurchaseDraft, PurchaseOrder } from "./domain";
 import { seed } from "./seed";
 import { publicServices, patientQuestions } from "./public-content";
+import siteConfig from "../site.config.json";
+
+interface SiteConfig {
+  official: boolean;
+  phone: string;
+  whatsapp: string;
+  email: string;
+  hours: { days: string; time: string; schema?: string }[];
+  privacyNoticeUrl: string;
+}
 
 const STORAGE = "pulmonogy.demo.v1";
 const emptyNote = (patientId: string): ClinicalNote => ({
@@ -91,6 +101,15 @@ export class AppComponent {
     { id: "caja", label: "Caja", icon: "wallet" },
     { id: "proyecto", label: "Plan del proyecto", icon: "route" },
   ];
+  // Contact data comes only from src/site.config.json, validated by scripts/site-mode.mjs.
+  readonly site: SiteConfig = siteConfig;
+  readonly phoneHref = this.site.phone ? "tel:" + this.site.phone.replace(/\s/g, "") : "";
+  readonly whatsappHref = this.site.whatsapp ? "https://wa.me/" + this.site.whatsapp : "";
+  readonly hasDirectContact = !!(this.phoneHref || this.whatsappHref);
+  readonly contactHref = this.whatsappHref || this.phoneHref || this.doctoralia;
+  readonly contactLabel = this.whatsappHref ? "Agendar por WhatsApp" : this.phoneHref ? "Llamar al consultorio" : "Ver perfil en Doctoralia";
+  readonly contactTarget = this.contactHref.startsWith("tel:") ? null : "_blank";
+  readonly year = new Date().getFullYear();
   readonly services = publicServices;
   readonly patientQuestions = patientQuestions;
   siteMenu = false;
@@ -194,7 +213,8 @@ export class AppComponent {
   }
   @HostListener("window:hashchange") onHash() {
     const id = location.hash.replace("#/panel/", "");
-    this.page.set(this.nav.some((n) => n.id === id) ? id : "inicio");
+    // The synthetic demo is part of the proposal only; the official site never exposes it.
+    this.page.set(!this.site.official && this.nav.some((n) => n.id === id) ? id : "inicio");
     this.mobileMenu = false;
     this.siteMenu = false;
     this.query = "";

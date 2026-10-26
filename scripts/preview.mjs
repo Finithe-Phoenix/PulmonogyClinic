@@ -1,10 +1,12 @@
 import { createServer } from 'node:http';
 import { readFile } from 'node:fs/promises';
+import { readFileSync } from 'node:fs';
 import { extname, resolve, sep } from 'node:path';
 
 // Serve only the compiled public directory, with the same prefix as GitHub Pages.
 const root = resolve('dist/clinic/browser');
-const prefix = '/PulmonogyClinic/';
+// The prefix follows the built <base href>: /PulmonogyClinic/ on Pages, / with a custom domain.
+const prefix = readFileSync(resolve(root, 'index.html'), 'utf8').match(/<base\s+href="([^"]+)"/)?.[1] ?? '/PulmonogyClinic/';
 const types = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.svg': 'image/svg+xml', '.txt': 'text/plain; charset=utf-8', '.json': 'application/json' };
 createServer(async (req, res) => {
   try {
