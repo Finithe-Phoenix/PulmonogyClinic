@@ -523,7 +523,7 @@
             <option>Cancelada</option>
           </select>
         </div>
-        <div class="table-scroll">
+        <div class="table-scroll" role="region" tabindex="0" aria-label="Citas de la agenda">
           <table>
             <thead>
               <tr>
@@ -819,7 +819,7 @@
               placeholder="Producto, SKU o lote..."
           /></label>
         </div>
-        <div class="table-scroll">
+        <div class="table-scroll" role="region" tabindex="0" aria-label="Inventario por lote">
           <table class="inventory-table">
             <thead>
               <tr>
@@ -911,7 +911,7 @@
             <option>Todas</option><option>Pendiente</option><option>Parcial</option><option>Recibida</option><option>Cancelada</option>
           </select>
         </div>
-        <div class="table-scroll">
+        <div class="table-scroll" role="region" tabindex="0" aria-label="Órdenes de compra">
           <table class="purchase-table"><thead><tr><th>Orden / proveedor</th><th>Productos y avance</th><th>Costo de la orden</th><th>Estado</th><th>Acciones</th></tr></thead>
             <tbody>@for(p of orders();track p.id){
               <tr>
@@ -930,7 +930,7 @@
       </section>
       <section class="panel spaced">
         <div class="panel-heading"><div><h2>Entregas recibidas</h2><p>Folio, lote y condición conservados en cada entrada.</p></div><span class="pill blue">{{state().receipts.length}}</span></div>
-        <div class="table-scroll"><table class="receipt-table"><thead><tr><th>Recepción / orden</th><th>Lote / caducidad</th><th>Unidades</th><th>Costo recibido</th><th>Condición</th></tr></thead>
+        <div class="table-scroll" role="region" tabindex="0" aria-label="Entregas recibidas"><table class="receipt-table"><thead><tr><th>Recepción / orden</th><th>Lote / caducidad</th><th>Unidades</th><th>Costo recibido</th><th>Condición</th></tr></thead>
           <tbody>@for(r of state().receipts;track r.id){<tr>
             <td><strong>{{r.reference}}</strong><small>{{orderReference(r.purchaseId)}} · {{r.date}}</small></td>
             <td>{{r.batch}}<small>{{r.expires}}</small></td><td>{{r.quantity}}</td><td>{{money(r.quantity*r.unitCostCents)}}</td>
@@ -1025,7 +1025,7 @@
               <app-icon name="download" /> CSV
             </button>
           </div>
-          <div class="table-scroll">
+          <div class="table-scroll" role="region" tabindex="0" aria-label="Registro de cobros">
             <table>
               <thead>
                 <tr>
