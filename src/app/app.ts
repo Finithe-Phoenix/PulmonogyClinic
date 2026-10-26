@@ -119,14 +119,14 @@ export class AppComponent {
     {
       phase: "04",
       title: "Sistema privado",
-      detail: "Inventario y compras en servidor, con permisos y bitácora; conexión del portal pendiente.",
-      state: "API probada · conexión pendiente",
+      detail: "Portal local conectado: inventario, compras, agenda, pacientes administrativos, caja y equipos. Solo datos sintéticos.",
+      state: "Verificado localmente · producción pendiente",
       done: false,
     },
     {
       phase: "05",
       title: "Validación clínica",
-      detail: "Elección del sistema clínico, firma, trazabilidad y migración.",
+      detail: "Expediente propio por desarrollar y validar: notas, firma aplicable, trazabilidad y migración.",
       state: "Requiere validación",
       done: false,
     },

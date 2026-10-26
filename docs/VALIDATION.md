@@ -1,4 +1,21 @@
-# Validación de la entrega v0.5.0
+# Validación y evidencia
+
+## Iteración de rediseño posterior a v0.5.0 · ejecución local
+
+**En integración, no entrega remota declarada.** Se conservan abajo las ejecuciones históricas; no acreditan los cambios nuevos por sí solas.
+
+- Reglas y utilidades: `npm test`, **462/462**. Desglose: 37 casos de dominio/formato/exportación, 12 del planificador de importación sin escrituras y 413 casos parametrizados del comparador de respaldo. Estos últimos son pruebas de representación e integridad del comparador, no 413 recorridos clínicos o de usuario.
+- API: **100/100**, Java21 + PostgreSQL17 real: inventario18, compras20, búsqueda10, operaciones20, caja15, equipos16, migración1. Sin truncar `clinic_dev` ni el proveedor de identidad.
+- Sitio/demo: build de Pages aprobado y **32/32** E2E, escritorio/móvil, incluidos los cinco anchos y axe. La UI estática no se conecta a la API privada.
+- Portal anterior al último ajuste de sesión/conflictos: **35/35** aprobados en ejecuciones por archivo (10 privados, 6 recuperación, 6 operación, 5 responsivos, 2 identidad, 6 exportación). La nueva suite integrada debe ejecutarse después de los ajustes finales; no se presenta este conteo como validación de cambios posteriores.
+- Identidad: migración persistente verificada y dos recorridos de acceso español/teclado/error/PKCE aprobados. Capturas de acceso solo con campos vacíos.
+- Recuperación: [respaldo/restauración sintéticos](BACKUP_RESTORE.md) `PASS_SYNTHETIC_ONLY`, 18 tablas/relaciones/huellas/Flyway, recursos propios retirados y artefactos conservados. No es un ensayo de recuperación productiva.
+
+Los reportes se separan en `playwright-report/public` y `playwright-report/portal`; las capturas privadas sintéticas viven en `.local/previews`, excluidas de Git. No se guardan trazas de autenticación, contraseñas ni tokens. La suite responsiva incorpora observación de tiempos de navegación y GET; su existencia no equivale todavía a medición ejecutada.
+
+Límites: no hay aceptación humana del diseño/piloto, revisión completa con lector de pantalla, Safari físico, carga productiva, integración Doctoralia, MFA productivo ni expediente certificado. [Backlog completo y dependencias](BACKLOG.md).
+
+## Historial v0.5.0
 
 ## Evidencia local actual · 28/09/2026
 

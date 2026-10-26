@@ -1,0 +1,117 @@
+@if (detailId()) {
+  <a routerLink="/caja" class="back-link">← Todos los turnos</a>
+  @if (selected(); as shift) {
+    <header class="page-heading">
+      <div><span class="eyebrow">CAJA / DETALLE DEL TURNO</span><h1 tabindex="-1">{{shift.reference}}</h1><p>{{statusLabel(shift.status)}} · Apertura {{date(shift.openedAt)}}</p></div>
+      @if (isOpen() && canWrite()) {
+        <button class="primary" type="button" (click)="beginPayment()" [disabled]="store.blocked() || detailLoading()"><app-icon name="plus"/>Registrar cobro</button>
+      }
+    </header>
+    <section class="detail-metrics panel" aria-label="Conciliación de efectivo" [attr.aria-busy]="detailLoading()">
+      <div><small>Fondo inicial</small><strong>{{money(shift.openingFloatCents)}}</strong></div>
+      <div><small>Cobros netos en efectivo</small><strong>{{money(shift.cashTotalCents)}}</strong></div>
+      <div><small>Efectivo esperado</small><strong>{{money(shift.expectedCashCents)}}</strong></div>
+    </section>
+    <section class="panel section-gap">
+      <header class="panel-heading"><div><h2>Conciliación del turno</h2><p>Importes en MXN. Tarjetas y transferencias se revisan por separado.</p></div><span class="badge" [class.warning]="isOpen()">{{statusLabel(shift.status)}}</span></header>
+      <div class="detail-metrics">
+        <div><small>Tarjetas, neto</small><strong>{{money(shift.cardTotalCents)}}</strong></div>
+        <div><small>Transferencias, neto</small><strong>{{money(shift.transferTotalCents)}}</strong></div>
+        <div><small>Efectivo contado</small><strong>{{shift.countedCashCents === null ? 'Por registrar' : money(shift.countedCashCents)}}</strong></div>
+      </div>
+      @if (shift.differenceCents !== null) {
+        <div class="notice" [class.warning]="shift.differenceCents !== 0" role="status"><span>{{differenceLabel(shift.differenceCents)}}: <strong>{{money(shift.differenceCents)}}</strong></span></div>
+        <ul class="compact-list"><li><strong>Cierre registrado</strong><span>{{date(shift.closedAt)}} · {{shift.closedBy}}</span></li><li><strong>Observaciones del cierre</strong><span>{{shift.closureReason}}</span></li></ul>
+      } @else {
+        <p class="field-help">El efectivo esperado incluye el fondo inicial y los cobros en efectivo que no se han revertido.</p>
+      }
+      @if (isOpen() && canWrite()) {
+        <div class="form-actions"><span class="field-help">Revisa cobros y cuenta el efectivo antes de cerrar.</span><button type="button" (click)="beginClose()" [disabled]="store.blocked() || detailLoading()"><app-icon name="check"/>Conciliar y cerrar</button></div>
+      }
+    </section>
+    <section class="panel section-gap" [attr.aria-busy]="paymentsLoading()">
+      <header class="panel-heading"><div><span class="eyebrow">HISTORIAL CONSERVADO</span><h2>Cobros y reversos</h2><p>Los cobros revertidos permanecen visibles y no se suman al saldo.</p></div></header>
+      <div class="table-scroll" tabindex="0" role="region" aria-label="Cobros del turno">
+        <table><thead><tr><th scope="col">Cobro / operación</th><th scope="col">Método</th><th scope="col" class="numeric">Importe</th><th scope="col">Estado</th><th scope="col"><span class="sr-only">Acciones</span></th></tr></thead><tbody>
+          @for (entry of payments(); track entry.id) {
+            <tr>
+              <td><strong>{{entry.reference}}</strong><small>{{date(entry.createdAt)}} · {{entry.actor}}</small>@if (entry.operationReference) {<small>Operación: {{entry.operationReference}}</small>}</td>
+              <td>{{methodLabel(entry.method)}}</td><td class="numeric"><strong>{{money(entry.amountCents)}}</strong></td>
+              <td><span class="badge" [class.warning]="entry.reversed">{{entry.reversed ? 'Revertido' : 'Registrado'}}</span>@if (entry.reversed) {<small>{{entry.reversalReason}}</small><small>{{date(entry.reversedAt)}} · {{entry.reversedBy}}</small>}</td>
+              <td class="row-actions">@if (!entry.reversed && isOpen() && canReverse()) {<button type="button" class="quiet" (click)="beginReverse(entry)" [disabled]="store.blocked() || detailLoading() || paymentsLoading()" [attr.aria-label]="'Revertir cobro '+entry.reference">Revertir</button>}</td>
+            </tr>
+          } @empty {
+            <tr><td colspan="5" class="empty-state">{{paymentsLoading() ? 'Consultando cobros…' : paymentsFailed() ? 'No pudimos consultar los cobros. Usa Actualizar para reintentar.' : 'No hay cobros en esta página del turno.'}}</td></tr>
+          }
+        </tbody></table>
+      </div>
+      <div class="pagination"><span aria-live="polite">{{paymentsLoading() ? 'Consultando…' : paymentsFailed() ? 'Consulta no disponible' : payments().length ? 'Registros '+(paymentsOffset()+1)+'–'+(paymentsOffset()+payments().length) : 'Sin registros en esta página'}}</span><div><button type="button" (click)="previousPayments()" [disabled]="paymentsLoading() || paymentsOffset() === 0">Anterior</button><button type="button" (click)="nextPayments()" [disabled]="paymentsLoading() || !paymentsMore()">Siguiente</button></div></div>
+    </section>
+    <p class="field-help section-gap">Caja administrativa: registra cobros y correcciones; no procesa pagos bancarios ni emite CFDI.</p>
+  } @else {
+    <section class="panel empty-state" role="status">{{detailLoading() ? 'Consultando el turno…' : 'No pudimos consultar este turno. Vuelve al listado o usa Actualizar.'}}</section>
+  }
+} @else {
+  <header class="page-heading"><div><span class="eyebrow">OPERACIÓN / CAJA ADMINISTRATIVA</span><h1 tabindex="-1">Caja</h1><p>Cobros claros, efectivo conciliado y un historial que permanece.</p></div>@if (canWrite()) {<button class="primary" type="button" (click)="beginOpen()" [disabled]="store.blocked() || currentRows.loading() || currentRows.failed() || !!visibleOpen()"><app-icon name="plus"/>Abrir turno</button>}</header>
+  @if (visibleOpen(); as active) {
+    <div class="notice"><span>Turno en curso: <strong>{{active.reference}}</strong> · Efectivo esperado {{money(active.expectedCashCents)}}</span><a [routerLink]="['/caja',active.id]" class="button">Continuar turno <app-icon name="arrow"/></a></div>
+  }
+  <section class="panel" [attr.aria-busy]="rows.loading()">
+    <header class="panel-heading"><div><h2>Historial de turnos</h2><p>Un turno abierto a la vez para todo el consultorio. Más recientes primero.</p></div><span class="badge">Importes en MXN</span></header>
+    <div class="table-scroll" tabindex="0" role="region" aria-label="Turnos de caja">
+      <table><thead><tr><th scope="col">Turno</th><th scope="col">Estado</th><th scope="col" class="numeric">Efectivo esperado</th><th scope="col" class="numeric">Diferencia al cierre</th><th scope="col"><span class="sr-only">Detalle</span></th></tr></thead><tbody>
+        @for (shift of rows.items(); track shift.id) {
+          <tr><td><div class="identity-cell"><span class="row-icon"><app-icon name="wallet"/></span><div><strong>{{shift.reference}}</strong><small>{{date(shift.openedAt)}}</small></div></div></td><td><span class="badge" [class.warning]="shift.status === 'OPEN'">{{statusLabel(shift.status)}}</span></td><td class="numeric">{{money(shift.expectedCashCents)}}</td><td class="numeric"><strong>{{shift.differenceCents === null ? 'Pendiente' : money(shift.differenceCents)}}</strong>@if (shift.differenceCents !== null) {<small>{{differenceLabel(shift.differenceCents)}}</small>}</td><td class="row-actions"><a [routerLink]="['/caja',shift.id]" class="button" [attr.aria-label]="'Ver turno '+shift.reference">Ver detalle <app-icon name="arrow"/></a></td></tr>
+        } @empty {
+          <tr><td colspan="5" class="empty-state">{{rows.loading() ? 'Consultando turnos…' : rows.failed() ? 'No pudimos consultar los turnos. Usa Actualizar para reintentar.' : rows.offset() > 0 ? 'No hay turnos en esta página. Regresa a la anterior.' : canWrite() ? 'Aún no hay turnos. Abre el primero con el fondo inicial de caja.' : 'Aún no hay turnos registrados.'}}</td></tr>
+        }
+      </tbody></table>
+    </div>
+    <clinic-pager [page]="rows"/>
+  </section>
+  <p class="field-help section-gap">Los reversos requieren administración. Cada cierre conserva el conteo, la diferencia y el motivo de conciliación.</p>
+}
+
+@if (dialog() === 'open') {
+  <clinic-dialog heading="Abrir turno de caja" description="Registra el efectivo inicial disponible para esta jornada." (closed)="dialog.set(null)">
+    <form (ngSubmit)="openShift()" #openingForm="ngForm"><fieldset [disabled]="store.blocked()">
+      <label>Referencia del turno<input name="openingReference" [(ngModel)]="opening.reference" maxlength="80" required placeholder="CAJA-2026-001" autocomplete="off"></label>
+      <label>Fondo inicial · MXN<input name="openingAmount" [(ngModel)]="opening.amount" inputmode="decimal" [pattern]="amountPattern" required aria-describedby="opening-amount-help" autocomplete="off"></label>
+      <p class="field-help" id="opening-amount-help">Escribe pesos sin separadores de miles, por ejemplo 1500.00. Se permite un fondo de cero.</p>
+      <div class="form-actions"><button type="button" (click)="dialog.set(null)">Volver</button><button class="primary" [disabled]="openingForm.invalid">Abrir turno</button></div>
+    </fieldset></form>
+  </clinic-dialog>
+}
+@if (dialog() === 'pay' && selected(); as shift) {
+  <clinic-dialog heading="Registrar cobro" [description]="'Turno '+shift.reference+' · Elige el método por el que recibiste el pago.'" (closed)="dialog.set(null)">
+    <form (ngSubmit)="recordPayment()" #paymentForm="ngForm"><fieldset [disabled]="store.blocked() || detailLoading() || !isOpen()">
+      <label>Referencia única del cobro<input name="paymentReference" [(ngModel)]="payment.reference" maxlength="80" required autocomplete="off" placeholder="COBRO-001"></label>
+      <div class="fields"><label>Importe · MXN<input name="paymentAmount" [(ngModel)]="payment.amount" inputmode="decimal" [pattern]="amountPattern" required aria-describedby="payment-amount-help" placeholder="850.00" autocomplete="off"></label><label>Método de pago<select name="paymentMethod" [(ngModel)]="payment.method" required><option value="CASH">Efectivo</option><option value="CARD">Tarjeta</option><option value="TRANSFER">Transferencia</option></select></label></div>
+      <p class="field-help" id="payment-amount-help">Importe mayor que cero, hasta dos decimales, sin separadores de miles.</p>
+      <label>Referencia de operación · opcional<input name="operationReference" [(ngModel)]="payment.operationReference" maxlength="80" autocomplete="off" placeholder="CITA-DEMO-001" aria-describedby="operation-help"></label>
+      <p class="field-help" id="operation-help">Usa un folio administrativo para conciliar. No escribas nombres ni información clínica.</p>
+      <div class="form-actions"><button type="button" (click)="dialog.set(null)">Volver</button><button class="primary" [disabled]="paymentForm.invalid">Confirmar cobro</button></div>
+    </fieldset></form>
+  </clinic-dialog>
+}
+@if (dialog() === 'reverse' && reversing(); as paymentToReverse) {
+  <clinic-dialog heading="Revertir cobro" description="Se registra una corrección administrativa. El cobro original permanece en el historial." (closed)="dialog.set(null)">
+    <div class="notice warning"><span><strong>{{paymentToReverse.reference}} · {{money(paymentToReverse.amountCents)}}</strong><br>{{methodLabel(paymentToReverse.method)}}. Esta acción no devuelve dinero por medios bancarios.</span></div>
+    <form (ngSubmit)="reversePayment()" #reverseForm="ngForm"><fieldset [disabled]="store.blocked() || detailLoading() || !isOpen() || !canReverse()">
+      <label>Motivo del reverso<textarea name="reversalReason" [(ngModel)]="reversalReason" rows="3" required maxlength="240" placeholder="Describe la corrección administrativa"></textarea></label>
+      <div class="form-actions"><button type="button" (click)="dialog.set(null)">Conservar cobro</button><button class="danger-button" [disabled]="reverseForm.invalid">Confirmar reverso</button></div>
+    </fieldset></form>
+  </clinic-dialog>
+}
+@if (dialog() === 'close' && selected(); as shift) {
+  <clinic-dialog heading="Conciliar y cerrar turno" [description]="'Turno '+shift.reference+' · El cierre conserva el conteo y no admite más movimientos.'" (closed)="dialog.set(null)">
+    <form (ngSubmit)="closeShift()" #closingForm="ngForm"><fieldset [disabled]="store.blocked() || detailLoading() || !isOpen()">
+      <div class="detail-metrics"><div><small>Efectivo esperado</small><strong>{{money(shift.expectedCashCents)}}</strong></div><div><small>Diferencia según conteo</small><strong aria-live="polite">{{closeDifference() === null ? 'Escribe el conteo' : money(closeDifference()!)}}</strong></div></div>
+      <label>Efectivo contado · MXN<input name="countedAmount" [(ngModel)]="closing.amount" inputmode="decimal" [pattern]="amountPattern" required aria-describedby="closing-help" autocomplete="off" placeholder="0.00"></label>
+      <p class="field-help" id="closing-help">Incluye el fondo inicial. Un importe negativo en la diferencia indica faltante; uno positivo, sobrante. El saldo se vuelve a calcular al confirmar.</p>
+      <label>Observaciones y motivo de cierre<textarea name="closureReason" [(ngModel)]="closing.reason" rows="3" required maxlength="240" placeholder="Registra la revisión realizada y cualquier diferencia"></textarea></label>
+      <label class="check"><input type="checkbox" name="acknowledged" [(ngModel)]="closing.acknowledged" required>Revisé el conteo y confirmo el cierre definitivo de este turno.</label>
+      <div class="form-actions"><button type="button" (click)="dialog.set(null)">Seguir revisando</button><button class="primary" [disabled]="closingForm.invalid || !closing.acknowledged">Confirmar cierre</button></div>
+    </fieldset></form>
+  </clinic-dialog>
+}

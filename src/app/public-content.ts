@@ -4,7 +4,7 @@ export const publicServices = [
   {
     icon: 'lungs', title: 'Consulta de neumología',
     text: 'Un espacio para conversar sobre tu salud respiratoria y revisar tus antecedentes.',
-    detail: 'El perfil profesional ofrece primera consulta de neumología. Puedes revisar las opciones de cita en Doctoralia y confirmar con el consultorio qué información llevar a la valoración.',
+    detail: 'El perfil profesional ofrece primera consulta de neumología. Puedes conocer al especialista en Doctoralia y confirmar con el consultorio tu cita y qué información llevar a la valoración.',
   },
   {
     icon: 'pulse', title: 'Espirometría',
@@ -24,7 +24,7 @@ export const publicServices = [
 ];
 
 export const patientQuestions = [
-  { question: '¿Cómo puedo agendar una consulta?', answer: 'Abre el perfil del doctor en Doctoralia para consultar la disponibilidad y solicitar una cita. La confirmación y los cambios se gestionan allí o directamente con el consultorio. Esta propuesta no crea una reserva adicional.' },
+  { question: '¿Cómo puedo agendar una consulta?', answer: 'Confirma el servicio y el horario directamente con recepción. La agenda principal será la del portal del consultorio; Doctoralia se utilizará solo para difusión y captación. Esta propuesta y su demo no crean una reserva real.' },
   { question: '¿Qué necesito llevar a mi primera visita?', answer: 'Ten a la mano tus estudios previos y la información de tus tratamientos para compartirlos durante la consulta. Confirma con recepción los documentos solicitados y anota las preguntas que quieras revisar con el doctor.' },
   { question: '¿Un estudio necesita preparación especial?', answer: 'Confirma las indicaciones del estudio con el consultorio antes de acudir. La preparación depende del servicio y de tu situación; el sitio no proporciona instrucciones individuales ni cambios de tratamiento.' },
   { question: '¿Dónde puedo confirmar horarios y costos?', answer: 'Consulta el perfil profesional y confirma con recepción el servicio, horario, costo y formas de pago antes de tu visita. Los importes que aparecen en la demo de gestión son ejemplos y no representan las tarifas del consultorio.' },

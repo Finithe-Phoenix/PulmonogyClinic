@@ -2,8 +2,7 @@
 <button class="skip-link" (click)="focusMain()">Ir al contenido</button>
 <div class="preview-bar">
   <span
-    ><span class="live-dot"></span> Propuesta de sitio · Versión de
-    demostración</span
+    ><span class="live-dot"></span> Propuesta de sitio · No oficial</span
   ><a href="#/panel/resumen">Explorar plataforma <app-icon name="arrow" /></a>
 </div>
 <header class="site-header wrap">
@@ -36,17 +35,16 @@
         <span class="line"></span> ATENCIÓN RESPIRATORIA ESPECIALIZADA
       </div>
       <h1>Respirar mejor<br />empieza con<br /><em>una buena atención.</em></h1>
-      <p>
-        Dr. Marco Antonio De Nova Macedo.<br />Una propuesta de atención
-        cercana, con claridad en cada paso de tu consulta.
-      </p>
+      <p class="hero-byline">Dr. Marco Antonio De Nova Macedo</p>
+      <p>Neumología en Toluca. Conoce los servicios publicados y encuentra
+        la información para organizar tu próxima visita.</p>
       <div class="hero-actions">
         <a
           class="button primary"
           [href]="doctoralia"
           target="_blank"
           rel="noopener noreferrer"
-          >Consultar citas en Doctoralia <app-icon name="arrowup" /></a
+          >Conocer al especialista <app-icon name="arrowup" /></a
         ><button class="button text" (click)="scroll('servicios')">
           Conocer servicios <app-icon name="arrow" />
         </button>
@@ -56,9 +54,9 @@
         <span>·</span> Neumología
       </div>
     </div>
-    <div class="hero-art" aria-label="Ilustración decorativa de pulmones">
+    <div class="hero-art" aria-hidden="true">
       <div class="art-top">
-        <span>EL CUIDADO EMPIEZA<br />POR ESCUCHARTE.</span
+        <span>NEUMOLOGÍA<br />TOLUCA, MÉXICO</span
         ><app-icon name="plus" />
       </div>
       <div class="breath-ring r1"></div>
@@ -79,21 +77,25 @@
             y2="320"
             gradientUnits="userSpaceOnUse"
           >
-            <stop stop-color="#e1f2d4" stop-opacity=".95" />
-            <stop offset="1" stop-color="#83c7ac" stop-opacity=".35" />
+            <stop stop-color="var(--blue-200)" stop-opacity=".8" />
+            <stop offset="1" stop-color="var(--blue-100)" stop-opacity=".45" />
           </linearGradient>
         </defs>
         <path
           d="M165 72C148 41 115 64 90 99 64 133 36 206 37 263c1 65 67 49 101 28 22-14 26-32 26-57V72Z"
           fill="url(#lungFill)"
+          stroke="var(--blue-600)"
+          stroke-width="1.25"
         />
         <path
           d="M195 72c17-31 50-8 75 27 26 34 54 107 53 164-1 65-67 49-101 28-22-14-26-32-26-57V72Z"
           fill="url(#lungFill)"
+          stroke="var(--blue-600)"
+          stroke-width="1.25"
         />
         <g
-          stroke="#e6f3dc"
-          stroke-width="5"
+          stroke="var(--ink-700)"
+          stroke-width="2.5"
           stroke-linecap="round"
           stroke-linejoin="round"
         >
@@ -102,28 +104,20 @@
           />
           <path
             d="m175 41 10 0m-10 16h10m-10 16h10m-10 16h10"
-            stroke-width="3"
+            stroke-width="2"
           />
         </g>
       </svg>
       <div class="art-bottom">
         <span class="tiny-wave">⌁</span
-        ><span>Un nuevo espacio<br />para tu salud respiratoria.</span
-        ><span class="art-number">01 / 03</span>
-      </div>
-      <div class="floating-note">
-        <span class="soft-icon"><app-icon name="shield" /></span>
-        <div>
-          <strong>Atención especializada</strong
-          ><small>Dr. Marco Antonio De Nova Macedo</small>
-        </div>
+        ><span>El cuidado empieza<br />por escucharte.</span>
       </div>
     </div>
   </section>
   <div class="trust-strip wrap">
     <span><app-icon name="users" /> Atención centrada en ti</span
     ><span><app-icon name="file" /> Información clara</span
-    ><span><app-icon name="calendar" /> Citas desde Doctoralia</span
+    ><span><app-icon name="calendar" /> Agenda del consultorio</span
     ><span><app-icon name="location" /> Consulta en Toluca</span>
   </div>
   <section class="section wrap" id="servicios">
@@ -157,7 +151,7 @@
   <section class="doctor-section wrap" id="doctor">
     <div class="doctor-monogram">
       <span class="eyebrow">DR. MARCO ANTONIO</span
-      ><span class="monogram">MN<span>+</span></span
+      ><span class="monogram">DN<span>+</span></span
       ><span>DE NOVA MACEDO</span><small>Identidad visual provisional</small>
     </div>
     <div class="doctor-copy">
@@ -191,7 +185,7 @@
       <p>Un lugar para consultar la información práctica<br />y preparar tus preguntas con calma.</p>
     </div>
     <div class="care-steps">
-      <article><span class="step-number">01</span><h3>Encuentra tu cita</h3><p>Consulta la disponibilidad en Doctoralia y confirma el servicio que necesitas con recepción.</p><a [href]="doctoralia" target="_blank" rel="noopener noreferrer">Consultar disponibilidad <app-icon name="arrowup" /></a></article>
+      <article><span class="step-number">01</span><h3>Prepara tu visita</h3><p>Conoce al especialista en Doctoralia. Recepción confirma el servicio y el horario en la agenda del consultorio.</p><a [href]="doctoralia" target="_blank" rel="noopener noreferrer">Ver perfil profesional <app-icon name="arrowup" /></a></article>
       <article><span class="step-number">02</span><h3>Prepara tu visita</h3><p>Reúne tus estudios previos y la información que quieras compartir. Confirma las indicaciones de cualquier estudio.</p><button (click)="scroll('ubicacion')">Cómo llegar <app-icon name="arrow" /></button></article>
       <article><span class="step-number">03</span><h3>Da continuidad</h3><p>Acuerda con el profesional los siguientes pasos y con recepción los detalles de tu próxima cita.</p><button (click)="scroll('preguntas')">Resolver dudas prácticas <app-icon name="arrow" /></button></article>
     </div>
@@ -234,7 +228,7 @@
         <p>Consulta cualquier preparación especial antes de un estudio.</p>
       </div>
       <p class="guide-footer">
-        <app-icon name="info" /> Las reservas reales se gestionan en Doctoralia.
+        <app-icon name="info" /> Esta demo no reserva citas. Confirma tu visita directamente con el consultorio.
       </p>
     </div>
   </section>
@@ -242,14 +236,14 @@
     <div class="faq-intro"><span class="eyebrow">INFORMACIÓN PARA PACIENTES</span><h2>Antes de venir,<br />resuelve tus dudas.</h2><p>Para preguntas sobre tu atención o un estudio, confirma los detalles directamente con el consultorio.</p><a [href]="doctoralia" target="_blank" rel="noopener noreferrer" class="button outline">Abrir perfil y contacto <app-icon name="arrowup" /></a></div>
     <div class="faq-list">@for(item of patientQuestions; track item.question){<details><summary>{{item.question}}<span aria-hidden="true">+</span></summary><p>{{item.answer}}</p></details>}</div>
   </section>
-  <section class="contact-band wrap"><div><span class="eyebrow">DA EL SIGUIENTE PASO</span><h2>Organiza tu próxima visita.</h2><p>Revisa horarios disponibles y solicita tu cita en el perfil profesional.</p></div><a class="button primary" [href]="doctoralia" target="_blank" rel="noopener noreferrer">Ver disponibilidad en Doctoralia <app-icon name="arrowup" /></a></section>
+  <section class="contact-band wrap"><div><span class="eyebrow">DA EL SIGUIENTE PASO</span><h2>Organiza tu próxima visita.</h2><p>Conoce al especialista y confirma tu cita directamente con recepción. Doctoralia es un canal de difusión, no la agenda de este portal.</p></div><a class="button primary" [href]="doctoralia" target="_blank" rel="noopener noreferrer">Ver perfil del especialista <app-icon name="arrowup" /></a></section>
   <section class="demo-invite wrap">
     <div>
-      <span class="eyebrow">LA CLÍNICA, MEJOR ORGANIZADA</span>
-      <h2>Un vistazo al siguiente paso.</h2>
+      <span class="eyebrow">DEMO INTERACTIVA · SOLO DATOS FICTICIOS</span>
+      <h2>Otra mirada a la organización.</h2>
       <p>
-        Explora cómo podrían trabajar juntos recepción, consultas, farmacia y
-        caja.
+        Un espacio independiente para explorar recepción, consultas, farmacia y caja.
+        No es un acceso clínico ni permite reservar una cita real.
       </p>
     </div>
     <a href="#/panel/resumen" class="button light"
@@ -273,7 +267,7 @@
     <a href="#/" class="brand side-brand"
       ><span class="brand-icon"><app-icon name="lungs" /></span
       ><span
-        ><strong>De Nova</strong><small>CONSULTORIO DIGITAL</small></span
+        ><strong>Pulmonogy</strong><small>DEMO SINTÉTICA</small></span
       ></a
     >
     <div class="workspace-switch">
@@ -283,7 +277,7 @@
         ><small>Espacio de demostración</small>
       </div>
     </div>
-    <div class="nav-label">ESPACIO DE TRABAJO</div>
+    <div class="nav-label">EXPLORA LOS MÓDULOS</div>
     <nav aria-label="Módulos de gestión">
       @for(item of nav;track item.id){<a
         [href]="'#/panel/'+item.id"
@@ -422,8 +416,8 @@
             }
           </div>
           <div class="panel-foot">
-            <app-icon name="info" /> Doctoralia sigue siendo la agenda
-            principal. Esta demo no está sincronizada.
+            <app-icon name="info" /> El portal será la agenda principal.
+            Doctoralia solo es un canal de captación. Esta demo no reserva citas reales.
           </div>
         </section>
         <div class="right-stack">
@@ -504,8 +498,8 @@
         <app-icon name="info" />
         <p>
           Estas citas son ficticias. Registrar o cancelar aquí
-          <strong>no modifica Doctoralia</strong>. En la operación real,
-          recepción trabajará sobre la agenda principal.
+          <strong>no crea ni modifica citas reales</strong>. Recepción
+          trabajará sobre la agenda del portal; Doctoralia solo aporta captación.
         </p>
       </div>
       <section class="panel">
@@ -1130,7 +1124,7 @@
             <app-icon name="file" />
             <h3>Validación clínica</h3>
             <p>
-              Decidir el sistema de expedientes y validar notas, firma,
+              Desarrollar el expediente propio y validar notas, firma,
               exportación y conservación.
             </p>
           </div>
@@ -1138,8 +1132,8 @@
             <app-icon name="box" />
             <h3>Datos de apertura</h3>
             <p>
-              Identificar pacientes, contar existencias por lote y conciliar la
-              agenda de Doctoralia.
+              Identificar pacientes, contar existencias por lote y registrar
+              los compromisos existentes en la agenda del portal.
             </p>
           </div>
         </div>

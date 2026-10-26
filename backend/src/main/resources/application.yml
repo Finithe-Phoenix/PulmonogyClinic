@@ -13,7 +13,7 @@ spring:
       maximum-pool-size: 10
       connection-timeout: 10000
   flyway:
-    enabled: true
+    enabled: ${FLYWAY_ENABLED:true}
     clean-disabled: true
     user: ${MIGRATION_USER:${DB_USER}}
     password: ${MIGRATION_PASSWORD:${DB_PASSWORD}}

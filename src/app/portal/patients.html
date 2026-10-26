@@ -1,0 +1,72 @@
+<header class="page-heading">
+  <div><span class="eyebrow">ATENCIÓN / DIRECTORIO</span><h1 tabindex="-1">Pacientes</h1><p>La información esencial para recibir a cada persona con claridad.</p></div>
+  @if (store.has('ADMIN','RECEPCION')) { <button class="primary" (click)="newPatient()" [disabled]="store.blocked()"><app-icon name="plus"/>Nuevo paciente</button> }
+</header>
+<section class="panel" aria-label="Directorio administrativo">
+  <form class="toolbar" (ngSubmit)="rows.filter({q:search})">
+    <label class="search-field"><app-icon name="search"/><input name="search" [(ngModel)]="search" maxlength="160" placeholder="Buscar nombre o referencia" aria-label="Buscar paciente por nombre o referencia"></label>
+    <button type="submit" [disabled]="rows.loading()">Buscar</button><span class="toolbar-note">Registros sintéticos · sin notas clínicas</span>
+  </form>
+  <div class="table-scroll" role="region" tabindex="0" aria-label="Pacientes registrados" [attr.aria-busy]="rows.loading()">
+    <table><thead><tr><th>Paciente</th><th>Nacimiento</th><th>Contacto</th><th>Registro</th><th><span class="sr-only">Acciones</span></th></tr></thead><tbody>
+      @for (patient of rows.items(); track patient.id) {
+        <tr><td><div class="identity-cell"><span class="row-icon"><app-icon name="users"/></span><div><strong>{{patient.fullName}}</strong><small class="mono">{{patient.reference}}</small></div></div></td><td>{{dateLabel(patient.birthDate)}}</td><td>{{patient.phone || 'Sin teléfono'}}<small>{{patient.email || 'Sin correo'}}</small></td><td><span class="badge soft">Administrativo</span></td><td><button class="quiet" (click)="show(patient)" [attr.aria-label]="'Ver a ' + patient.fullName">Ver detalle<app-icon name="arrow"/></button></td></tr>
+      } @empty { <tr><td colspan="5" class="empty-state">{{rows.loading() ? 'Consultando pacientes…' : rows.failed() ? 'No pudimos consultar el directorio. Vuelve a buscar.' : 'No encontramos pacientes con esa búsqueda. Revisa el nombre o registra un nuevo ejemplo.'}}</td></tr> }
+    </tbody></table>
+  </div><clinic-pager [page]="rows"/>
+</section>
+
+@if (formMode() && !confirmationRecovered()) {
+  <clinic-dialog [heading]="formMode() === 'new' ? 'Nuevo paciente' : 'Actualizar datos administrativos'" description="Datos mínimos de identificación. Todos los campos de este entorno deben ser ficticios." (closed)="close()">
+    <form (ngSubmit)="save()" #form="ngForm">
+      @if (formError()) { <p class="notice error" role="alert">{{formError()}}</p> }
+      @if (store.pending()) { <p class="notice" role="status">La operación espera confirmación. Cierra este diálogo y usa «Reintentar» en el aviso del portal; conservaremos la misma solicitud.</p> }
+      @if (conflictRequired()) {
+        <section class="notice warning" aria-label="Comparar cambios del paciente">
+          <h3>El registro cambió en otra sesión</h3><p>Tu borrador sigue intacto. Compara los datos actuales antes de decidir si quieres volver a guardarlo.</p>
+          @if (conflictLoading()) { <p role="status">Consultando la versión actual…</p> }
+          @if (conflict(); as current) {
+            <p>Versión de tu edición: {{detail()?.version}} · Versión actual: {{current.version}}</p>
+            <div class="table-scroll" role="region" tabindex="0" aria-label="Datos actuales y borrador del paciente"><table><thead><tr><th>Campo</th><th>Actual en servidor</th><th>Tu borrador</th></tr></thead><tbody>@for (row of conflictRows(); track row.label) { <tr><th scope="row">{{row.label}}</th><td>{{row.current}}</td><td>{{row.draft}}</td></tr> }</tbody></table></div>
+            <button type="button" (click)="acceptConflict()" [disabled]="store.blocked() || conflictLoading()">Usar versión actual y conservar mi borrador</button>
+          } @else if (!conflictLoading()) { <p>No pudimos obtener la versión actual. Tu borrador permanece aquí.</p><button type="button" (click)="loadConflict()" [disabled]="store.blocked()">Reintentar comparación</button> }
+        </section>
+      }
+      <fieldset [disabled]="store.blocked() || duplicateChecking()">
+        <div class="fields">
+          <label>Referencia<input name="reference" [(ngModel)]="draft.reference" required minlength="2" maxlength="40" pattern="[A-Za-z0-9-]{2,40}" placeholder="PAC-DEMO-001" autocomplete="off"><small>Única; letras, números y guiones.</small></label>
+          <label>Nombre completo<input name="fullName" [(ngModel)]="draft.fullName" (ngModelChange)="identityChanged()" required maxlength="160" placeholder="Nombre de ejemplo" autocomplete="off"></label>
+          <label>Fecha de nacimiento<input type="date" name="birthDate" [(ngModel)]="draft.birthDate" (ngModelChange)="identityChanged()" required [max]="maxBirthDate"></label>
+          <label>Teléfono <small>Opcional</small><input type="tel" name="phone" [(ngModel)]="draft.phone" (ngModelChange)="identityChanged()" minlength="7" maxlength="30" placeholder="+52 722 000 0000" autocomplete="off"></label>
+          <label>Correo <small>Opcional</small><input type="email" email name="email" [(ngModel)]="draft.email" maxlength="160" placeholder="ejemplo@example.invalid" autocomplete="off"></label>
+        </div>
+        <div class="form-actions"><button type="button" (click)="checkDuplicates()" [disabled]="!draft.fullName.trim() || !draft.birthDate">Revisar coincidencias</button></div>
+        @if (duplicateChecked()) {
+          @if (duplicateRequired()) {
+            <section class="notice" aria-label="Posibles coincidencias">
+              <h3>Verifica que sea una persona distinta</h3><p>Un nombre o contacto compartido no confirma un duplicado. Compara estos registros antes de continuar.</p>
+              <ul class="compact-list">@for (candidate of duplicates(); track candidate.patient.id) { <li><div><strong>{{candidate.patient.fullName}}</strong><small>{{candidate.patient.reference}} · {{dateLabel(candidate.patient.birthDate)}} · {{candidate.patient.phone || 'Sin teléfono'}}</small></div><span class="badge soft">Posible coincidencia</span></li> }</ul>
+              @if (duplicateOffset() > 0 || duplicateMore()) { <div class="form-actions"><button type="button" (click)="checkDuplicates(duplicateOffset()-20)" [disabled]="duplicateOffset()===0">Anteriores</button><button type="button" (click)="checkDuplicates(duplicateOffset()+20)" [disabled]="!duplicateMore()">Más coincidencias</button></div> }
+              <label class="check"><input type="checkbox" name="duplicateReviewed" [(ngModel)]="draft.duplicateReviewed">Revisé las coincidencias y confirmo que este registro debe mantenerse independiente.</label>
+            </section>
+          } @else { <p class="notice" role="status">No encontramos coincidencias por nombre o por nacimiento y teléfono.</p> }
+        }
+        <label class="check"><input type="checkbox" name="synthetic" [(ngModel)]="draft.synthetic" required>Confirmo que estos datos son ficticios y no pertenecen a un paciente real.</label>
+        <div class="form-actions"><button type="button" (click)="close()">Cancelar</button><button class="primary" type="submit" [disabled]="form.invalid || conflictRequired() || (duplicateRequired() && !draft.duplicateReviewed)">{{formMode() === 'new' ? 'Registrar paciente' : 'Guardar cambios'}}</button></div>
+      </fieldset>
+      @if (duplicateChecking()) { <p role="status">Revisando posibles coincidencias…</p> }
+    </form>
+  </clinic-dialog>
+} @else if (detail(); as patient) {
+  <clinic-dialog [heading]="patient.fullName" [description]="patient.reference + ' · Registro administrativo sintético'" (closed)="close()">
+    @if (confirmationRecovered()) { <p class="notice" role="status">La operación se confirmó al reintentar. Actualiza el detalle para consultar los datos guardados.</p><button (click)="show(patient)">Actualizar detalle</button> }
+    @if (detailLoading()) { <p role="status">Actualizando información…</p> }
+    <dl class="detail-metrics"><div><dt>Nacimiento</dt><dd>{{dateLabel(patient.birthDate)}}</dd></div><div><dt>Teléfono</dt><dd>{{patient.phone || 'Sin registrar'}}</dd></div><div><dt>Correo</dt><dd>{{patient.email || 'Sin registrar'}}</dd></div><div><dt>Última actualización</dt><dd>{{dateTime(patient.updatedAt)}}</dd></div></dl>
+    @if (store.has('ADMIN','RECEPCION')) { <div class="form-actions"><button (click)="editPatient()" [disabled]="detailLoading() || store.blocked() || confirmationRecovered()">Editar datos</button></div> }
+    <h3>Citas registradas</h3>
+    @if (historyError()) { <p class="notice error" role="alert">{{historyError()}}</p><button (click)="loadHistory(historyOffset())">Reintentar consulta</button> }
+    @if (historyLoading()) { <p role="status">Consultando citas…</p> }
+    <ul class="compact-list">@for (appointment of history(); track appointment.id) { <li><div><strong>{{dateTime(appointment.startsAt)}}</strong><small>{{appointment.service}} · {{appointment.practitioner}}</small></div><span class="badge soft">{{stateLabel(appointment.status)}}</span></li> } @empty { @if (!historyLoading() && !historyError()) { <li class="empty-state">Este registro aún no tiene citas.</li> } }</ul>
+    @if (historyOffset() > 0 || historyMore()) { <div class="form-actions"><button (click)="loadHistory(historyOffset()-5)" [disabled]="historyLoading() || historyOffset()===0">Anteriores</button><button (click)="loadHistory(historyOffset()+5)" [disabled]="historyLoading() || !historyMore()">Siguientes</button></div> }
+  </clinic-dialog>
+}

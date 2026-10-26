@@ -22,7 +22,7 @@ public class SecurityConfiguration {
             Object claim = jwt.getClaims().get("roles");
             if (!(claim instanceof List<?> roles)) return List.of();
             return roles.stream().filter(String.class::isInstance).map(String.class::cast)
-                    .filter(Set.of("ADMIN", "FARMACIA", "AUDITOR", "RECEPCION")::contains)
+                    .filter(Set.of("ADMIN", "FARMACIA", "AUDITOR", "RECEPCION", "MEDICO")::contains)
                     .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
                     .map(org.springframework.security.core.GrantedAuthority.class::cast).toList();
         });
@@ -33,6 +33,14 @@ public class SecurityConfiguration {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(HttpMethod.GET, "/health").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/v1/audit/events").hasAnyRole("ADMIN", "AUDITOR")
+                .requestMatchers(HttpMethod.GET, "/api/v1/operations/**").hasAnyRole("ADMIN", "RECEPCION", "MEDICO", "AUDITOR")
+                .requestMatchers(HttpMethod.POST, "/api/v1/operations/patients", "/api/v1/operations/patients/*/update").hasAnyRole("ADMIN", "RECEPCION")
+                .requestMatchers(HttpMethod.POST, "/api/v1/operations/appointments", "/api/v1/operations/appointments/*/reschedule", "/api/v1/operations/appointments/*/transition").hasAnyRole("ADMIN", "RECEPCION", "MEDICO")
+                .requestMatchers(HttpMethod.GET, "/api/v1/cash/**").hasAnyRole("ADMIN", "RECEPCION", "AUDITOR")
+                .requestMatchers(HttpMethod.POST, "/api/v1/cash/payments/*/reverse").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.POST, "/api/v1/cash/shifts", "/api/v1/cash/shifts/*/payments", "/api/v1/cash/shifts/*/close").hasAnyRole("ADMIN", "RECEPCION")
+                .requestMatchers(HttpMethod.GET, "/api/v1/equipment/**").hasAnyRole("ADMIN", "RECEPCION", "MEDICO", "AUDITOR", "FARMACIA")
+                .requestMatchers(HttpMethod.POST, "/api/v1/equipment/assets", "/api/v1/equipment/assets/*/status", "/api/v1/equipment/assets/*/maintenance").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.GET, "/api/v1/inventory/**").hasAnyRole("ADMIN", "FARMACIA", "AUDITOR")
                 .requestMatchers(HttpMethod.POST, "/api/v1/inventory/products").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.POST, "/api/v1/inventory/lots/*/quarantine").hasRole("ADMIN")

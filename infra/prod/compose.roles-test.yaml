@@ -1,0 +1,45 @@
+# Synthetic rehearsal only, NOT the production stack. Use a fresh project name.
+# No ports, no existing volumes, no clinic_dev/clinic_test/identity connections.
+services:
+  roles-db:
+    image: postgres:17
+    mem_limit: 512m
+    cpus: 1
+    environment:
+      POSTGRES_DB: clinic_roles_fixture
+      POSTGRES_USER: roles_test_admin
+      POSTGRES_PASSWORD: ${ROLE_TEST_ADMIN_PASSWORD:?Generate an ephemeral test password in the shell}
+    tmpfs: ['/var/lib/postgresql/data:rw,nosuid,noexec,size=268435456']
+    networks: [isolated]
+    healthcheck:
+      test: [CMD-SHELL, pg_isready -U roles_test_admin -d clinic_roles_fixture]
+      interval: 2s
+      retries: 40
+  roles-test:
+    image: maven:3.9.11-eclipse-temurin-21
+    mem_limit: 1536m
+    cpus: 1
+    working_dir: /app
+    command: [mvn, -B, -ntp, -Dtest=DatabasePrivilegesRehearsal, test]
+    environment:
+      ROLE_TEST_ISOLATED: 'true'
+      ROLE_TEST_DB_URL: jdbc:postgresql://roles-db:5432/clinic_roles_fixture
+      ROLE_TEST_DB_USER: roles_test_admin
+      ROLE_TEST_DB_PASSWORD: ${ROLE_TEST_ADMIN_PASSWORD:?Generate an ephemeral test password in the shell}
+      ROLE_TEST_ACCESS_SQL: /policy/database-access.sql
+    read_only: true
+    tmpfs: [/tmp]
+    volumes:
+      - ../../backend:/app:ro
+      - ./database-access.sql:/policy/database-access.sql:ro
+      - role-maven-cache:/root/.m2
+      - role-test-target:/app/target
+    networks: [isolated, downloads]
+    depends_on:
+      roles-db: {condition: service_healthy}
+networks:
+  isolated: {internal: true}
+  downloads: {}
+volumes:
+  role-maven-cache: {}
+  role-test-target: {}

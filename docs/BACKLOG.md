@@ -1,45 +1,46 @@
-# Backlog de implementación
+# Backlog y condiciones de aceptación
 
-## Avance v0.5.0 · primera operación privada
+## Iteración posterior a v0.5.0 · 28/09/2026
 
-SEC-01, INV-02 y COM-02 ahora tienen **portal privado local conectado y verificado**, con Keycloak de desarrollo, PKCE, autorización JWT existente, PostgreSQL, persistencia entre sesiones y concurrencia entre usuarios. DEV-01 tiene Pages habilitado y desplegado; DEV-02 agrega workflow privado con 10 pruebas E2E. Identidad/MFA productivos, hosting y piloto siguen pendientes. [Guía](PRIVATE_PORTAL.md), [96 pruebas locales](VALIDATION.md), [diagnóstico y dependencias](SESSION_2026-09-28.md).
+El portal local conecta inventario, compras, pacientes administrativos, agenda, caja, equipos y auditoría. El rediseño Paper & Ink elimina el verde como color de marca y separa módulos mediante rutas. La identidad de desarrollo tiene acceso en español y almacenamiento persistente migrado con verificación de preservación. **No equivale a una plataforma terminada ni habilitada para datos reales.**
 
-La tabla conserva el alcance completo; los avances de conexión del portal se actualizan debajo.
+La [validación](VALIDATION.md) distingue ejecuciones locales de entregas publicadas. Una prueba aprobada no cierra por sí sola una fila del backlog.
 
-Base: plan de 18 semanas acordado como referencia, operación actual en papel y Doctoralia. No equivale a una fecha comprometida ni a un expediente clínico terminado.
+| ID | Entrega | Implementado / evidencia local | Pendiente y dependencia |
+| --- | --- | --- | --- |
+| UX-01 | Sistema visual y navegación | Tokens, nueve rutas privadas, componentes, consulta separada de edición; sitio/acceso coherentes | Revisión final, lector de pantalla/dispositivo real y formularios bajo conflicto/sesión. Técnica + usuarios |
+| WEB-01 | Sitio/demo adaptables | Rediseño local; pruebas a 360, 390, 768, 1280 y 1440 px; demo separada sintética | Publicar esta iteración y verificar URL. Técnica |
+| WEB-02 | Sitio oficial | Datos/enlaces de referencia y marca/fotos provisionales explícitas | Aprobar marca, fotos autorizadas, horarios, teléfonos, servicios, ubicación y avisos. Consultorio |
+| OPS-01 | Pacientes administrativos | Alta, búsqueda, homónimos, revisión de duplicados, versiones; comparación de conflictos y descarte de respuestas tardías | Revisar el recorrido con el personal y política de identidad real. Consultorio |
+| OPS-02 | Recepción y agenda | Reserva, llegada, espera, consulta, finalización/cancelación, reprogramación; conflictos y hora México. Titular define portal como agenda principal; Doctoralia solo captación | Alinear perfil/canales externos y registrar compromisos existentes antes del piloto. No conector. Consultorio |
+| INV-01 | Catálogo/lotes/FEFO | Altas, entradas/salidas/bajas, cuarentena/liberación, búsquedas paginadas, CSV de página | Conteo, catálogo/unidades reales, trazabilidad navegable e importación. Técnica + consultorio |
+| INV-02 | Integridad de stock | Transacciones, roles, reintento UUID por sujeto, última unidad, bloqueos vencido/cuarentena | Ensayo operativo de conciliación antes de uso real. Consultorio |
+| INV-03 | Categorías reguladas | Sin medicamentos reales ni dispensación clínica | Procedimientos y responsabilidades según catálogo aprobado. Consultorio |
+| COM-01 | Compras | Proveedores, varias partidas, costo histórico, recepción parcial por lote, cancelación del saldo; persistencia/concurrencia | Navegación integral orden–recepción–lote–movimiento; documentos acordados. Técnica + consultorio |
+| COM-02 | Búsqueda/exportación | Filtros/páginas acotadas y CSV parcial seguro sin consultas ocultas | Exportación masiva/auditada no incluida; definir necesidad/permisos antes de ampliar |
+| COM-03 | Correcciones/devoluciones | Cancelar saldo no borra entregas; historia protegida | Acordar causales, autorizadores, cuarentena, compensaciones de stock/costo y documentos. Consultorio + técnica |
+| CAJ-01 | Turnos/cobros/cierre | Fondo, métodos, referencia única, centavos exactos, reverso ADMIN, diferencia/cierre; UI/API/PostgreSQL | Confirmados cobros por cita e independientes. Implementar vínculo opcional validado; hoy referencia manual sin FK. Técnica |
+| CAJ-02 | Integraciones financieras | Sin pagos electrónicos, contabilidad ni CFDI | Proveedor/PAC, acceso, alcance, costos y aceptación. Consultorio + terceros |
+| EQ-01 | Equipos/mantenimiento | Activos, ubicación/serie, disponibilidad, historial/próxima intervención y recurso normalizado en agenda | Inventario real/evidencias aprobadas; no certificación de calibración. Consultorio |
+| CLI-01 | Expediente/documentos | Demo sin validez, [arquitectura/fuentes oficiales](CLINICAL_READINESS.md) y construcción propia confirmada | Implementación privada sintética, cuenta MEDICO y permisos por autor; después formatos/firma/custodia/retención y aceptación. Captura real deshabilitada |
+| SEC-01 | Identidad/permisos | Keycloak/PKCE, JWT/RBAC servidor; roles ADMIN/RECEPCION/FARMACIA/MEDICO/AUDITOR; tokens en memoria | Recorrido real de rol médico, MFA/alta-baja/sesiones productivas, mínimos por recurso. Técnica + titular |
+| SEC-02 | Sesión/recuperación | Renovación real, bloqueo/reauth con PKCE; formularios solo en memoria y separación de cuentas; 10 casos aprobados | Repetir suite integral tras ajustes finales; MFA/operación productiva requieren entorno autorizado |
+| API-01 | Servidor modular | Java21/SpringBoot/PostgreSQL17, V1..V5; 100 pruebas locales y 7 de roles BD separados aprobadas | Ampliar contratos/pruebas/política de permisos con cada módulo nuevo. Técnica |
+| DEV-01 | Publicación | Pages existente para sitio/demo; API/portal solo locales | Commit/push, Actions y URL de esta iteración. Técnica |
+| DEV-02 | Preparación productiva | Stack reproducible, secretos fuera de Git, BD de pruebas exclusiva, política runtime/migración y ensayo 7/7 | Parametrizar portal, HTTPS/MFA, observabilidad/actualización y entorno aprobado. Hosting/dominio/costos: titular |
+| REC-01 | Respaldo/restauración | [Ensayo cifrado aprobado](BACKUP_RESTORE.md): 18 tablas, destino nuevo, hashes/relaciones; artefactos conservados | No cubre producción, identidad/adjuntos, copias externas, retención, llaves independientes ni RPO/RTO. Técnica + titular |
+| MIG-01 | Conteo/importación/migración | [Plantillas/planificador sin escrituras](IMPORT_AND_COUNT.md), 12 casos puros y ensayo sintético: seis propuestas, cero importaciones | No importador productivo habilitado. Validar catálogo/archivos y autorizar ejecución/conciliación. Técnica + consultorio |
+| PIL-01 | Capacitación/turno piloto | [Guía por rol y contingencia](PILOT_RUNBOOK.md); recorridos sintéticos automatizados, no piloto humano | Asignar responsables, medir jornada y aceptar entrada/salida con personal real. Consultorio + técnica |
+| QA-01 | Calidad integral | API/dominio/navegador, axe y cinco anchuras; evidencias sintéticas | Rendimiento con escenario documentado, pruebas asistivas manuales y aceptación humana. Técnica + usuarios |
 
-| ID      | Prioridad | Entrega / criterio de aceptación                                                             | Estado                      |
-| ------- | --------- | -------------------------------------------------------------------------------------------- | --------------------------- |
-| WEB-01  | P0        | Sitio adaptable con servicios, ubicación, enlace al perfil y etiqueta de propuesta.          | Demo implementada           |
-| OPS-01  | P0        | Pacientes ficticios, estados de atención y vista diaria reproducible.                        | Demo implementada           |
-| INV-01  | P0        | Alta de productos/lotes, entradas/salidas, alertas, bloqueos y exportación.                  | Demo implementada en v0.3.0 |
-| COM-01  | P0        | Proveedores, órdenes, entregas parciales, trazabilidad por lote, bloqueo de duplicados y cancelación del saldo. | Demo implementada en v0.2.0 |
-| CAJ-01  | P0        | Cobros en centavos, referencias únicas, reversos y cierre ilustrativo.                       | Demo implementada           |
-| CLI-01  | P0        | Flujo de borrador, cierre y adenda, identificado sin validez clínica.                        | Demo implementada           |
-| DEV-01  | P0        | Compilación y pruebas en Actions; artefacto estático para Pages.                             | Pages habilitado, publicado y verificado |
-| DEV-02  | P0        | Portal privado separado, stack local y pruebas integrales de identidad/API/UI.              | Implementado; 10 E2E locales aprobados |
-| DISC-01 | P0        | Confirmar nombre, razón social, sedes, servicios, personal, horarios y plan Doctoralia.      | Pendiente del levantamiento |
-| CLI-02  | P0        | Seleccionar sistema clínico y verificar certificación/versión/alcance, exportación y firma.  | Pendiente de evaluación     |
-| SEC-01  | P0        | Portal privado, identidad/MFA, RBAC en API y pruebas negativas por rol/recurso.              | Portal local/Keycloak/PKCE/RBAC verificados; MFA e identidad productiva pendientes |
-| API-01  | P0        | Spring Boot modular, PostgreSQL, migraciones y repositorios con transacciones.               | API de inventario y compras implementada en v0.4.0 |
-| INV-02  | P0        | Catálogo y lotes reales, conteo inicial, compras, recepción parcial, FEFO y concurrencia.    | API conservada; catálogo, recepción y existencias conectados; conteo real y UI de movimientos pendientes |
-| COM-02  | P0        | Proveedores y órdenes persistentes; recibir por lote, evitar duplicados/sobreentrega y cancelar saldos con permiso. | API y portal local conectados; persistencia y concurrencia verificadas |
-| COM-03  | P1        | Devoluciones, correcciones de entrega, impuestos y documentos acordados con el responsable. | Pendiente del levantamiento |
-| INV-03  | P0        | Procedimientos de antibióticos y categorías reguladas acordes al catálogo real.              | Pendiente del responsable   |
-| CAJ-02  | P0        | Turnos de caja, fondo inicial, autorizaciones de reverso y persistencia privada.             | Pendiente                   |
-| MIG-01  | P0        | Ensayo sintético; medir archivo; migrar pacientes activos y validar identidad con recepción. | Pendiente                   |
-| OPS-02  | P0        | Agenda principal definida; conciliación de citas futuras y cambios en Doctoralia.            | Pendiente                   |
-| REC-01  | P0        | Backups cifrados, restauración ensayada, contingencia y recuperación acordada.               | Pendiente                   |
-| WEB-02  | P1        | Fotos autorizadas, marca final, textos, avisos y publicación oficial aprobados.              | Pendiente                   |
-| API-02  | P1        | Integración Doctoralia aprobada; probar cambios, cancelaciones, reintentos y reconciliación. | Condicionada al proveedor   |
-| FIN-01  | P1        | Seleccionar PAC y acordar emisión de CFDI, errores y cancelaciones.                          | Alcance adicional           |
-| EQ-01   | P1        | Inventario real de equipo, mantenimiento/calibración y disponibilidad por recurso.           | Pendiente                   |
-| PIL-01  | P0        | Un turno piloto, personal capacitado, cero defectos críticos abiertos y entrega documentada. | Pendiente                   |
+## Decisiones que el desarrollo no puede sustituir
 
-## Datos de arranque
+1. **Expediente:** construcción propia confirmada; faltan plantillas, firma, custodia y habilitación clínica. Agenda propia principal y Doctoralia solo exposición/captación también confirmadas. Ver [decisiones](PRODUCT_DECISIONS.md); no volver a pedir esas elecciones ni condicionar el avance a una API de Doctoralia.
+2. **Operación económica:** cobros tanto por cita como independientes confirmados; implementar el vínculo opcional. Faltan reglas de aplicación de anticipos, pagos parciales, devoluciones y responsables. Un cobro no implica factura ni consulta concluida.
+3. **Inventario:** aprobar catálogo/unidades, conteo, correcciones/devoluciones y categorías reguladas.
+4. **Privacidad/infraestructura:** responsable, dominio, hosting, custodios y retención; autorizar costos antes de contratar.
+5. **Sitio/piloto:** aprobar contenidos y asignar personal para validar un turno. Pruebas o revisión de agentes no sustituyen aceptación humana.
 
-Nombre comercial confirmado; servicios/horarios; lista de personal y responsabilidades; contrato y funcionalidades de Doctoralia; formatos clínicos vacíos; catálogo de productos y unidades; volumen de archivo; inventario de dispositivos y conectividad. No subir expedientes ni datos de pacientes a este repositorio.
+## Secuencia técnica
 
-## Secuencia siguiente
-
-Tras el primer recorrido privado local verificado, extender pacientes administrativos y recepción al servidor; continuar caja y equipos con sus interfaces y pruebas. En paralelo, cerrar descubrimiento/sistema clínico y seleccionar infraestructura e identidad/MFA productivas. Después preparar conteo/importación, recuperación, capacitación y piloto. La integración local no omite estas etapas.
+Cerrar defectos de sesión/conflicto, ejecutar la suite integrada y publicar la iteración visual verificada. Continuar trazabilidad, configuración productiva, ensayo de importación/conteo, capacitación y piloto sintético. Las dependencias externas no bloquean esos frentes, pero sí impiden declarar el goal completo o habilitar uso clínico real.

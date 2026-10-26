@@ -1,0 +1,3 @@
+sourceId,productSourceId,targetLotId,batch,expiresOn,quarantined,recordedQuantity,countedQuantity,reason,synthetic
+LOT-001,PROD-001,,SYN-PILOT-LOTE-001,,false,0,12,Conteo inicial ficticio SYNTHETIC-PILOT-V1 LOT-001,true
+LOT-002,PROD-002,,SYN-PILOT-LOTE-002,2035-12-31,true,0,4,Conteo inicial ficticio en cuarentena SYNTHETIC-PILOT-V1 LOT-002,true

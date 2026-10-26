@@ -1,0 +1,94 @@
+<header class="page-heading">
+  <div><span class="eyebrow">ATENCIÓN / JORNADA</span><h1 tabindex="-1">Agenda y recepción</h1><p>De la primera llegada al cierre de la consulta, una jornada en orden.</p></div>
+  @if (store.has('ADMIN','RECEPCION','MEDICO')) { <button class="primary" (click)="newAppointment()" [disabled]="store.blocked()"><app-icon name="plus"/>Reservar cita</button> }
+</header>
+<p class="notice"><app-icon name="calendar"/> Horarios de Ciudad de México. Esta es la agenda principal del consultorio. Doctoralia solo aporta captación; registra aquí los contactos confirmados por recepción.</p>
+<section class="panel" aria-label="Jornada del consultorio">
+  <form class="toolbar" (ngSubmit)="filter()">
+    <button type="button" (click)="shiftDay(-1)" aria-label="Día anterior">‹</button>
+    <label>Fecha<input type="date" name="date" [(ngModel)]="date" required (change)="filter()" aria-label="Fecha de la jornada"></label>
+    <button type="button" (click)="shiftDay(1)" aria-label="Día siguiente">›</button><button type="button" (click)="goToday()">Hoy</button>
+    <label>Estado<select name="status" [(ngModel)]="status" (change)="filter()"><option value="">Todos los estados</option>@for (state of states; track state.value) { <option [value]="state.value">{{state.label}}</option> }</select></label>
+    <button type="submit" [disabled]="rows.loading()">Actualizar</button>
+  </form>
+  <div class="table-scroll" role="region" tabindex="0" aria-label="Citas de la jornada" [attr.aria-busy]="rows.loading()">
+    <table><thead><tr><th>Horario</th><th>Paciente</th><th>Atención</th><th>Estado</th><th><span class="sr-only">Acciones</span></th></tr></thead><tbody>
+      @for (appointment of rows.items(); track appointment.id) {
+        <tr><td><strong>{{time(appointment.startsAt)}}</strong><small>hasta {{time(appointment.endsAt)}} · {{appointment.durationMinutes}} min</small></td><td><div class="identity-cell"><span class="row-icon"><app-icon name="users"/></span><div><strong>{{appointment.patientName}}</strong><small class="mono">{{appointment.patientReference}}</small></div></div></td><td>{{appointment.service}}<small>{{appointment.practitioner}} · {{appointment.resource}}</small></td><td><span class="badge" [class.soft]="appointment.status === 'BOOKED' || appointment.status === 'COMPLETED'" [class.warning]="appointment.status === 'ARRIVED'" [class.active]="appointment.status === 'IN_CONSULTATION'">{{stateLabel(appointment.status)}}</span><small>{{appointment.source === 'DOCTORALIA_MANUAL' ? 'Captación · Doctoralia' : 'Agenda del consultorio'}}</small></td><td><button class="quiet" (click)="show(appointment)" [attr.aria-label]="'Abrir cita de ' + appointment.patientName + ' a las ' + time(appointment.startsAt)">Abrir<app-icon name="arrow"/></button></td></tr>
+      } @empty { <tr><td colspan="5" class="empty-state">{{rows.loading() ? 'Consultando la jornada…' : rows.failed() ? 'No pudimos consultar la agenda. Pulsa Actualizar para reintentar.' : 'No hay citas para esta fecha y estado. Prueba otra fecha o reserva una cita.'}}</td></tr> }
+    </tbody></table>
+  </div><clinic-pager [page]="rows"/>
+</section>
+
+@if (editor() && !confirmationRecovered()) {
+  <clinic-dialog [heading]="editor() === 'new' ? 'Reservar cita' : 'Reprogramar cita'" description="Fecha y hora de Ciudad de México. Verificaremos los conflictos al guardar." (closed)="close()">
+    @if (formError()) { <p class="notice error" role="alert">{{formError()}}</p> }
+    @if (store.pending()) { <p class="notice" role="status">La operación espera confirmación. Cierra este diálogo y usa «Reintentar» en el aviso del portal; se conserva la misma solicitud.</p> }
+    <ng-container [ngTemplateOutlet]="conflictReview"/>
+    @if (editor() === 'new') {
+      <form class="toolbar" (ngSubmit)="patients.filter({q:patientSearch})"><label class="search-field"><app-icon name="search"/><input name="patientSearch" [(ngModel)]="patientSearch" maxlength="160" placeholder="Nombre o referencia del paciente" aria-label="Buscar paciente para la cita"></label><button type="submit" [disabled]="patients.loading() || store.blocked()">Buscar</button></form>
+      @if (selectedPatient(); as selected) { <div class="notice"><strong>Paciente seleccionado: {{selected.fullName}}</strong><p>{{selected.reference}} · {{dateLabel(selected.birthDate)}}</p><button type="button" (click)="selectedPatient.set(null)" [disabled]="store.blocked()">Cambiar paciente</button></div> }
+      @else {
+        <ul class="compact-list" aria-label="Pacientes disponibles">@for (patient of patients.items(); track patient.id) { <li><div><strong>{{patient.fullName}}</strong><small>{{patient.reference}} · {{dateLabel(patient.birthDate)}}</small></div><button type="button" (click)="selectedPatient.set(patient)" [disabled]="store.blocked()" [attr.aria-label]="'Seleccionar a ' + patient.fullName + ', referencia ' + patient.reference">Seleccionar</button></li> } @empty { <li class="empty-state">{{patients.loading() ? 'Buscando pacientes…' : patients.failed() ? 'No pudimos consultar los pacientes. Reintenta la búsqueda.' : 'No encontramos coincidencias. Registra primero al paciente en el directorio.'}}</li> }</ul>
+        <clinic-pager [page]="patients"/>
+      }
+    } @else if (detail(); as appointment) { <p class="notice"><strong>{{appointment.patientName}}</strong> · {{appointment.patientReference}}<br>La cita conserva el mismo paciente.</p> }
+    <form (ngSubmit)="save()" #form="ngForm"><fieldset [disabled]="store.blocked()">
+      <div class="fields">
+        <label>Fecha y hora · Ciudad de México<input type="datetime-local" name="localStart" [(ngModel)]="draft.localStart" required></label>
+        <label>Duración en minutos<input type="number" name="durationMinutes" [(ngModel)]="draft.durationMinutes" min="5" max="480" step="1" required></label>
+        <label>Servicio<input name="service" [(ngModel)]="draft.service" required maxlength="120" placeholder="Ej. Consulta de seguimiento"></label>
+        <label>Profesional<input name="practitioner" [(ngModel)]="draft.practitioner" required maxlength="80" placeholder="MEDICO-1"><small>Usa siempre la misma referencia para evitar cruces.</small></label>
+        <label>Consultorio o equipo<input name="resource" [(ngModel)]="draft.resource" required maxlength="80" placeholder="CONSULTORIO-1"><small>Para equipos, usa su referencia del módulo Equipos.</small></label>
+        <label>Origen<select name="source" [(ngModel)]="draft.source"><option value="LOCAL">Agenda del consultorio</option><option value="DOCTORALIA_MANUAL">Contacto desde Doctoralia</option></select></label>
+        @if (draft.source === 'DOCTORALIA_MANUAL') { <label>Referencia del contacto de Doctoralia<input name="externalReference" [(ngModel)]="draft.externalReference" required maxlength="100" placeholder="Referencia única asignada al contacto"><small>Recepción confirma el horario en esta agenda. No existe sincronización con Doctoralia.</small></label> }
+      </div>
+      <p class="field-help">Solo pacientes y citas sintéticos en este entorno. La reserva no envía mensajes al paciente.</p>
+      <div class="form-actions"><button type="button" (click)="close()">Cancelar</button><button type="submit" class="primary" [disabled]="form.invalid || conflictRequired() || (editor() === 'reschedule' && detail()?.status !== 'BOOKED') || (editor() === 'new' && !selectedPatient())">{{editor() === 'new' ? 'Confirmar reserva' : 'Guardar nuevo horario'}}</button></div>
+    </fieldset></form>
+  </clinic-dialog>
+} @else if (detail(); as appointment) {
+  <clinic-dialog [heading]="appointment.patientName" [description]="appointment.patientReference + ' · ' + dateTime(appointment.startsAt)" (closed)="close()">
+    @if (confirmationRecovered()) { <p class="notice" role="status">La operación se confirmó al reintentar. Actualiza este detalle para consultar su estado actual.</p><button (click)="show(appointment)">Actualizar detalle</button> }
+    @if (detailLoading()) { <p role="status">Actualizando la cita…</p> }
+    @if (detailError()) { <p class="notice error" role="alert">{{detailError()}}</p><button (click)="show(appointment)">Reintentar consulta</button> }
+    @if (formError()) { <p class="notice error" role="alert">{{formError()}}</p> }
+    @if (store.pending()) { <p class="notice" role="status">Hay una operación pendiente de confirmar. Cierra el detalle y reintenta desde el aviso del portal.</p> }
+    <ng-container [ngTemplateOutlet]="conflictReview"/>
+    <span class="badge soft">{{stateLabel(appointment.status)}}</span>
+    <dl class="detail-metrics"><div><dt>Servicio</dt><dd>{{appointment.service}}</dd></div><div><dt>Horario</dt><dd>{{time(appointment.startsAt)}}–{{time(appointment.endsAt)}}</dd></div><div><dt>Profesional</dt><dd>{{appointment.practitioner}}</dd></div><div><dt>Consultorio o equipo</dt><dd>{{appointment.resource}}</dd></div><div><dt>Origen</dt><dd>{{appointment.source === 'DOCTORALIA_MANUAL' ? 'Contacto desde Doctoralia' : 'Agenda del consultorio'}}</dd></div>@if (appointment.externalReference) { <div><dt>Referencia externa</dt><dd>{{appointment.externalReference}}</dd></div> }</dl>
+    @if (appointment.cancellationReason) { <p class="notice"><strong>Motivo de cancelación:</strong> {{appointment.cancellationReason}}</p> }
+    @if (store.has('ADMIN','RECEPCION','MEDICO')) {
+      <fieldset [disabled]="store.blocked() || detailLoading() || !!detailError() || confirmationRecovered() || conflictRequired()">
+        <div class="form-actions">
+          @if (appointment.status === 'BOOKED') { <button class="primary" (click)="transition('ARRIVED')"><app-icon name="users"/>Registrar llegada</button><button (click)="reschedule()">Reprogramar</button> }
+          @if (appointment.status === 'ARRIVED' && store.has('ADMIN','MEDICO')) { <button class="primary" (click)="transition('IN_CONSULTATION')">Iniciar consulta<app-icon name="arrow"/></button> }
+          @if (appointment.status === 'ARRIVED' && !store.has('ADMIN','MEDICO')) { <p class="field-help">En sala de espera. El personal médico puede iniciar la consulta.</p> }
+          @if (appointment.status === 'IN_CONSULTATION' && store.has('ADMIN','MEDICO')) { <button class="primary" (click)="transition('COMPLETED')">Finalizar consulta</button> }
+          @if ((appointment.status === 'BOOKED' || appointment.status === 'ARRIVED') && !cancelling()) { <button class="quiet" (click)="requestCancellation()">Cancelar cita</button> }
+        </div>
+        @if (cancelling()) { <form (ngSubmit)="transition('CANCELLED')" #cancelForm="ngForm"><label>Motivo administrativo de cancelación<input name="cancellationReason" [(ngModel)]="cancellationReason" required maxlength="240" placeholder="Ej. Solicitud de reprogramación"></label><p class="field-help">Se libera el horario y se conserva el historial de esta cita.</p><div class="form-actions"><button type="button" (click)="cancelling.set(false)">Conservar cita</button><button type="submit" [disabled]="cancelForm.invalid || !cancellationReason.trim()">Confirmar cancelación</button></div></form> }
+      </fieldset>
+    }
+    <h3>Historial de la cita</h3>
+    @if (historyError()) { <p class="notice error" role="alert">{{historyError()}}</p><button (click)="loadHistory(historyOffset())">Reintentar historial</button> }
+    @if (historyLoading()) { <p role="status">Consultando historial…</p> }
+    <ul class="compact-list">@for (event of history(); track event.id) { <li><div><strong>{{eventLabel(event)}}</strong><small>{{dateTime(event.createdAt)}} · {{event.actor}}</small><p>{{event.reason}}</p><small>Horario registrado: {{dateTime(event.startsAt)}} · {{event.resource}}</small></div></li> } @empty { @if (!historyLoading() && !historyError()) { <li class="empty-state">El historial estará disponible al confirmar el registro.</li> } }</ul>
+    @if (historyOffset() > 0 || historyMore()) { <div class="form-actions"><button (click)="loadHistory(historyOffset()-5)" [disabled]="historyLoading() || historyOffset()===0">Anteriores</button><button (click)="loadHistory(historyOffset()+5)" [disabled]="historyLoading() || !historyMore()">Siguientes</button></div> }
+  </clinic-dialog>
+}
+
+<ng-template #conflictReview>
+  @if (conflictRequired()) {
+    <section class="notice warning" aria-label="Comparar cambios de la cita">
+      <h3>La cita cambió en otra sesión</h3><p>Conservamos tu borrador. Compara la versión actual; ninguna acción se repetirá automáticamente.</p>
+      @if (conflictLoading()) { <p role="status">Consultando la versión actual…</p> }
+      @if (conflict(); as current) {
+        <p>Versión revisada: {{detail()?.version}} · Versión actual: {{current.version}}</p>
+        @if (attemptedTransition(); as attempted) { <p>Acción que intentabas confirmar: {{stateLabel(attempted)}}.@if (attempted === 'CANCELLED') { Motivo conservado: {{cancellationReason}} }</p> }
+        <div class="table-scroll" role="region" tabindex="0" aria-label="Datos actuales y borrador de la cita"><table><thead><tr><th>Campo</th><th>Actual en servidor</th><th>{{editor() ? 'Tu borrador' : 'Versión que revisaste'}}</th></tr></thead><tbody>@for (row of conflictRows(); track row.label) { <tr><th scope="row">{{row.label}}</th><td>{{row.current}}</td><td>{{row.draft}}</td></tr> }</tbody></table></div>
+        <button type="button" (click)="acceptConflict()" [disabled]="store.blocked() || conflictLoading()">{{editor() ? 'Usar versión actual y conservar mi borrador' : 'Usar estado actual sin repetir la acción'}}</button>
+      } @else if (!conflictLoading()) { <p>No pudimos obtener la versión actual. Tu borrador permanece aquí.</p><button type="button" (click)="loadConflict()" [disabled]="store.blocked()">Reintentar comparación</button> }
+    </section>
+  }
+</ng-template>

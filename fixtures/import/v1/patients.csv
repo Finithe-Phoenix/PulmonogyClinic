@@ -1,0 +1,3 @@
+sourceId,reference,fullName,birthDate,phone,email,synthetic
+PERSON-001,SYN-PILOT-PAC-001,Persona Ficticia Alba,1990-05-17,,alba@example.invalid,true
+PERSON-002,SYN-PILOT-PAC-002,Persona Ficticia Bruno,1985-11-03,,bruno@example.invalid,true

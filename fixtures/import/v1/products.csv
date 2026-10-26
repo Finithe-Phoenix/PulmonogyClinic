@@ -1,0 +1,3 @@
+sourceId,sku,name,category,unit,minimumStock,synthetic
+PROD-001,SYN-PILOT-INSUMO-001,"Insumo ficticio, paquete de muestra",INSUMOS,pieza,5,true
+PROD-002,SYN-PILOT-CATEGORIA-002,Artículo ficticio de categoría farmacia sin uso clínico,FARMACIA,pieza,2,true

@@ -37,9 +37,19 @@ public class PurchasingService {
     public PurchasingService(JdbcTemplate jdbc, CommandService commands, InventoryService inventory, Clock clock) {
         this.jdbc = jdbc; this.commands = commands; this.inventory = inventory; this.clock = clock;
     }
-    public Page<Supplier> suppliers(int limit, int offset) {
+    public Page<Supplier> suppliers(int limit, int offset) { return suppliers(null, limit, offset); }
+    public Page<Supplier> suppliers(String q, int limit, int offset) {
         pageBounds(limit, offset);
-        return new Page<>(jdbc.query("SELECT * FROM purchase_supplier ORDER BY reference LIMIT ? OFFSET ?", SUPPLIER, limit, offset), limit, offset);
+        String query = searchText(q);
+        var args = new ArrayList<Object>();
+        String sql = "SELECT * FROM purchase_supplier";
+        if (!query.isEmpty()) {
+            sql += " WHERE position(lower(?) in lower(concat_ws(' ', reference, name))) > 0";
+            args.add(query);
+        }
+        sql += " ORDER BY reference, id LIMIT ? OFFSET ?";
+        args.add(limit); args.add(offset);
+        return new Page<>(jdbc.query(sql, SUPPLIER, args.toArray()), limit, offset);
     }
     public Supplier createSupplier(UUID key, String actor, SupplierInput input) {
         return commands.execute(key, actor, "CREATE_SUPPLIER", input, Supplier.class, () -> {
@@ -85,15 +95,22 @@ public class PurchasingService {
         long received = lines.stream().mapToLong(l -> (long)l.received() * l.unitCostCents()).sum();
         return new Order(id, header.reference(), header.supplierId(), header.date(), header.expectedOn(), header.currency(), status(header.cancelled(), total, received), header.cancellationReason(), lines, total, received, header.cancelled() ? 0 : total - received);
     }
-    public Page<OrderSummary> orders(UUID supplierId, int limit, int offset) {
+    public Page<OrderSummary> orders(UUID supplierId, int limit, int offset) { return orders(supplierId, null, limit, offset); }
+    public Page<OrderSummary> orders(UUID supplierId, String q, int limit, int offset) {
         pageBounds(limit, offset);
+        String query = searchText(q);
         var args = new ArrayList<Object>();
         String sql = """
             SELECT o.*, sum(l.ordered::bigint * l.unit_cost_cents) total_cents,
                    sum(l.received::bigint * l.unit_cost_cents) received_cents
             FROM purchase_order o JOIN purchase_line l ON l.order_id = o.id
+            JOIN purchase_supplier s ON s.id = o.supplier_id WHERE 1=1
             """;
-        if (supplierId != null) { sql += " WHERE o.supplier_id = ?"; args.add(supplierId); }
+        if (supplierId != null) { sql += " AND o.supplier_id = ?"; args.add(supplierId); }
+        if (!query.isEmpty()) {
+            sql += " AND position(lower(?) in lower(concat_ws(' ', o.reference, s.reference, s.name))) > 0";
+            args.add(query);
+        }
         sql += " GROUP BY o.id ORDER BY o.created_at DESC, o.id LIMIT ? OFFSET ?";
         args.add(limit); args.add(offset);
         return new Page<>(jdbc.query(sql, (r,n) -> {
@@ -162,5 +179,11 @@ public class PurchasingService {
     private static ApiProblem invalid(String message) { return new ApiProblem(HttpStatus.BAD_REQUEST, "INVALID_PURCHASE", message); }
     private static void pageBounds(int limit, int offset) {
         if (limit < 1 || limit > 100 || offset < 0 || offset > 1000000) throw invalid("Revisa los límites de paginación.");
+    }
+    private static String searchText(String q) {
+        String query = q == null ? "" : q.strip();
+        if (query.length() > 160)
+            throw new ApiProblem(HttpStatus.BAD_REQUEST, "INVALID_SEARCH", "La búsqueda admite hasta 160 caracteres.");
+        return query;
     }
 }

@@ -21,12 +21,29 @@ public class InventoryService {
     private final Clock clock;
     private static final RowMapper<Product> PRODUCT = (r, n) -> new Product(r.getObject("id", UUID.class), r.getString("sku"), r.getString("name"), Category.valueOf(r.getString("category")), r.getString("unit"), r.getInt("minimum_stock"));
     private static final RowMapper<Lot> LOT = (r, n) -> new Lot(r.getObject("id", UUID.class), r.getObject("product_id", UUID.class), r.getString("batch"), r.getObject("expires_on", LocalDate.class), r.getInt("quantity"), r.getBoolean("quarantined"));
+    private static final RowMapper<LotView> LOT_VIEW = (r, n) -> new LotView(r.getObject("id", UUID.class), r.getObject("product_id", UUID.class), r.getString("batch"), r.getObject("expires_on", LocalDate.class), r.getInt("quantity"), r.getBoolean("quarantined"), r.getString("product_name"), r.getString("product_sku"));
+    private static final String LOT_VIEW_SELECT = "SELECT l.*, p.name AS product_name, p.sku AS product_sku FROM inventory_lot l JOIN inventory_product p ON p.id = l.product_id";
     private static final RowMapper<Movement> MOVEMENT = (r, n) -> new Movement(r.getObject("id", UUID.class), r.getObject("lot_id", UUID.class), MovementKind.valueOf(r.getString("kind")), r.getInt("quantity"), r.getInt("balance_after"), r.getString("reason"), r.getString("actor"), r.getObject("created_at", OffsetDateTime.class).toInstant());
     public InventoryService(JdbcTemplate jdbc, CommandService commands, Clock clock) { this.jdbc = jdbc; this.commands = commands; this.clock = clock; }
 
-    public Page<Product> products(int limit, int offset) {
+    public Page<Product> products(int limit, int offset) { return products(null, limit, offset); }
+    public Page<Product> products(String q, int limit, int offset) {
         pageBounds(limit, offset);
-        return new Page<>(jdbc.query("SELECT * FROM inventory_product ORDER BY sku LIMIT ? OFFSET ?", PRODUCT, limit, offset), limit, offset);
+        String query = searchText(q);
+        var args = new java.util.ArrayList<Object>();
+        String sql = "SELECT * FROM inventory_product";
+        if (!query.isEmpty()) {
+            sql += " WHERE position(lower(?) in lower(concat_ws(' ', sku, name, category))) > 0";
+            args.add(query);
+        }
+        sql += " ORDER BY sku, id LIMIT ? OFFSET ?";
+        args.add(limit); args.add(offset);
+        return new Page<>(jdbc.query(sql, PRODUCT, args.toArray()), limit, offset);
+    }
+    public Product product(UUID id) {
+        var found = jdbc.query("SELECT * FROM inventory_product WHERE id = ?", PRODUCT, id);
+        if (found.isEmpty()) throw ApiProblem.missing();
+        return found.getFirst();
     }
     public Product createProduct(UUID key, String actor, ProductInput input) {
         return commands.execute(key, actor, "CREATE_PRODUCT", input, Product.class, () -> {
@@ -37,16 +54,35 @@ public class InventoryService {
         });
     }
     public Page<Lot> lots(UUID productId, boolean availableOnly, int limit, int offset) {
+        return lots(productId, availableOnly, null, limit, offset);
+    }
+    public Page<Lot> lots(UUID productId, boolean availableOnly, String q, int limit, int offset) {
+        return queryLots(productId, availableOnly, q, limit, offset, LOT);
+    }
+    public Page<LotView> lotViews(UUID productId, boolean availableOnly, String q, int limit, int offset) {
+        return queryLots(productId, availableOnly, q, limit, offset, LOT_VIEW);
+    }
+    private <T> Page<T> queryLots(UUID productId, boolean availableOnly, String q, int limit, int offset, RowMapper<T> mapper) {
         pageBounds(limit, offset);
+        String query = searchText(q);
         var args = new java.util.ArrayList<Object>();
-        String sql = "SELECT * FROM inventory_lot WHERE 1=1";
-        if (productId != null) { sql += " AND product_id = ?"; args.add(productId); }
-        if (availableOnly) { sql += " AND quantity > 0 AND NOT quarantined AND (expires_on IS NULL OR expires_on >= ?)"; args.add(LocalDate.now(clock)); }
-        sql += " ORDER BY expires_on NULLS LAST, id LIMIT ? OFFSET ?";
+        String sql = LOT_VIEW_SELECT + " WHERE 1=1";
+        if (productId != null) { sql += " AND l.product_id = ?"; args.add(productId); }
+        if (availableOnly) { sql += " AND l.quantity > 0 AND NOT l.quarantined AND (l.expires_on IS NULL OR l.expires_on >= ?)"; args.add(LocalDate.now(clock)); }
+        if (!query.isEmpty()) {
+            sql += " AND position(lower(?) in lower(concat_ws(' ', l.batch, p.sku, p.name))) > 0";
+            args.add(query);
+        }
+        sql += " ORDER BY l.expires_on NULLS LAST, l.id LIMIT ? OFFSET ?";
         args.add(limit); args.add(offset);
-        return new Page<>(jdbc.query(sql, LOT, args.toArray()), limit, offset);
+        return new Page<>(jdbc.query(sql, mapper, args.toArray()), limit, offset);
     }
     public Lot lot(UUID id) { return findLot(id, false); }
+    public LotView lotView(UUID id) {
+        var found = jdbc.query(LOT_VIEW_SELECT + " WHERE l.id = ?", LOT_VIEW, id);
+        if (found.isEmpty()) throw ApiProblem.missing();
+        return found.getFirst();
+    }
     public Lot createLot(UUID key, String actor, LotInput input) {
         return commands.execute(key, actor, "CREATE_LOT", input, Lot.class, () -> {
             var products = jdbc.query("SELECT * FROM inventory_product WHERE id = ?", PRODUCT, input.productId());
@@ -132,5 +168,12 @@ public class InventoryService {
     private void pageBounds(int limit, int offset) {
         if (limit < 1 || limit > 100 || offset < 0 || offset > 1000000)
             throw new ApiProblem(HttpStatus.BAD_REQUEST, "INVALID_PAGE", "El límite debe ser de 1 a 100 y el desplazamiento de 0 a 1000000.");
+    }
+    private static String searchText(String q) {
+        String query = q == null ? "" : q.strip();
+        if (query.length() > 160)
+            throw new ApiProblem(HttpStatus.BAD_REQUEST, "INVALID_SEARCH", "La búsqueda admite hasta 160 caracteres.");
+        // POSITION gives literal substring semantics, including %, _ and backslashes.
+        return query;
     }
 }

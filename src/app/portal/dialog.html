@@ -1,0 +1,6 @@
+<dialog aria-labelledby="dialog-title" aria-describedby="dialog-description" (cancel)="$event.preventDefault(); close()" (focusin)="rememberFocus($event)">
+  <header class="dialog-heading"><div><span class="eyebrow">REGISTRO EN EL SERVIDOR</span><h2 id="dialog-title">{{heading()}}</h2><p id="dialog-description">{{description()}}</p></div><button class="icon-button" type="button" aria-label="Cerrar formulario" (click)="close()"><app-icon name="close" /></button></header>
+  @if(store.error()){<div role="alert" class="notice error">{{store.error()}}</div>}
+  @if(store.pending()){<div role="status" class="notice warning"><span>Operación pendiente de confirmación. Conservamos la misma clave.</span><button type="button" (click)="recover()" [disabled]="store.busy() || store.sessionLocked()">Reintentar operación</button></div>}
+  <ng-content />
+</dialog>

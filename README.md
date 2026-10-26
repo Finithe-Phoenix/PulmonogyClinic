@@ -2,15 +2,15 @@
 
 Proyecto digital del Dr. Marco Antonio De Nova Macedo: sitio profesional propuesto y plataforma de demostración para consultorio, farmacia y caja.
 
-**Estado: v0.5.0 — sitio/demo públicos + portal privado local conectado a inventario y compras. Todos los pacientes, proveedores, compras, notas, productos, lotes, equipos y cobros son ficticios. No usar para atención clínica ni capturar datos reales.**
+**v0.6.0 — rediseño Paper & Ink y portal privado conectado a inventario, compras, pacientes administrativos, agenda, caja y equipos. Todos los registros son ficticios. No usar para atención clínica ni capturar datos reales.** Las ejecuciones locales y la publicación remota se acreditan por separado en [validación](docs/VALIDATION.md).
 
 [Abrir sitio y demo publicados](https://finithe-phoenix.github.io/PulmonogyClinic/) · [Iniciar portal privado local](docs/PRIVATE_PORTAL.md) · [Diagnóstico y pendientes por dependencia](docs/SESSION_2026-09-28.md)
 
-La v0.5.0 completa el recorrido local **inicio de sesión → proveedor → orden → recepción parcial → existencias → auditoría** con Keycloak/PKCE, roles de servidor y PostgreSQL. El portal se compila por separado y no se publica en Pages. Requiere Node 24 y Docker: `npm ci`, `npm run build:portal`, `npm run dev:private`, `node scripts/wait-private.mjs`; abrir `http://localhost:4180/`. Las contraseñas sintéticas se generan en `.local/private.env`, excluido del repositorio. [Guía y límites](docs/PRIVATE_PORTAL.md).
+El recorrido local **inicio de sesión → proveedor → orden → recepción parcial → existencias → auditoría** conserva Keycloak/PKCE, autorización de servidor y PostgreSQL. Se añaden pacientes/agenda, turnos/cobros/reversos/cierre y activos/mantenimiento. El portal se compila por separado y no se publica en Pages. Requiere Node 24 y Docker: `npm ci`, `npm run build:portal`, `npm run dev:private`, `node scripts/wait-private.mjs`; abrir `http://localhost:4180/`. Las contraseñas sintéticas se generan en `.local/private.env`, excluido del repositorio. [Guía y límites](docs/PRIVATE_PORTAL.md).
 
-![Propuesta del sitio del doctor](docs/previews/sitio-desktop.jpg)
+[Sistema visual](docs/DESIGN_SYSTEM.md) · [Guion de demo](docs/DEMO_GUIDE.md) · [Respaldo/restauración ensayados](docs/BACKUP_RESTORE.md) · [Arquitectura clínica y decisiones pendientes](docs/CLINICAL_READINESS.md) · [Backlog por dependencia](docs/BACKLOG.md). Las capturas anteriores de `docs/previews` son históricas y no representan el rediseño actual.
 
-[Sitio completo](docs/previews/sitio-completo.png) · [Sitio en celular](docs/previews/sitio-mobile.jpg) · [Inventario en escritorio](docs/previews/inventario-desktop.png) · [Inventario en celular](docs/previews/inventario-mobile.png) · [Ver el panel de gestión](docs/previews/panel-desktop.png) · [Compras en escritorio](docs/previews/compras-desktop.png) · [Compras en celular](docs/previews/compras-mobile.png) · [Guion para presentar la demo](docs/DEMO_GUIDE.md) · [Validaciones y límites](docs/VALIDATION.md)
+**Decisiones confirmadas:** el portal es la agenda principal; Doctoralia solo exposición/captación. El expediente será propio y caja tendrá cobros vinculados a citas e independientes: esos dos desarrollos siguen pendientes, no se presentan como terminados en esta entrega. [Alcance y límites](docs/PRODUCT_DECISIONS.md). [Preparación privada y permisos ensayados](docs/PRIVATE_DEPLOYMENT.md) · [Planificador de importación sin escrituras](docs/IMPORT_AND_COUNT.md) · [Guía de piloto humano pendiente](docs/PILOT_RUNBOOK.md).
 
 ## Ejecutar
 
@@ -60,7 +60,7 @@ Los cambios de la demo se conservan en `localStorage` de ese navegador. **La int
 
 La v0.4.0 agrega al servidor **proveedores, órdenes de varias partidas y recepciones parciales**. Crear una orden no cambia el stock. Confirmar una entrega guarda lote, entrada, costo de la partida, saldo recibido y auditoría en una sola transacción; una cancelación administrativa conserva lo recibido y cierra únicamente lo pendiente. Incluye migración desde la v0.3.0 y pruebas de reintentos, permisos y concurrencia. [Contrato de compras](backend/docs/PURCHASING_API.md).
 
-**Validación local:** 96 casos aprobados: 25 de reglas, 22 de demo en navegador, 39 del servidor con PostgreSQL (incluida la migración) y 10 del portal con identidad real de desarrollo. [Ejecuciones y límites](docs/VALIDATION.md).
+**Validación:** la base v0.5.0 tenía 96 casos. La iteración actual amplía reglas, API/PostgreSQL, navegador, accesibilidad, recuperación y comparación de respaldos. No se suman ejecuciones históricas a la cobertura actual: [resultados por suite, estado y límites](docs/VALIDATION.md).
 
 Fecha operativa fija: **28 de septiembre de 2026**, señalada en la interfaz para que los casos de caducidad y conciliación sean reproducibles. Precios y equipos son ejemplos, no información comercial validada.
 

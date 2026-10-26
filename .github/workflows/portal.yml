@@ -26,7 +26,9 @@ jobs:
       - name: Start isolated synthetic stack
         run: npm run dev:private
       - run: node scripts/wait-private.mjs
-      - name: Real login, persistence, retry, roles and concurrent receipt
+      - name: Reject accidentally included local secrets
+        run: node scripts/check-private-leaks.mjs
+      - name: Real identity, operational journeys, recovery, accessibility and concurrency
         run: npm run test:portal
       - name: Save results without credentials or authentication traces
         if: always()

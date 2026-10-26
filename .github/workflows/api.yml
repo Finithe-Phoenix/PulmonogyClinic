@@ -44,3 +44,41 @@ jobs:
           name: private-api-test-report
           path: backend/target/surefire-reports/
           retention-days: 7
+
+  database-privileges:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    # This job gets its own disposable PostgreSQL service; never the integration DB.
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_DB: clinic_roles_fixture
+          POSTGRES_USER: roles_test_admin
+          POSTGRES_PASSWORD: synthetic-role-ci-only
+        ports: [5432:5432]
+        options: >-
+          --health-cmd "pg_isready -U roles_test_admin -d clinic_roles_fixture"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+      - name: Exercise separate migration and runtime logins
+        run: mvn -B -ntp -f backend/pom.xml -Dtest=DatabasePrivilegesRehearsal test
+        env:
+          ROLE_TEST_ISOLATED: 'true'
+          ROLE_TEST_DB_URL: jdbc:postgresql://127.0.0.1:5432/clinic_roles_fixture
+          ROLE_TEST_DB_USER: roles_test_admin
+          ROLE_TEST_DB_PASSWORD: synthetic-role-ci-only
+          ROLE_TEST_ACCESS_SQL: ${{ github.workspace }}/infra/prod/database-access.sql
+      - name: Save synthetic database privilege results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: database-privilege-report
+          path: backend/target/surefire-reports/
+          retention-days: 7

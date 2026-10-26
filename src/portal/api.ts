@@ -3,7 +3,8 @@ export interface Supplier { id: string; reference: string; name: string }
 export interface OrderSummary { id: string; reference: string; supplierId: string; status: string; totalCents: number; receivedCents: number; pendingCents: number }
 export interface OrderLine { id: string; productId: string; productName: string; ordered: number; received: number; unitCostCents: number }
 export interface Order extends OrderSummary { lines: OrderLine[]; cancellationReason: string | null }
-export interface Lot { id: string; productId: string; batch: string; expiresOn: string | null; quantity: number; quarantined: boolean }
+export interface Lot { id: string; productId: string; productName?: string; productSku?: string; batch: string; expiresOn: string | null; quantity: number; quarantined: boolean }
+export interface Movement { id: string; lotId: string; kind: string; quantity: number; balanceAfter: number; reason: string; actor: string; createdAt: string }
 export interface Audit { id: number; action: string; actor: string; entityId: string; reason: string; createdAt: string }
 export interface Receipt { id: string; reference: string; orderId: string; batch: string; quantity: number; actor: string }
 export interface PendingCommand { subject: string; path: string; body: unknown; key: string }

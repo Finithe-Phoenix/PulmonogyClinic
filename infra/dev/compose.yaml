@@ -21,7 +21,10 @@ services:
       DEV_AUDITOR_PASSWORD: ${DEV_AUDITOR_PASSWORD:?}
       DEV_RECEPTION_PASSWORD: ${DEV_RECEPTION_PASSWORD:?}
     ports: ["127.0.0.1:8180:8080"]
-    volumes: ["./clinic-dev-realm.json:/opt/keycloak/data/import/clinic-dev-realm.json:ro"]
+    volumes:
+      - identity-data:/opt/keycloak/data
+      - ./clinic-dev-realm.json:/opt/keycloak/data/import/clinic-dev-realm.json:ro
+      - ./themes/pulmonogy:/opt/keycloak/themes/pulmonogy:ro
   api:
     build: ../../backend
     environment:
@@ -71,5 +74,7 @@ services:
     depends_on:
       test-db: {condition: service_healthy}
 volumes:
+  identity-data:
+    name: pulmonogy-private-dev-identity-data
   clinic-dev:
   maven-cache:
